@@ -33,7 +33,8 @@ const systemState = {
     tpm: false,
     immutable: false,
     zerotrust: false,
-    sdcardMode: false
+    sdcardMode: false,
+    autoUpdate: false
   },
   tour: {
     step: 0,
@@ -829,10 +830,29 @@ function handleTerminalCommand(e, input) {
   gpg -c [text]              - Run symmetric AES encryption pipeline.
   ssh-e2ee [remote_ip]       - Establish E2EE remote terminal session.
   exit                       - Disconnect remote session or close terminal.
+  tomb-upgrade               - Automatically update all compliant OSS security frameworks.
   clear                      - Purge terminal lines.`;
           break;
         case 'whoami':
           output = `sec-admin (System Administrator, UID: 0 - root context active)`;
+          break;
+        case 'tomb-upgrade':
+          const hash1 = generateInteractionHash();
+          const hash2 = generateInteractionHash();
+          const hash3 = generateInteractionHash();
+          output = `[TOMB-UPGRADE] Initiating secure synchronization with upstream OSS databases...
+[TOMB-UPGRADE] Contacting mirrors: security.tomb-os.org
+[TOMB-UPGRADE] Fetching compliant open-source frameworks:
+  - AppArmor security profiles: v3.1.2-tomb (Up to date)
+    -> Verified signature key: [${hash1}]
+  - UFW Netfilter tables: v0.36-compliant (Update available!)
+    -> Compiling new UFW packet filters...
+    -> Verified signature key: [${hash2}]
+  - Suricata intrusion signatures: v7.0.3-hardened (Update available!)
+    -> Merging Snort-compliant signatures...
+    -> Verified signature key: [${hash3}]
+[TOMB-UPGRADE] System upgraded successfully. Open source security engines expanded and verified.`;
+          logAudit("Manual OSS framework security upgrade executed.");
           break;
         case 'ssh-e2ee':
           const remoteIp = args[1];
@@ -1987,6 +2007,21 @@ function renderUltimateWrapper() {
             </label>
           </div>
         </div>
+        <div class="ultimate-card">
+          <div class="ultimate-card-header">
+            <span class="ultimate-card-tag">AUTO-UPGRADES</span>
+            <span class="ultimate-card-status ${systemState.ultimate.autoUpdate ? 'enforced' : 'inactive'}" id="ultimate-status-autoUpdate">${systemState.ultimate.autoUpdate ? 'AUTO UPDATES ACTIVE' : 'MANUAL UPDATES ONLY'}</span>
+          </div>
+          <span class="ultimate-card-title">Compliant OSS Framework Auto-Updates</span>
+          <span class="ultimate-card-desc">Automatically fetch, cryptographically verify, and apply patches for open-source frameworks (AppArmor, UFW, Snort/Suricata).</span>
+          <div class="ultimate-card-action">
+            <span class="ultimate-action-lbl">Auto-Upgrade OSS Frameworks</span>
+            <label class="aa-switch">
+              <input type="checkbox" ${systemState.ultimate.autoUpdate ? 'checked' : ''} onchange="toggleUltimateControl('autoUpdate', this)" aria-label="Activate open source security auto updates">
+              <span class="aa-slider"></span>
+            </label>
+          </div>
+        </div>
       </div>
       <div class="ultimate-interactive-logs" id="ultimate-logs">
         <div class="ultimate-log-row info">[SECURE ENGINE] Monitoring advanced containment vectors...</div>
@@ -2010,6 +2045,8 @@ function toggleUltimateControl(key, checkbox) {
       statusBadge.textContent = checkbox.checked ? 'ZERO TRUST ACTIVE' : 'OPEN COMMS';
     } else if (key === 'sdcardMode') {
       statusBadge.textContent = checkbox.checked ? 'LIVE SD BOOT' : 'HARD DRIVE BOOT';
+    } else if (key === 'autoUpdate') {
+      statusBadge.textContent = checkbox.checked ? 'AUTO UPDATES ACTIVE' : 'MANUAL UPDATES ONLY';
     }
     statusBadge.className = `ultimate-card-status ${checkbox.checked ? 'enforced' : 'inactive'}`;
   }
@@ -2043,12 +2080,25 @@ function toggleUltimateControl(key, checkbox) {
       msg = checkbox.checked
         ? `[Live SD Boot] Isolated systems storage containment active on block /dev/sdb1. Zero disk caching enabled.`
         : `[Live SD Boot Warning] Storage shifted back to internal monolithic hard disk. Live containment disabled.`;
+    } else if (key === 'autoUpdate') {
+      msg = checkbox.checked
+        ? `[Auto-Upgrades] Enabled. Periodically downloading cryptographically-signed compliance tables, Suricata IPS signature rules, and AppArmor profiles.`
+        : `[Auto-Upgrades] Disabled. OSS framework updates must be initiated manually via terminal commands.`;
     }
     
     const hash = generateInteractionHash();
     row.textContent = `[${time}] ${msg} | Verification Key: ${hash}`;
     logs.appendChild(row);
     logs.scrollTop = logs.scrollHeight;
+  }
+
+  // Trigger background upgrade intervals
+  if (key === 'autoUpdate') {
+    if (checkbox.checked) {
+      if (typeof startOSSAutoUpgrades === 'function') startOSSAutoUpgrades();
+    } else {
+      if (typeof stopOSSAutoUpgrades === 'function') stopOSSAutoUpgrades();
+    }
   }
 
   syncComplianceDials();
@@ -2986,5 +3036,51 @@ function translateIncomingMessage(template) {
   const feed = document.getElementById('translate-feed');
   if (feed) {
     feed.innerHTML = renderTranslationFeed();
+  }
+}
+
+// ==========================================
+// OSS SECURITY FRAMEWORK AUTO-UPGRADES DAEMON
+// ==========================================
+let ossUpgradeInterval = null;
+
+function startOSSAutoUpgrades() {
+  if (ossUpgradeInterval) clearInterval(ossUpgradeInterval);
+  ossUpgradeInterval = setInterval(() => {
+    if (!systemState.ultimate.autoUpdate) {
+      clearInterval(ossUpgradeInterval);
+      ossUpgradeInterval = null;
+      return;
+    }
+    const targets = [
+      { name: "Suricata IPS Rules Database", ver: "v7.0.3-hardened" },
+      { name: "AppArmor Mandatory Access Profiles", ver: "v3.1.2-tomb" },
+      { name: "UFW iptables Filter Tables", ver: "v0.36-compliant" },
+      { name: "seL4 Microkernel Core Proof Tables", ver: "v12.1.0-verified" }
+    ];
+    const target = targets[Math.floor(Math.random() * targets.length)];
+    const hash = generateInteractionHash();
+    const msg = `[Auto-Upgrades] Synced, compiled, and verified ${target.name} (${target.ver}). System security increased.`;
+    
+    // Log to auditd
+    logAudit(`OSS Auto-Upgrade: Installed new ${target.name} patches.`);
+    
+    // Log to Ultimate Center UI if open
+    const logsEl = document.getElementById('ultimate-logs');
+    if (logsEl) {
+      const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+      const row = document.createElement('div');
+      row.className = 'ultimate-log-row verified';
+      row.textContent = `[${time}] ${msg} | Verification Key: ${hash}`;
+      logsEl.appendChild(row);
+      logsEl.scrollTop = logsEl.scrollHeight;
+    }
+  }, 8000);
+}
+
+function stopOSSAutoUpgrades() {
+  if (ossUpgradeInterval) {
+    clearInterval(ossUpgradeInterval);
+    ossUpgradeInterval = null;
   }
 }
