@@ -206,6 +206,19 @@ function updateSecurityShield() {
   const auditActive = systemState.features.audit;
   const f2bActive = systemState.features.fail2ban;
   
+  // Cross-system security framework logic integration
+  if (!ufwActive && systemState.features.ips) {
+    addHypervisorLog("FIREWALL_OFF: Enforcing local VM-level egress limits to compensate for disabled UFW.");
+  }
+  
+  if (!aaActive && systemState.ultimate.sel4) {
+    logAudit("[seL4 core] System protection downgraded: AppArmor sandboxing is inactive. Mathematical formal proofs compromised.");
+  }
+  
+  if (!auditActive) {
+    logAudit("[WARNING] Audit logging daemon is stopped. Administrative compliance integrity lost.");
+  }
+  
   if (systemState.threatLevel === "THREAT_DETECTED") {
     badge.className = "status-shield threat-detected";
     badgeText.textContent = "THREAT LEVEL HIGH";
@@ -1006,6 +1019,29 @@ function initIDSCanvas() {
   }, 180);
 }
 
+function triggerIntegratedDefense(event) {
+  // Fail2Ban detects high-risk alerts and acts
+  if (systemState.features.fail2ban && event.tag === 'alert') {
+    if (!systemState.blockedIPs.includes(event.src) && event.src !== 'localhost') {
+      systemState.blockedIPs.push(event.src);
+      
+      logAudit(`[Fail2Ban IPS] Intercepted signature '${event.type}' from IP: ${event.src}. Adding host to blacklist.`);
+      addHypervisorLog(`IPS BAN: Fail2Ban blocked malicious IP ${event.src} on ports 22, 80, 443`);
+      
+      // If UFW is active, sync the block rule directly to UFW logs!
+      if (systemState.features.ufw) {
+        logAudit(`[UFW Firewall] Loaded active REJECT packet filter rule for banned IP: ${event.src}`);
+      }
+    }
+  }
+
+  // AppArmor sandbox violations logged to auditd
+  if (systemState.features.apparmor && event.type === 'MAC Policy') {
+    logAudit(`[AppArmor sandbox violation] Blocked unauthorized resource query by chromium-browser`);
+    addHypervisorLog(`MAC AUDIT: AppArmor blocked Chromium browser accessing secure directory '/etc/shadow'`);
+  }
+}
+
 function setupIDSFeed() {
   if (idsAttackInterval) clearInterval(idsAttackInterval);
 
@@ -1016,6 +1052,9 @@ function setupIDSFeed() {
       
       let alertMsg = template.msg;
       let alertTag = template.tag;
+      
+      // Invoke integrated defense framework bridge
+      triggerIntegratedDefense(template);
       
       if (systemState.features.ips && template.tag === 'alert') {
         alertMsg = `[IPS BLOCKED] ${template.msg} from IP ${template.src}`;
