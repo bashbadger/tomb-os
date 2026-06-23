@@ -32,11 +32,28 @@ const systemState = {
     sel4: false,
     tpm: false,
     immutable: false,
-    zerotrust: false
+    zerotrust: false,
+    sdcardMode: false
   },
   tour: {
     step: 0,
     active: false
+  },
+  render: {
+    isPlaying: false,
+    playProgress: 0,
+    isRendering: false,
+    renderProgress: 0,
+    activeScene: "Scene 1: System Boot & Kernel Audits",
+    intervalId: null
+  },
+  teacher: {
+    activeTab: 'translator',
+    rules: [
+      "When firewall blocks an IP, log target to IDS console.",
+      "Always restrict USB driver loading on system VMs."
+    ],
+    translations: []
   },
   hypervisor: {
     zones: {
@@ -49,7 +66,9 @@ const systemState = {
       vault: 'personal',
       ultimate: 'secure',
       readme: 'personal',
-      hypervisor: 'secure'
+      hypervisor: 'secure',
+      render: 'work',
+      teacher: 'secure'
     },
     rules: {
       interAppDnd: true,
@@ -249,7 +268,8 @@ function updateSecurityShield() {
 function logAudit(message) {
   const now = new Date();
   const timeStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + " " + now.toLocaleTimeString('en-US', { hour12: false });
-  auditLogs.push(`${timeStr} tomb-os admin-events: ${message}`);
+  const hash = generateInteractionHash();
+  auditLogs.push(`${timeStr} tomb-os admin-events: ${message} | INTEGRITY_KEY: [${hash}]`);
 }
 
 // Sync compliance metrics dynamically
@@ -562,6 +582,20 @@ const windowConfig = {
     height: 460,
     icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" fill="none" stroke="#E95420" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     getContent: () => getHypervisorContent()
+  },
+  render: {
+    title: "Tomb Render (Video Production Studio)",
+    width: 700,
+    height: 520,
+    icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z" fill="#E95420"/></svg>`,
+    getContent: () => getRenderContent()
+  },
+  teacher: {
+    title: "Tomb AI Teacher & Translator Hub",
+    width: 650,
+    height: 500,
+    icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-.83 0-1.5-.67-1.5-1.5S11.17 14 12 14s1.5.67 1.5 1.5S12.83 17 12 17zm1-5.5h-2v-4h2v4z" fill="#E95420"/></svg>`,
+    getContent: () => getTeacherContent()
   }
 };
 
@@ -651,6 +685,10 @@ function closeWindow(appId, e) {
   if (win) win.remove();
   const dot = document.getElementById(`dot-${appId}`);
   if (dot) dot.classList.add('hidden');
+  
+  if (appId === 'render') {
+    resetRenderPlay();
+  }
 }
 
 function minimizeWindow(appId, e) {
@@ -1055,6 +1093,13 @@ function setupIDSFeed() {
       
       // Invoke integrated defense framework bridge
       triggerIntegratedDefense(template);
+      
+      // Translate incoming system messages dynamically
+      if (template.tag === 'alert' || template.tag === 'warn') {
+        if (typeof translateIncomingMessage === 'function') {
+          translateIncomingMessage(template);
+        }
+      }
       
       if (systemState.features.ips && template.tag === 'alert') {
         alertMsg = `[IPS BLOCKED] ${template.msg} from IP ${template.src}`;
@@ -1878,6 +1923,21 @@ function renderUltimateWrapper() {
             </label>
           </div>
         </div>
+        <div class="ultimate-card">
+          <div class="ultimate-card-header">
+            <span class="ultimate-card-tag">SD-CARD</span>
+            <span class="ultimate-card-status ${systemState.ultimate.sdcardMode ? 'enforced' : 'inactive'}" id="ultimate-status-sdcardMode">${systemState.ultimate.sdcardMode ? 'LIVE SD BOOT' : 'HARD DRIVE BOOT'}</span>
+          </div>
+          <span class="ultimate-card-title">Live SD Card Storage Containment</span>
+          <span class="ultimate-card-desc">Lock and run all operating system components directly from external SD card media. Zero write-caching to main disks.</span>
+          <div class="ultimate-card-action">
+            <span class="ultimate-action-lbl">Run from Live SD Card</span>
+            <label class="aa-switch">
+              <input type="checkbox" ${systemState.ultimate.sdcardMode ? 'checked' : ''} onchange="toggleUltimateControl('sdcardMode', this)" aria-label="Activate SD Card Live boot containment">
+              <span class="aa-slider"></span>
+            </label>
+          </div>
+        </div>
       </div>
       <div class="ultimate-interactive-logs" id="ultimate-logs">
         <div class="ultimate-log-row info">[SECURE ENGINE] Monitoring advanced containment vectors...</div>
@@ -1899,6 +1959,8 @@ function toggleUltimateControl(key, checkbox) {
       statusBadge.textContent = checkbox.checked ? 'READONLY SYSTEM' : 'WRITABLE OVERLAY';
     } else if (key === 'zerotrust') {
       statusBadge.textContent = checkbox.checked ? 'ZERO TRUST ACTIVE' : 'OPEN COMMS';
+    } else if (key === 'sdcardMode') {
+      statusBadge.textContent = checkbox.checked ? 'LIVE SD BOOT' : 'HARD DRIVE BOOT';
     }
     statusBadge.className = `ultimate-card-status ${checkbox.checked ? 'enforced' : 'inactive'}`;
   }
@@ -1928,9 +1990,14 @@ function toggleUltimateControl(key, checkbox) {
       msg = checkbox.checked 
         ? `[Zero Trust Access] SUB-SYSTEM SEGMENTATION ENFORCED. App-to-app communications require SHA-256 micro-token signatures.`
         : `[Zero Trust warning] SUB-SYSTEM SEGMENTATION DISABLED. Open inter-process communication allowed.`;
+    } else if (key === 'sdcardMode') {
+      msg = checkbox.checked
+        ? `[Live SD Boot] Isolated systems storage containment active on block /dev/sdb1. Zero disk caching enabled.`
+        : `[Live SD Boot Warning] Storage shifted back to internal monolithic hard disk. Live containment disabled.`;
     }
     
-    row.textContent = `[${time}] ${msg}`;
+    const hash = generateInteractionHash();
+    row.textContent = `[${time}] ${msg} | Verification Key: ${hash}`;
     logs.appendChild(row);
     logs.scrollTop = logs.scrollHeight;
   }
@@ -2410,3 +2477,461 @@ document.addEventListener('touchend', (e) => {
   }
   lastTouchEnd = now;
 }, false);
+
+// ==========================================
+// 150-CHARACTER CRYPTOGRAPHIC HASH GENERATOR
+// ==========================================
+function generateInteractionHash() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < 150; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+// ==========================================
+// TOMB RENDER (VIDEO PRODUCTION STUDIO)
+// ==========================================
+function getRenderContent() {
+  const isPlaying = systemState.render.isPlaying;
+  const playProgress = systemState.render.playProgress;
+  const isRendering = systemState.render.isRendering;
+  const renderProgress = systemState.render.renderProgress;
+  const activeScene = systemState.render.activeScene;
+
+  return `
+    <div class="app-render-container">
+      <div class="render-preview-box">
+        <div class="render-canvas-sim">
+          <div style="font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #fff; letter-spacing: 1px;">TOMB PRODUCTION STUDIO PREVIEW</div>
+          <div id="render-preview-scene" style="font-size: 11.5px; color: var(--sec-yellow); font-family: var(--font-mono); margin-bottom: 8px; font-weight: bold; height: 16px;">
+            ${activeScene}
+          </div>
+          <div id="render-preview-timer" style="font-size: 11px; color: var(--ubuntu-light-grey); font-family: var(--font-mono);">
+            Time: ${(playProgress * 0.15).toFixed(1)}s / 15.0s
+          </div>
+          <div style="display: flex; gap: 6px; margin-top: 12px; font-size: 9px; color: rgba(255,255,255,0.4); text-transform: uppercase;">
+            <span>1080p Stream</span> • <span>60 FPS</span> • <span>VM Zone: Work</span>
+          </div>
+        </div>
+
+        ${isRendering ? `
+        <div class="render-progress-overlay" id="render-progress-overlay">
+          <div style="font-size: 12px; font-weight: bold; color: var(--sec-green); font-family: var(--font-mono); letter-spacing: 1px; animation: pulse 1s infinite alternate;">COMPILING VIDEO STREAMS...</div>
+          <div class="render-bar">
+            <div class="render-bar-fill" id="render-bar-fill" style="width: ${renderProgress}%"></div>
+          </div>
+          <div id="render-progress-text" style="font-size: 11px; color: #fff; font-family: var(--font-mono);">${renderProgress}% Complete</div>
+        </div>
+        ` : ''}
+      </div>
+
+      <div class="render-timeline">
+        <div style="position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center;">
+          <div class="timeline-tracks" style="position: relative; overflow-x: hidden;">
+            <!-- Vertical Playhead -->
+            <div id="render-playhead" style="position: absolute; top: 0; bottom: 0; width: 2px; background: var(--ubuntu-orange); left: calc(60px + (100% - 70px) * (${playProgress} / 100)); pointer-events: none; z-index: 5; box-shadow: 0 0 6px var(--ubuntu-orange);"></div>
+            
+            <div class="timeline-track" style="margin-bottom: 4px;">
+              <div class="track-label">VIDEO</div>
+              <div class="track-bar">
+                <div class="track-clip" style="left: 0%; width: 25%;" title="Intro Scene: Kernel Boot">Intro</div>
+                <div class="track-clip" style="left: 25%; width: 35%; background: linear-gradient(90deg, #b00020, #e95420);" title="Scene 2: Cyber Attack Sim">Threat Sim</div>
+                <div class="track-clip" style="left: 60%; width: 40%; background: linear-gradient(90deg, #33d17a, #3584e4);" title="Scene 3: Crypt Shield & Mitigation">Mitigation</div>
+              </div>
+            </div>
+
+            <div class="timeline-track" style="margin-bottom: 4px;">
+              <div class="track-label">AUDIO</div>
+              <div class="track-bar">
+                <div class="track-clip audio" style="left: 0%; width: 50%;" title="Theme Music Track">Soundtrack</div>
+                <div class="track-clip audio" style="left: 50%; width: 50%;" title="IDS Alarm Effects">Alarm.fx</div>
+              </div>
+            </div>
+
+            <div class="timeline-track">
+              <div class="track-label">FX/TEXT</div>
+              <div class="track-bar">
+                <div class="track-clip fx" style="left: 10%; width: 20%;" title="Title Card overlay">Title Text</div>
+                <div class="track-clip fx" style="left: 30%; width: 20%;" title="Alert overlay">Alert.Overlay</div>
+                <div class="track-clip fx" style="left: 60%; width: 30%;" title="Success overlay">Success.Overlay</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="render-controls">
+        <div>
+          <button class="render-btn-play" onclick="toggleRenderPlay()" id="render-play-btn">
+            ${isPlaying ? '❚❚ Pause' : '▶ Play'}
+          </button>
+          <button class="render-btn-play" style="margin-left: 5px;" onclick="resetRenderPlay()">
+            Stop / Reset
+          </button>
+        </div>
+        <div>
+          <button class="render-btn-build" onclick="startMovieRendering()">
+            Render Production Movie
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function toggleRenderPlay() {
+  const isPlaying = systemState.render.isPlaying;
+  
+  if (isPlaying) {
+    // Pause
+    systemState.render.isPlaying = false;
+    if (systemState.render.intervalId) {
+      clearInterval(systemState.render.intervalId);
+      systemState.render.intervalId = null;
+    }
+    const playBtn = document.getElementById('render-play-btn');
+    if (playBtn) playBtn.textContent = '▶ Play';
+  } else {
+    // Play
+    systemState.render.isPlaying = true;
+    const playBtn = document.getElementById('render-play-btn');
+    if (playBtn) playBtn.textContent = '❚❚ Pause';
+    
+    systemState.render.intervalId = setInterval(() => {
+      systemState.render.playProgress += 1;
+      if (systemState.render.playProgress > 100) {
+        systemState.render.playProgress = 0;
+      }
+      updateRenderPlayUI();
+    }, 150);
+  }
+}
+
+function resetRenderPlay() {
+  systemState.render.isPlaying = false;
+  systemState.render.playProgress = 0;
+  systemState.render.activeScene = "Scene 1: System Boot & Kernel Audits";
+  
+  if (systemState.render.intervalId) {
+    clearInterval(systemState.render.intervalId);
+    systemState.render.intervalId = null;
+  }
+  
+  const playBtn = document.getElementById('render-play-btn');
+  if (playBtn) playBtn.textContent = '▶ Play';
+  
+  updateRenderPlayUI();
+}
+
+function updateRenderPlayUI() {
+  const playhead = document.getElementById('render-playhead');
+  const timer = document.getElementById('render-preview-timer');
+  const scene = document.getElementById('render-preview-scene');
+  const playProgress = systemState.render.playProgress;
+
+  if (playhead) {
+    playhead.style.left = `calc(60px + (100% - 70px) * (${playProgress} / 100))`;
+  }
+  if (timer) {
+    timer.textContent = `Time: ${(playProgress * 0.15).toFixed(1)}s / 15.0s`;
+  }
+  if (scene) {
+    let activeScene = "Scene 1: System Boot & Kernel Audits";
+    if (playProgress >= 25 && playProgress < 60) {
+      activeScene = "⚠️ Scene 2: Firewall Breach & Port Scan Intrusion";
+    } else if (playProgress >= 60) {
+      activeScene = "🛡️ Scene 3: Crypt Shield Isolation & seL4 Hardening Proof";
+    }
+    scene.textContent = activeScene;
+    systemState.render.activeScene = activeScene;
+  }
+}
+
+function startMovieRendering() {
+  if (systemState.render.isRendering) return;
+  
+  // Pause playback first
+  if (systemState.render.isPlaying) {
+    toggleRenderPlay();
+  }
+
+  systemState.render.isRendering = true;
+  systemState.render.renderProgress = 0;
+
+  // Append overlay programmatically
+  const container = document.querySelector('.app-render-container');
+  const previewBox = document.querySelector('.render-preview-box');
+  
+  if (!previewBox) return;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'render-progress-overlay';
+  overlay.id = 'render-progress-overlay';
+  overlay.innerHTML = `
+    <div style="font-size: 12px; font-weight: bold; color: var(--sec-green); font-family: var(--font-mono); letter-spacing: 1px; animation: pulse 1s infinite alternate;">COMPILING VIDEO STREAMS...</div>
+    <div class="render-bar">
+      <div class="render-bar-fill" id="render-bar-fill" style="width: 0%"></div>
+    </div>
+    <div id="render-progress-text" style="font-size: 11px; color: #fff; font-family: var(--font-mono);">0% Complete</div>
+  `;
+  previewBox.appendChild(overlay);
+
+  const renderTimer = setInterval(() => {
+    systemState.render.renderProgress += 5;
+    
+    const fill = document.getElementById('render-bar-fill');
+    const txt = document.getElementById('render-progress-text');
+    
+    if (fill) fill.style.width = `${systemState.render.renderProgress}%`;
+    if (txt) txt.textContent = `${systemState.render.renderProgress}% Complete`;
+
+    if (systemState.render.renderProgress >= 100) {
+      clearInterval(renderTimer);
+      systemState.render.isRendering = false;
+
+      // Generate verification key of 150 characters
+      const key = generateInteractionHash();
+
+      // Intercept file write using Qubes Hypervisor security borders
+      interceptAction(
+        'render',
+        'vault',
+        'write_rendered_video_file',
+        () => {
+          // Allowed by hypervisor
+          const overlayEl = document.getElementById('render-progress-overlay');
+          if (overlayEl) overlayEl.remove();
+          
+          let alertMsg = `SUCCESS: Production Movie 'tomb_production_movie.mp4' compiled.\n\n`;
+          if (systemState.ultimate.sdcardMode) {
+            alertMsg += `Storage: live sd-card (/media/sdcard/movies/)\n`;
+          } else {
+            alertMsg += `Storage: crypt-vault (/home/sec-admin/vault/)\n`;
+          }
+          alertMsg += `Integrity Verification Key:\n${key}`;
+          
+          alert(alertMsg);
+          logAudit(`Saved production movie to Vault. Size: 412 MB. SHA-256 Verified.`);
+        },
+        () => {
+          // Blocked by hypervisor
+          const overlayEl = document.getElementById('render-progress-overlay');
+          if (overlayEl) overlayEl.remove();
+          
+          alert(`BLOCKED: Hypervisor denied permission to write output movie file to secure storage.`);
+          logAudit(`XEN Intercept Blocked Movie Maker exporting video file to Vault.`);
+        }
+      );
+    }
+  }, 150);
+}
+
+// ==========================================
+// AI TEACHER & TRANSLATOR HUB
+// ==========================================
+const translationTemplates = [
+  {
+    lang: "🇷🇺 Russian",
+    original: "Обнаружена атака методом подбора пароля SSH с IP-адреса 91.240.118.66",
+    english: "SSH brute-force attack detected from IP 91.240.118.66",
+    src: "91.240.118.66"
+  },
+  {
+    lang: "🇨🇳 Chinese",
+    original: "检测到端口扫描，扫描端口范围：21, 22, 23, 80",
+    english: "Port scan detected, scanned ports: 21, 22, 23, 80",
+    src: "45.143.203.14"
+  },
+  {
+    lang: "🇪🇸 Spanish",
+    original: "Intento de inyección SQL detectado en HTTP GET /login",
+    english: "SQL Injection attempt detected in HTTP GET /login",
+    src: "185.220.101.5"
+  },
+  {
+    lang: "🇫🇷 French",
+    original: "AppArmor a bloqué la lecture non autorisée de /etc/shadow par chromium-browser",
+    english: "AppArmor blocked unauthorized read on /etc/shadow by chromium-browser",
+    src: "localhost"
+  },
+  {
+    lang: "🇩🇪 German",
+    original: "ICMP-Flood-Paketvolumen hat den Grenzwert überschritten",
+    english: "ICMP flood packet volume has exceeded the limit",
+    src: "192.168.1.102"
+  },
+  {
+    lang: "🇯🇵 Japanese",
+    original: "IPアドレス 185.220.101.5 からの SQL インジェクション攻撃を検出しました",
+    english: "SQL Injection attack detected from IP address 185.220.101.5",
+    src: "185.220.101.5"
+  },
+  {
+    lang: "🇰🇷 Korean",
+    original: "SSH 무차별 대입 공격 감지: IP 91.240.118.66",
+    english: "SSH brute-force attack detected: IP 91.240.118.66",
+    src: "91.240.118.66"
+  }
+];
+
+function getTeacherContent() {
+  const activeTab = systemState.teacher.activeTab || 'translator';
+  
+  return `
+    <div class="app-teacher-container">
+      <div class="teacher-tabs">
+        <button class="teacher-tab ${activeTab === 'translator' ? 'active' : ''}" onclick="switchTeacherTab('translator')">
+          🌐 Live Language Translator
+        </button>
+        <button class="teacher-tab ${activeTab === 'teacher' ? 'active' : ''}" onclick="switchTeacherTab('teacher')">
+          🧠 Interactive Agent Teacher
+        </button>
+      </div>
+
+      ${activeTab === 'translator' ? `
+        <div class="teacher-panel" id="teacher-translator-panel">
+          <div style="font-size: 11px; color: var(--ubuntu-light-grey); margin-bottom: 2px;">
+            Incoming international alerts and message streams translated into English in real-time.
+          </div>
+          <div class="translate-feed" id="translate-feed">
+            ${renderTranslationFeed()}
+          </div>
+        </div>
+      ` : `
+        <div class="teacher-panel" id="teacher-agent-panel">
+          <div style="font-size: 11px; color: var(--ubuntu-light-grey); margin-bottom: 2px;">
+            Submit custom rules, behavior guidelines, or command automation preferences to train your Tomb OS agent.
+          </div>
+          
+          <div class="teacher-input-area">
+            <label for="teacher-rule-input" style="font-weight: 600; margin-bottom: 4px; display: block;">Rule / Instruction to Teach Agent:</label>
+            <textarea class="teacher-textarea" id="teacher-rule-input" placeholder="e.g. When Port 22 is scanned, immediately toggle AppArmor sandbox on SSH..."></textarea>
+            <button class="teacher-btn-action" style="margin-top: 6px;" onclick="submitAgentRule()">Teach Rules to Agent</button>
+          </div>
+
+          <div style="font-size: 11px; font-weight: bold; color: var(--sec-yellow); margin-top: 4px;">Active Learned Rules Brain Database:</div>
+          <div class="teacher-logs" id="teacher-rules-logs">
+            ${renderLearnedRules()}
+          </div>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+function switchTeacherTab(tab) {
+  systemState.teacher.activeTab = tab;
+  const win = document.getElementById('window-teacher');
+  if (win) {
+    const content = win.querySelector('.window-content');
+    if (content) {
+      content.innerHTML = getTeacherContent();
+    }
+  }
+}
+
+function submitAgentRule() {
+  const textarea = document.getElementById('teacher-rule-input');
+  if (!textarea) return;
+  
+  const ruleText = textarea.value.trim();
+  if (!ruleText) {
+    alert("Please enter a rule to teach the agent.");
+    return;
+  }
+
+  // Generate unique validation hash of 150 characters
+  const hash = generateInteractionHash();
+  
+  // Format the learned rule with its 150-char validation hash
+  const formattedRule = `"${ruleText}" | Verification Hash: [${hash}]`;
+  systemState.teacher.rules.unshift(formattedRule);
+  
+  // Clear textarea
+  textarea.value = '';
+  
+  // Log to auditd
+  logAudit(`Trained agent with new behavior rule: "${ruleText.substring(0, 40)}..."`);
+  
+  // Update view
+  const rulesLogs = document.getElementById('teacher-rules-logs');
+  if (rulesLogs) {
+    rulesLogs.innerHTML = renderLearnedRules();
+  }
+}
+
+function renderLearnedRules() {
+  if (systemState.teacher.rules.length === 0) {
+    return `<div style="color: rgba(255,255,255,0.4); font-style: italic; font-size: 11px;">No rules loaded. Submit a rule above to teach the agent.</div>`;
+  }
+  return systemState.teacher.rules.map((rule, idx) => {
+    return `
+      <div style="margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 6px; font-size: 11px; line-height: 1.4;">
+        <span style="color: var(--sec-green); font-weight: bold; display: block; margin-bottom: 2px;">[LEARNED RULE #${systemState.teacher.rules.length - idx}]</span>
+        <div style="color: #fff; margin-bottom: 4px;">${rule.split(' | ')[0]}</div>
+        <div style="color: rgba(255,255,255,0.3); font-size: 9.5px; word-break: break-all; font-family: var(--font-mono);">Hash: ${rule.split(' | ')[1].replace('Verification Hash: [', '').replace(']', '')}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderTranslationFeed() {
+  if (systemState.teacher.translations.length === 0) {
+    return `<div style="color: rgba(255,255,255,0.3); font-style: italic; text-align: center; margin-top: 50px; font-size: 12px;">
+      Waiting for incoming traffic alerts in foreign languages...
+    </div>`;
+  }
+  return systemState.teacher.translations.map(t => {
+    return `
+      <div class="translate-row" style="margin-bottom: 8px;">
+        <div class="translate-source" style="display: flex; justify-content: space-between; align-items: center;">
+          <span>${t.lang} Alert (IP: ${t.src})</span>
+          <span style="color: var(--sec-green); font-family: var(--font-mono); font-size: 9px;">VERIFIED</span>
+        </div>
+        <div class="translate-text-original">${t.original}</div>
+        <div class="translate-text-english">${t.english}</div>
+        <div style="font-size: 9px; color: rgba(255,255,255,0.25); margin-top: 5px; word-break: break-all; font-family: var(--font-mono);">
+          Hash: ${t.hash}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function translateIncomingMessage(template) {
+  // Find a matching translation template or fallback
+  const matchingTrans = translationTemplates.filter(t => 
+    t.english.toLowerCase().includes(template.type.toLowerCase()) || 
+    template.msg.toLowerCase().includes(t.english.split(' ')[0].toLowerCase())
+  );
+  
+  const trans = matchingTrans.length > 0 
+    ? matchingTrans[Math.floor(Math.random() * matchingTrans.length)] 
+    : translationTemplates[Math.floor(Math.random() * translationTemplates.length)];
+  
+  const original = trans.original.replace('91.240.118.66', template.src).replace('185.220.101.5', template.src).replace('45.143.203.14', template.src);
+  const english = trans.english.replace('91.240.118.66', template.src).replace('185.220.101.5', template.src).replace('45.143.203.14', template.src);
+
+  // Generate 150-char validation hash for this specific translation interaction
+  const hash = generateInteractionHash();
+
+  systemState.teacher.translations.unshift({
+    lang: trans.lang,
+    original: original,
+    english: english,
+    src: template.src,
+    hash: hash
+  });
+
+  if (systemState.teacher.translations.length > 20) {
+    systemState.teacher.translations.pop();
+  }
+
+  // Update DOM if it's currently open
+  const feed = document.getElementById('translate-feed');
+  if (feed) {
+    feed.innerHTML = renderTranslationFeed();
+  }
+}

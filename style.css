@@ -2373,4 +2373,316 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   }
 }
 
+/* Tomb Render Video Production Studio CSS */
+.app-render-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #11000a;
+  font-family: var(--font-ui);
+  padding: 16px;
+  gap: 12px;
+  color: #fff;
+  min-height: 0;
+}
+
+.render-preview-box {
+  width: 100%;
+  height: 140px;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.render-canvas-sim {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--sec-green);
+  text-align: center;
+  background: radial-gradient(circle at center, #1b0026 0%, #000 100%);
+}
+
+.render-timeline {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+}
+
+.timeline-tracks {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.timeline-track {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.track-label {
+  font-size: 10px;
+  width: 50px;
+  color: var(--ubuntu-light-grey);
+  font-weight: 600;
+}
+
+.track-bar {
+  flex: 1;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.track-clip {
+  position: absolute;
+  height: 100%;
+  background: linear-gradient(90deg, var(--ubuntu-medium) 0%, var(--ubuntu-orange) 100%);
+  border-radius: 3px;
+  border-left: 2px solid #fff;
+  border-right: 2px solid #fff;
+}
+
+.track-clip.audio {
+  background: linear-gradient(90deg, #007AFF 0%, #00e5ff 100%);
+}
+
+.track-clip.fx {
+  background: linear-gradient(90deg, var(--sec-green) 0%, #a6ff00 100%);
+}
+
+.render-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.render-btn-play {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.render-btn-play:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.render-btn-build {
+  background: var(--ubuntu-orange);
+  border: none;
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(233, 84, 32, 0.4);
+}
+
+.render-btn-build:hover {
+  filter: brightness(1.1);
+}
+
+.render-progress-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  z-index: 100;
+}
+
+.render-bar {
+  width: 80%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.render-bar-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--sec-green);
+  box-shadow: 0 0 8px var(--sec-green);
+  transition: width 0.1s linear;
+}
+
+/* AI Teacher & Translator CSS */
+.app-teacher-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: rgba(44, 0, 30, 0.85);
+  padding: 16px;
+  gap: 12px;
+  color: #fff;
+  min-height: 0;
+}
+
+.teacher-tabs {
+  display: flex;
+  gap: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.teacher-tab {
+  background: none;
+  border: none;
+  color: var(--ubuntu-light-grey);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: all 0.2s;
+}
+
+.teacher-tab.active {
+  color: var(--ubuntu-orange);
+  border-bottom: 2px solid var(--ubuntu-orange);
+}
+
+.teacher-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.translate-feed {
+  flex: 1;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.translate-row {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 4px;
+  padding: 8px 10px;
+}
+
+.translate-source {
+  font-size: 10px;
+  color: var(--sec-yellow);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.translate-text-original {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: #f2f1f0;
+  margin-bottom: 4px;
+}
+
+.translate-text-english {
+  color: var(--sec-green);
+  border-left: 2px solid var(--sec-green);
+  padding-left: 6px;
+  font-style: italic;
+}
+
+.teacher-input-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(0,0,0,0.15);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 6px;
+  padding: 12px;
+  flex-shrink: 0;
+}
+
+.teacher-input-area label {
+  font-size: 11px;
+  color: var(--ubuntu-light-grey);
+}
+
+.teacher-textarea {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  padding: 8px;
+  resize: none;
+  height: 50px;
+  outline: none;
+}
+
+.teacher-btn-action {
+  background: var(--sec-green);
+  border: none;
+  color: #000;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.teacher-btn-action:hover {
+  filter: brightness(1.1);
+}
+
+.teacher-logs {
+  background: rgba(0,0,0,0.3);
+  border: 1px dashed rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  height: 70px;
+  overflow-y: auto;
+  color: #a6ff00;
+  flex-shrink: 0;
+}
+
 
