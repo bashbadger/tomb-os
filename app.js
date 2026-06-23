@@ -340,7 +340,7 @@ const windowConfig = {
         </div>
         <div class="terminal-history"></div>
         <div class="terminal-input-line">
-          <span class="terminal-prompt">sec-admin@tomb-os:~$</span>
+          <span class="terminal-prompt" id="terminal-prompt-label">sec-admin@tomb-os:~$</span>
           <input type="text" class="terminal-input" autofocus onkeydown="handleTerminalCommand(event, this)" spellcheck="false" aria-label="Terminal input prompt" />
         </div>
         <div class="terminal-chips-wrapper">
@@ -351,6 +351,7 @@ const windowConfig = {
           <button class="terminal-chip" onclick="runTerminalChipCommand('auditd')">auditd</button>
           <button class="terminal-chip" onclick="runTerminalChipCommand('sysctl -a')">sysctl -a</button>
           <button class="terminal-chip" onclick="runTerminalChipCommand('help')">help</button>
+          <button class="terminal-chip" style="background: rgba(166, 255, 0, 0.15); border-color: #a6ff00;" onclick="runTerminalChipCommand('ssh-e2ee 192.168.1.150')">ssh-e2ee (E2EE Remote)</button>
           <button class="terminal-chip" style="background: rgba(255, 204, 0, 0.15); border-color: var(--sec-yellow);" onclick="pasteTerminalFromVMClipboard()">Paste VM Clipboard</button>
         </div>
       </div>
@@ -787,9 +788,17 @@ function handleTerminalCommand(e, input) {
     if (!rawVal) return;
     const history = input.parentElement.previousElementSibling;
     
-    history.innerHTML += `<div class="terminal-line"><span class="terminal-prompt">sec-admin@tomb-os:~$</span> <span style="color: #fff;">${escapeHTML(rawVal)}</span></div>`;
+    const promptText = systemState.remoteConnected ? `sec-admin@remote-node [E2EE]:~$` : `sec-admin@tomb-os:~$`;
+    const promptColor = systemState.remoteConnected ? 'var(--sec-yellow)' : '#4AF626';
+    history.innerHTML += `<div class="terminal-line"><span class="terminal-prompt" style="color: ${promptColor};">${promptText}</span> <span style="color: #fff;">${escapeHTML(rawVal)}</span></div>`;
     
     const runCmd = () => {
+      // E2EE REMOTE ENCRYPTION TRACE
+      if (systemState.remoteConnected) {
+        const transHash = generateInteractionHash();
+        history.innerHTML += `<div class="terminal-line info" style="font-size: 10px; color: var(--sec-yellow); font-family: var(--font-mono); margin-bottom: 3px;">[E2EE Channel] Encrypted Payload: ${transHash}</div>`;
+      }
+
       // IMMUTABLE FILESYSTEM CONSTRAINT CHECK
       if (systemState.ultimate.immutable) {
         const isWriteCmd = rawVal.match(/^(gpg|touch|rm|mkdir|mv|cp|dd|sudo\s+touch|sudo\s+rm|sudo\s+mkdir)/i);
@@ -814,15 +823,55 @@ function handleTerminalCommand(e, input) {
   ufw status                 - Display active Firewall filters.
   ufw enable | ufw disable   - Configure status parameters for packet filter.
   aa-status                  - Inspect active AppArmor confinement state.
-  aa-enforce [app]           - Force enforce sandboxing policy on target profile.
   fail2ban-client status     - Display active IPS banned telemetry logs.
   auditd                     - Print Linux Audit Daemon security logs.
   sysctl -a                  - View hardened system network kernel configs.
   gpg -c [text]              - Run symmetric AES encryption pipeline.
+  ssh-e2ee [remote_ip]       - Establish E2EE remote terminal session.
+  exit                       - Disconnect remote session or close terminal.
   clear                      - Purge terminal lines.`;
           break;
         case 'whoami':
           output = `sec-admin (System Administrator, UID: 0 - root context active)`;
+          break;
+        case 'ssh-e2ee':
+          const remoteIp = args[1];
+          if (!remoteIp) {
+            output = `Usage: ssh-e2ee [remote_ip_address]`;
+          } else {
+            systemState.remoteConnected = remoteIp;
+            const hash = generateInteractionHash();
+            output = `[E2EE HANDSHAKE] Generating local Ephemeral Kyber-1024 / Dilithium keys...
+[E2EE HANDSHAKE] Exchanging public key certificates with remote node ${escapeHTML(remoteIp)}...
+[E2EE HANDSHAKE] Derived shared secret via quantum-resistant Kyber ECDH exchange.
+[E2EE SESSION] Channel active. Cipher suite: AES-256-GCM.
+[E2EE SESSION] E2EE Handshake key: [${hash}]
+[E2EE SESSION] Remote Terminal control active. Type 'exit' to disconnect.`;
+            
+            const promptLabel = document.getElementById('terminal-prompt-label');
+            if (promptLabel) {
+              promptLabel.textContent = `sec-admin@remote-node [E2EE]:~$`;
+              promptLabel.style.color = 'var(--sec-yellow)';
+            }
+            logAudit(`Established End-to-End Encrypted Remote session to ${remoteIp}.`);
+          }
+          break;
+        case 'exit':
+          if (systemState.remoteConnected) {
+            output = `Disconnecting remote terminal session from ${escapeHTML(systemState.remoteConnected)}...
+Session encryption terminated securely.`;
+            systemState.remoteConnected = false;
+            
+            const promptLabel = document.getElementById('terminal-prompt-label');
+            if (promptLabel) {
+              promptLabel.textContent = `sec-admin@tomb-os:~$`;
+              promptLabel.style.color = '#4AF626';
+            }
+            logAudit(`Terminated encrypted remote session.`);
+          } else {
+            closeWindow('terminal');
+            return;
+          }
           break;
         case 'clear':
           history.innerHTML = '';
