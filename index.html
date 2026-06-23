@@ -14,15 +14,15 @@
   <!-- System Boot Overlay -->
   <div id="boot-screen" class="boot-screen">
     <div class="boot-logo-container">
-      <svg class="ubuntu-logo" viewBox="0 0 100 100" width="120" height="120">
-        <!-- Ubuntu-like circle logo with glowing elements -->
-        <circle cx="50" cy="50" r="40" fill="none" stroke="#E95420" stroke-width="8" />
-        <circle cx="50" cy="18" r="8" fill="#E95420" />
-        <circle cx="28" cy="62" r="8" fill="#E95420" />
-        <circle cx="72" cy="62" r="8" fill="#E95420" />
-        <path d="M 50 26 A 24 24 0 0 1 68 38" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
-        <path d="M 64 62 A 24 24 0 0 1 40 72" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
-        <path d="M 36 48 A 24 24 0 0 1 46 26" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
+      <svg class="ubuntu-logo" viewBox="0 0 24 24" width="120" height="120" fill="none" stroke="#E95420" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 15px var(--ubuntu-orange));">
+        <!-- Tombstone Arch -->
+        <path d="M4 22V9a8 8 0 0 1 16 0v13" stroke-width="1.8" />
+        <!-- Base Stand -->
+        <path d="M2 22h20" stroke-width="2" />
+        <!-- RIP Symbol -->
+        <path d="M12 7v8M9 10h6" stroke-width="1.5" />
+        <!-- Structural Texture Cracks -->
+        <path d="M6 11l2 1.5M17 6.5l-1.5 2" stroke-width="1" stroke="rgba(255,255,255,0.45)" />
       </svg>
       <div class="boot-title">Tomb OS 1.0 LTS</div>
       <div class="boot-status">Loading Tomb Security Kernels & Sandbox Modules...</div>
@@ -31,7 +31,7 @@
   </div>
 
   <!-- Main Desktop Environment -->
-  <div id="desktop-wrapper" class="desktop-wrapper hidden">
+  <div id="desktop-wrapper" class="desktop-wrapper hidden dock-left">
     <!-- GNOME Top Bar -->
     <header id="top-bar">
       <div class="top-bar-left">
@@ -50,11 +50,14 @@
           <span class="badge-text">SECURE</span>
         </div>
         <div class="system-indicators" onclick="toggleQuickSettings()">
-          <span class="network-status">
-            <svg viewBox="0 0 24 24" width="16" height="16">
-              <path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-1.47-1.99-2.35-4.43-2.35-7.1 0-6.63 5.37-12 12-12s12 5.37 12 12c0 2.67-.88 5.11-2.35 7.1l-1.62-1.79C21.26 16.07 22 14.12 22 12c0-4.97-4.03-9-9-9zm0 4c-2.76 0-5 2.24-5 5 0 1.25.46 2.39 1.21 3.29l1.43-1.58C9.23 13.19 9 12.62 9 12c0-1.66 1.34-3 3-3s3 1.34 3 3c0 .62-.23 1.19-.64 1.71l1.43 1.58c.75-.9 1.21-2.04 1.21-3.29 0-2.76-2.24-5-5-5zm0 4c-.55 0-1 .45-1 1 0 .28.11.53.3.71l1.41-1.41c-.18-.19-.43-.3-.71-.3z" fill="currentColor"/>
+          <!-- Live SD Card Indicator -->
+          <span id="sdcard-indicator" class="hidden" style="margin-right: 8px; color: var(--sec-green); display: inline-flex; align-items: center; gap: 4px;" title="Live SD Card Boot Mode Active">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+              <path d="M18 2H10L4 8v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 8H7V5h2v3zm3 0h-2V5h2v3zm3 0h-2V5h2v3z"/>
             </svg>
+            <span style="font-size: 10px; font-weight: bold; letter-spacing: 0.5px;">SD LIVE</span>
           </span>
+          <span class="network-status" id="top-network-icon"></span>
           <span class="battery-status">100%</span>
           <span class="system-dropdown-arrow">▼</span>
         </div>
@@ -96,10 +99,21 @@
           <div><strong>IP Address:</strong> 10.0.2.15 (NAT)</div>
           <div><strong>Kernel:</strong> Linux 6.13.0-tomb-hardened</div>
           <div><strong>Uptime:</strong> <span id="uptime-counter">0m</span></div>
+          
+          <div class="qs-network-selector" style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: #fff;">
+            <span style="color: var(--ubuntu-light-grey);">Network Mode:</span>
+            <div style="display: flex; gap: 6px;">
+              <button id="net-btn-wifi" class="theme-btn" onclick="setNetworkInterface('wifi')" style="padding: 3px 8px; font-size: 10px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; cursor: pointer; border-radius: 3px;">Wi-Fi</button>
+              <button id="net-btn-ethernet" class="theme-btn" onclick="setNetworkInterface('ethernet')" style="padding: 3px 8px; font-size: 10px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; cursor: pointer; border-radius: 3px;">Ethernet</button>
+            </div>
+          </div>
         </div>
-        <div class="qs-footer">
-          <button class="qs-btn" onclick="triggerOSAction('restart')">Restart OS</button>
-          <button class="qs-btn shutdown" onclick="triggerOSAction('shutdown')">Shutdown</button>
+        <div class="qs-footer" style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+          <div style="display: flex; gap: 8px; width: 100%;">
+            <button class="qs-btn" onclick="triggerOSAction('restart')" style="flex: 1;">Restart OS</button>
+            <button class="qs-btn shutdown" onclick="triggerOSAction('shutdown')" style="flex: 1;">Shutdown</button>
+          </div>
+          <button class="qs-btn" onclick="triggerOSAction('bios')" style="width: 100%; border-color: var(--ubuntu-orange); color: var(--ubuntu-orange); background: transparent; cursor: pointer;">Reboot to BIOS Setup</button>
         </div>
       </div>
     </header>
@@ -143,24 +157,24 @@
     </div>
 
     <!-- Hypervisor Authorization Dialog -->
-    <div id="hypervisor-overlay" class="tour-overlay hidden" style="z-index: 20000; background: rgba(0,0,0,0.65);">
+    <div id="hypervisor-overlay" class="tour-overlay hidden" style="z-index: 20000; background: rgba(0,0,0,0.65); pointer-events: none;">
       <div class="tour-card" style="border-color: var(--sec-red); box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 15px var(--sec-red-glow); pointer-events: auto; position: relative; left: unset; top: unset;">
         <div class="tour-header" style="border-bottom-color: rgba(255,59,48,0.25);">
           <h4 style="color: var(--sec-red); font-weight: 700;">[XEN] Hypervisor Interdiction</h4>
           <span style="font-size: 9px; color: var(--ubuntu-light-grey); background: rgba(255,255,255,0.08); padding: 1px 4px; border-radius: 3px; font-family: var(--font-mono);">Dom0 Rules</span>
         </div>
         <div class="tour-body" id="hypervisor-body" style="font-size: 12.5px; margin: 8px 0; line-height: 1.5;">
-          Source app requesting communication channel to target app.
+          Source app requesting communication channel to target app.<br><input type="password" id="hypervisor-token-input" placeholder="Admin token" style="width:100%;margin-top:8px;padding:4px;border-radius:4px;border:1px solid var(--sec-red);background: rgba(255,255,255,0.1);color:#fff;"/><div id="hypervisor-error" style="color:#ffbaba;margin-top:4px;font-size:11px;display:none;"></div>
         </div>
         <div class="tour-footer" style="border-top-color: rgba(255,59,48,0.15); padding-top: 10px; display: flex; justify-content: flex-end; gap: 8px;">
           <button class="tour-btn secondary" onclick="denyHypervisorAccess()" style="border: 1px solid rgba(255,59,48,0.4); color: #ffbaba;">Block (Default)</button>
-          <button class="tour-btn" onclick="allowHypervisorAccess()" style="background: var(--sec-red); color: #fff;">Authorize Once</button>
+          <button class="tour-btn" id="hypervisor-allow-btn" onclick="allowHypervisorAccess()" style="background: var(--sec-red); color: #fff;">Authorize Once</button>
         </div>
       </div>
     </div>
 
     <!-- Ubuntu Left Dock -->
-    <nav id="dock">
+    <nav id="dock" class="dock pos-left">
       <div class="dock-inner">
         <!-- Terminal (Terminal emulator) -->
         <div class="dock-item" data-app="terminal" onclick="openWindow('terminal')" title="Hardened Terminal">
@@ -254,6 +268,14 @@
           </svg>
           <div class="dock-dot hidden" id="dot-teacher"></div>
         </div>
+        
+        <!-- Theme & UI Customizer App -->
+        <div class="dock-item" data-app="theme" onclick="openWindow('theme')" title="Tomb UI Customization Center">
+          <svg viewBox="0 0 24 24" class="dock-svg-icon theme-color">
+            <path d="M12 3a9 9 0 0 0-9 9 9 9 0 0 0 9 9 1.5 1.5 0 0 0 1.5-1.5c0-.39-.15-.75-.4-1.01a1.48 1.48 0 0 1-.4-1.03c0-.82.68-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" fill="#E95420" />
+          </svg>
+          <div class="dock-dot hidden" id="dot-theme"></div>
+        </div>
 
         <!-- Interactive Tour Guide -->
         <div class="dock-item" data-app="tour" onclick="startTour()" title="Interactive OS Tour" style="margin-top: 15px; border-color: rgba(74, 246, 38, 0.4);">
@@ -264,6 +286,44 @@
         </div>
       </div>
     </nav>
+  </div>
+
+  <!-- BIOS POST Simulation Screen -->
+  <div id="bios-post-screen" class="bios-post-screen hidden">
+    <div style="color: #4AF626; font-weight: bold; margin-bottom: 20px; font-size: 20px; font-family: var(--font-mono);">▲ TOMB MICROSYSTEMS BIOS v1.0.4</div>
+    <div id="bios-post-log" style="line-height: 1.6; white-space: pre-wrap; font-family: var(--font-mono); color: #dfdbd2;"></div>
+  </div>
+
+  <!-- BIOS Setup Screen -->
+  <div id="bios-screen" class="bios-screen hidden">
+    <div class="bios-header">
+      TOMB OS SYSTEM BIOS CONFIGURATION UTILITY - (C) 2026 TOMB SECURE LTD
+    </div>
+    
+    <div class="bios-menu">
+      <button class="bios-menu-tab active" onclick="switchBiosTab('main')">[ Main ]</button>
+      <button class="bios-menu-tab" onclick="switchBiosTab('security')">[ Security ]</button>
+      <button class="bios-menu-tab" onclick="switchBiosTab('boot')">[ Boot ]</button>
+      <button class="bios-menu-tab" onclick="switchBiosTab('exit')">[ Exit ]</button>
+    </div>
+    
+    <div class="bios-body">
+      <div class="bios-settings-column" id="bios-settings-list">
+        <!-- Rendered dynamically by JS -->
+      </div>
+      <div class="bios-help-column">
+        <h4 style="margin-top: 0; color: #ffff55; border-bottom: 1px solid #ffffff; padding-bottom: 4px; font-family: var(--font-mono);">Item Help</h4>
+        <div id="bios-help-text" style="line-height: 1.4; font-family: var(--font-mono);">
+          Select an item on the left to see its configuration options and security implications.
+        </div>
+      </div>
+    </div>
+    
+    <div class="bios-footer">
+      <span>▲▼: Select Item</span>
+      <span>Enter/Click: Toggle Option</span>
+      <span>F10: Save & Exit</span>
+    </div>
   </div>
 
   <script src="app.js"></script>

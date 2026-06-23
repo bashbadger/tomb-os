@@ -17,6 +17,11 @@
   --glass-border: rgba(233, 84, 32, 0.15);
   --glass-shadow: rgba(0, 0, 0, 0.5);
   
+  --glass-blur: 15px;
+  --glass-border-width: 1px;
+  --glass-border-style: solid;
+  --system-font-size: 100%;
+  
   --font-ui: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: 'JetBrains Mono', 'Courier New', Courier, monospace;
 }
@@ -34,6 +39,7 @@ body, html {
   overflow: hidden;
   font-family: var(--font-ui);
   background-color: #11000a;
+  font-size: var(--system-font-size, 100%);
 }
 
 /* Boot Screen */
@@ -433,14 +439,14 @@ body, html {
 }
 
 /* Left Dock */
-#dock {
+.dock {
   position: absolute;
   top: 28px;
   left: 0;
   bottom: 0;
   width: 58px;
-  background-color: rgba(16, 0, 11, 0.7);
-  backdrop-filter: blur(15px);
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur, 15px));
   border-right: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   justify-content: center;
@@ -517,7 +523,7 @@ body, html {
   min-width: 320px;
   min-height: 200px;
   background: var(--glass-bg);
-  backdrop-filter: blur(25px);
+  backdrop-filter: blur(var(--glass-blur, 15px));
   border: 1px solid var(--glass-border);
   border-radius: 10px;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
@@ -1709,7 +1715,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   display: flex;
   justify-content: center;
   align-items: center;
-  pointer-events: none; /* Let user click desktop behind it, target card overrides */
+  
   transition: opacity 0.3s;
 }
 
@@ -2259,7 +2265,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 
 /* Responsive Media Queries for Mobile & Tablet (iOS & Android) compatibility */
 @media (max-width: 768px) {
-  #dock {
+  .dock {
     width: 48px !important;
   }
   .dock-inner {
@@ -2680,9 +2686,346 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   font-family: var(--font-mono);
   font-size: 11px;
   height: 70px;
-  overflow-y: auto;
   color: #a6ff00;
   flex-shrink: 0;
 }
+
+/* ==========================================
+   TOMB UI CUSTOMIZER ENGINE STYLING
+   ========================================== */
+
+/* Dynamic Dock Positions */
+.dock.pos-left {
+  position: absolute;
+  left: 0;
+  top: 40px;
+  bottom: 0;
+  width: 58px;
+  height: auto;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: none;
+  border-top: none;
+  border-bottom: none;
+  display: flex;
+  flex-direction: column;
+}
+.dock.pos-left .dock-inner {
+  flex-direction: column;
+}
+.dock.pos-right {
+  position: absolute;
+  left: auto;
+  right: 0;
+  top: 40px;
+  bottom: 0;
+  width: 58px;
+  height: auto;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: none;
+  border-top: none;
+  border-bottom: none;
+  display: flex;
+  flex-direction: column;
+}
+.dock.pos-right .dock-inner {
+  flex-direction: column;
+}
+.dock.pos-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: auto;
+  width: 100%;
+  height: 58px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
+.dock.pos-bottom .dock-inner {
+  flex-direction: row;
+  padding: 0 15px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.dock.pos-bottom .dock-dot {
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Desktop Viewport Offsets */
+.desktop-wrapper.dock-left { padding-left: 58px; padding-bottom: 0; padding-right: 0; }
+.desktop-wrapper.dock-right { padding-right: 58px; padding-left: 0; padding-bottom: 0; }
+.desktop-wrapper.dock-bottom { padding-bottom: 58px; padding-left: 0; padding-right: 0; }
+
+/* Custom Dock Icon Sizes */
+.dock.size-small { width: 46px; }
+.dock.size-small .dock-item { width: 32px; height: 32px; border-radius: 6px; }
+.dock.size-small .dock-svg-icon { width: 18px; height: 18px; }
+
+.dock.size-large { width: 70px; }
+.dock.size-large .dock-item { width: 54px; height: 54px; border-radius: 10px; }
+.dock.size-large .dock-svg-icon { width: 32px; height: 32px; }
+
+.dock.pos-bottom.size-small { height: 46px; width: 100%; }
+.dock.pos-bottom.size-large { height: 70px; width: 100%; }
+
+/* UI Customization Center Panels */
+.app-theme-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: rgba(30, 0, 20, 0.92);
+  padding: 16px;
+  gap: 14px;
+  color: #fff;
+  overflow-y: auto;
+  min-height: 0;
+}
+.theme-sec-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--sec-yellow);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.theme-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.theme-label {
+  font-size: 11px;
+  color: var(--ubuntu-light-grey);
+}
+.theme-swatches {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+.theme-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid rgba(255,255,255,0.25);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: all 0.2s ease;
+}
+.theme-swatch:hover {
+  transform: scale(1.15);
+  border-color: #fff;
+}
+.theme-swatch.active {
+  box-shadow: 0 0 0 2px var(--ubuntu-orange), 0 4px 8px rgba(0,0,0,0.4);
+  border-color: #fff;
+  transform: scale(1.05);
+}
+.theme-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.theme-btn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.theme-btn:hover {
+  background: rgba(255,255,255,0.15);
+}
+.theme-btn.active {
+  background: var(--ubuntu-orange);
+  border-color: var(--ubuntu-orange);
+  font-weight: bold;
+}
+.theme-slider-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.theme-slider {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  outline: none;
+  -webkit-appearance: none;
+}
+.theme-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--ubuntu-orange);
+  cursor: pointer;
+}
+.theme-slider-val {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  width: 45px;
+  text-align: right;
+  color: var(--sec-green);
+}
+
+/* Adjust Window Borders dynamically */
+.os-window {
+  border-width: var(--glass-border-width, 1px) !important;
+  border-style: var(--glass-border-style, solid) !important;
+}
+.os-window.zone-untrusted { border-color: var(--sec-red) !important; }
+.os-window.zone-work { border-color: var(--sec-yellow) !important; }
+.os-window.zone-personal { border-color: #3584e4 !important; }
+.os-window.zone-secure { border-color: var(--sec-green) !important; }
+
+/* BIOS Utility styling */
+.bios-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0000aa; /* classic BIOS blue */
+  color: #ffff55; /* bright yellow text */
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  z-index: 25000;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.bios-screen.hidden {
+  display: none !important;
+}
+
+.bios-header {
+  background: #ffffff;
+  color: #0000aa;
+  font-weight: bold;
+  text-align: center;
+  padding: 3px 0;
+  margin-bottom: 12px;
+}
+
+.bios-menu {
+  display: flex;
+  gap: 15px;
+  border-bottom: 2px double #ffffff;
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+.bios-menu-tab {
+  padding: 2px 10px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.bios-menu-tab.active {
+  background: #ffffff;
+  color: #0000aa;
+  font-weight: bold;
+}
+
+.bios-body {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  min-height: 0;
+}
+
+.bios-settings-column {
+  flex: 2;
+  border: 1px solid #ffffff;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #000088;
+  overflow-y: auto;
+}
+
+.bios-help-column {
+  flex: 1;
+  border: 1px solid #ffffff;
+  padding: 12px;
+  background: #000088;
+  color: #ffffff;
+}
+
+.bios-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.bios-row:hover {
+  background: #ffff55;
+  color: #0000aa;
+}
+
+.bios-row-value {
+  color: #ffffff;
+}
+
+.bios-row:hover .bios-row-value {
+  color: #0000aa;
+}
+
+.bios-footer {
+  border-top: 2px double #ffffff;
+  padding-top: 8px;
+  margin-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  color: #ffffff;
+  font-size: 11px;
+}
+
+.bios-post-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  color: #dfdbd2;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  z-index: 26000;
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+.bios-post-screen.hidden {
+  display: none !important;
+}
+
 
 

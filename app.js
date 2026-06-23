@@ -36,6 +36,20 @@ const systemState = {
     sdcardMode: false,
     autoUpdate: false
   },
+  theme: {
+    accent: '#E95420',
+    darkBase: '#2C001E',
+    secondary: '#5E2750',
+    wallpaper: 'gradient-aubergine',
+    opacity: 0.65,
+    blur: 15,
+    fontFamily: 'outfit',
+    fontSize: '100%',
+    dockPosition: 'left',
+    dockIconSize: 'medium',
+    borderWidth: '1px',
+    borderStyle: 'solid'
+  },
   tour: {
     step: 0,
     active: false
@@ -74,20 +88,31 @@ const systemState = {
     rules: {
       interAppDnd: true,
       crossCopy: true,
-      vaultExport: true
+      vaultExport: true,
+      firmwareLock: true
     },
     logs: [
       "Xen hypervisor v4.17 initialized.",
       "Domain-0 control panel loaded.",
       "Security isolation policy loaded: App containment strict."
     ],
-    pendingAction: null
+    pendingAction: null,
+    pendingTimer: null,
+    adminToken: "CHANGE_ME"
   },
   threatLevel: "SECURE", // SECURE, WARNING, THREAT_DETECTED
+  network: 'wifi',
   uptime: 0,
   activeWindow: null,
   windowCount: 0,
-  blockedIPs: ["198.51.100.42", "203.0.113.88"]
+  blockedIPs: ["198.51.100.42", "203.0.113.88"],
+  // VERSION TRACKING
+  version: "1.0.0",
+  lastUpdated: "2026-06-23",
+  changeLog: [
+    "2026-06-23: Added admin token input, auto‑deny timeout, and overlay pointer‑events adjustment.",
+    "2026-06-20: Initial implementation of hypervisor interception and UI components."
+  ]
 };
 
 // Simulated Security Logs for auditd
@@ -152,6 +177,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(updateTime, 1000);
   setInterval(incrementUptime, 60000);
   setupIDSFeed();
+  initializeTheme();
 });
 
 // Update System Clock
@@ -598,8 +624,39 @@ const windowConfig = {
     height: 500,
     icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-.83 0-1.5-.67-1.5-1.5S11.17 14 12 14s1.5.67 1.5 1.5S12.83 17 12 17zm1-5.5h-2v-4h2v4z" fill="#E95420"/></svg>`,
     getContent: () => getTeacherContent()
+  },
+  theme: {
+    title: "Tomb UI Customization Center",
+    width: 630,
+    height: 500,
+    icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 3a9 9 0 0 0-9 9 9 9 0 0 0 9 9 1.5 1.5 0 0 0 1.5-1.5c0-.39-.15-.75-.4-1.01a1.48 1.48 0 0 1-.4-1.03c0-.82.68-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.42-4.03-8-9-8z" fill="#E95420"/></svg>`,
+    getContent: () => getThemeContent()
   }
 };
+
+// Get or assign unique IP for a window VM sandbox
+function getWindowIp(appId) {
+  if (!systemState.windowIps) {
+    systemState.windowIps = {};
+  }
+  if (!systemState.windowIps[appId]) {
+    const currentZone = systemState.hypervisor.zones[appId] || 'personal';
+    let subnet = 1;
+    if (currentZone === 'untrusted') subnet = 10;
+    else if (currentZone === 'work') subnet = 20;
+    else if (currentZone === 'personal') subnet = 30;
+    else if (currentZone === 'secure') subnet = 40;
+    
+    let ip;
+    do {
+      const host = 10 + Math.floor(Math.random() * 240);
+      ip = `10.137.${subnet}.${host}`;
+    } while (Object.values(systemState.windowIps).includes(ip));
+    
+    systemState.windowIps[appId] = ip;
+  }
+  return systemState.windowIps[appId];
+}
 
 // Open Window API
 function openWindow(appId) {
@@ -638,11 +695,13 @@ function openWindow(appId) {
   win.style.left = `${left}px`;
   win.style.top = `${top}px`;
   
+  const winIp = getWindowIp(appId);
+  
   win.innerHTML = `
     <div class="window-titlebar" onmousedown="dragStart(event, '${appId}')" ontouchstart="dragStart(event, '${appId}')" ondblclick="maximizeWindow('${appId}')">
       <div class="window-title">
         <span class="window-title-icon">${config.icon}</span>
-        <span>${config.title}</span>
+        <span>${config.title} <span class="window-ip-badge" style="font-family: var(--font-mono); font-size: 10px; opacity: 0.8; background: rgba(255,255,255,0.08); padding: 1px 5px; border-radius: 3px; margin-left: 6px;">IP: ${winIp}</span></span>
         <select class="window-zone-select sel-${currentZone}" onchange="changeWindowZone('${appId}', this)" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
           <option value="untrusted" ${currentZone === 'untrusted' ? 'selected' : ''}>[Red] Untrusted</option>
           <option value="work" ${currentZone === 'work' ? 'selected' : ''}>[Yellow] Work</option>
@@ -821,6 +880,7 @@ function handleTerminalCommand(e, input) {
           output = `Available Diagnostics Toolkit Commands:
   help                       - Show this documentation index.
   whoami                     - Inspect active administrative context.
+  ifconfig                   - Display active VM network interface config.
   ufw status                 - Display active Firewall filters.
   ufw enable | ufw disable   - Configure status parameters for packet filter.
   aa-status                  - Inspect active AppArmor confinement state.
@@ -829,6 +889,7 @@ function handleTerminalCommand(e, input) {
   sysctl -a                  - View hardened system network kernel configs.
   gpg -c [text]              - Run symmetric AES encryption pipeline.
   ssh-e2ee [remote_ip]       - Establish E2EE remote terminal session.
+  reboot --bios              - Request Xen authorization to reboot to system BIOS.
   exit                       - Disconnect remote session or close terminal.
   tomb-upgrade               - Automatically update all compliant OSS security frameworks.
   clear                      - Purge terminal lines.`;
@@ -837,6 +898,14 @@ function handleTerminalCommand(e, input) {
           output = `sec-admin (System Administrator, UID: 0 - root context active)`;
           break;
         case 'tomb-upgrade':
+          if (systemState.network === 'wifi') {
+            output = `[SECURITY BLOCK] Tomb OS Upgrade Agent aborted.
+Reason: Active network interface is Wi-Fi (wlan0).
+To prevent Man-in-the-Middle (MITM) package tampering, compliant updates and installations are restricted to secure wired Ethernet (eth0) interfaces.
+Please connect a physical network cable and switch your interface in Quick Settings.`;
+            logAudit("Attempted manual OSS upgrade blocked due to Wi-Fi connection.");
+            break;
+          }
           const hash1 = generateInteractionHash();
           const hash2 = generateInteractionHash();
           const hash3 = generateInteractionHash();
@@ -989,6 +1058,35 @@ kernel.yama.ptrace_scope = 1 (Hardens process memory probing)
 fs.protected_symlinks = 1`;
           }
           break;
+        case 'ifconfig':
+        case 'ip':
+          const terminalIp = getWindowIp('terminal');
+          output = `eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet ${terminalIp}  netmask 255.255.255.0  broadcast 10.137.2.255
+        inet6 fe80::5054:ff:fe8c:da12  prefixlen 64  scopeid 0x20<link>
+        ether 52:54:00:8c:da:12  txqueuelen 1000  (Ethernet)
+        RX packets 4531  bytes 342152 (342.1 KB)
+        TX packets 2102  bytes 189412 (189.4 KB)
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)`;
+          break;
+        case 'reboot':
+          if (args[1] === '--bios') {
+            executeRebootToBios();
+            return;
+          } else {
+            output = `Rebooting Tomb OS...`;
+            setTimeout(() => location.reload(), 1000);
+          }
+          break;
+        case 'reboot-bios':
+        case 'bios':
+        case 'brute-bios':
+          executeRebootToBios();
+          return;
         case 'gpg':
           if (args[1] === '-c') {
             const content = args.slice(2).join(' ');
@@ -1022,13 +1120,23 @@ Salted Payload: ${b64.slice(0, 12)}X9F..${b64.slice(-8)}==
 
     const args = rawVal.split(' ');
     const cmd = args[0].toLowerCase();
-    const isSensitive = ['ufw', 'aa-enforce', 'auditd', 'fail2ban-client', 'gpg'].includes(cmd);
+    const isBiosCmd = (cmd === 'reboot' && args[1] === '--bios') || ['reboot-bios', 'bios', 'brute-bios'].includes(cmd);
+    const isSensitive = ['ufw', 'aa-enforce', 'auditd', 'fail2ban-client', 'gpg'].includes(cmd) || isBiosCmd;
 
     if (isSensitive) {
+      let targetDomain = 'ultimate';
+      let actionName = `run_command_${cmd}`;
+      if (cmd === 'gpg') {
+        targetDomain = 'vault';
+      } else if (isBiosCmd) {
+        targetDomain = 'firmware';
+        actionName = 'reboot_to_bios';
+      }
+
       interceptAction(
         'terminal',
-        cmd === 'gpg' ? 'vault' : 'ultimate',
-        `run_command_${cmd}`,
+        targetDomain,
+        actionName,
         runCmd,
         () => {
           history.innerHTML += `<div class="terminal-line error">[XEN BLOCK] Hypervisor interdiction: Permission denied. Command execution blocked.</div>`;
@@ -1487,6 +1595,7 @@ function runVaultDecrypt() {
           }
           outputPanel.className = "vault-result-panel quantum-glow";
         } else {
+          plain = ciphertext.replace(/[a-zA-Z]/g, c => String.fromCharCode((c <= 'Z' ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26));
           plain = ciphertext.replace(/[a-zA-Z]/g, c => String.fromCharCode((c <= 'Z' ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26));
           outputPanel.className = "vault-result-panel active";
         }
@@ -2110,8 +2219,14 @@ function interceptAction(sourceApp, targetApp, actionType, onAllow, onDeny) {
   const targetZone = systemState.hypervisor.zones[targetApp] || 'personal';
   
   let shouldIntercept = false;
+  let isFirmwareLocked = false;
   
-  if (sourceZone === 'untrusted') {
+  if (actionType === 'reboot_to_bios') {
+    shouldIntercept = true;
+    if (systemState.hypervisor.rules.firmwareLock) {
+      isFirmwareLocked = true;
+    }
+  } else if (sourceZone === 'untrusted') {
     shouldIntercept = true;
   } else if (sourceZone !== targetZone) {
     shouldIntercept = true;
@@ -2132,7 +2247,8 @@ function interceptAction(sourceApp, targetApp, actionType, onAllow, onDeny) {
     onAllow,
     onDeny,
     sourceZone,
-    targetZone
+    targetZone,
+    isFirmwareLocked
   };
   
   // Show prompt overlay
@@ -2145,16 +2261,41 @@ function interceptAction(sourceApp, targetApp, actionType, onAllow, onDeny) {
     
     let description = `<strong>Security Alert:</strong> The application ${srcLabel} is requesting to perform a cross-domain action: <strong>${actionType}</strong> on ${tgtLabel}.<br><br>`;
     
-    if (sourceZone === 'untrusted') {
+    if (isFirmwareLocked) {
+      description += `<span style="color: var(--sec-red); font-weight: bold;">⚠️ CRITICAL BLOCK: Firmware Setup Lock is ACTIVE. Booting/rebooting to BIOS Setup is locked by security policy. Authorization is disabled.</span><br><br><span style="font-size: 11px; color: var(--ubuntu-light-grey);">To allow this action, please disable "Firmware (BIOS) Configuration Lock" in the Tomb Hypervisor VM Manager.</span>`;
+    } else if (sourceZone === 'untrusted') {
       description += `<span style="color: var(--sec-red);">⚠️ Warning: Source domain is UNTRUSTED (Red). Executing this action could compromise other zones.</span>`;
     } else {
-      description += `<span style="color: var(--sec-yellow);">ℹ️ Notice: The hypervisor requires administrator permission to bridge these zones.</span>`;
+      description += `<span style="color: var(--sec-yellow);">ℹ/ Notice: The hypervisor requires administrator permission to bridge these zones.</span>`;
     }
     
     body.innerHTML = description;
     overlay.classList.remove('hidden');
+    // Set auto‑deny timeout (15 seconds)
+    if (systemState.hypervisor.pendingTimer) {
+      clearTimeout(systemState.hypervisor.pendingTimer);
+    }
+    systemState.hypervisor.pendingTimer = setTimeout(() => {
+      denyHypervisorAccess();
+    }, 15000);
     
-    addHypervisorLog(`INTERCEPT: ${sourceApp} (${sourceZone}) -> ${targetApp} (${targetZone}) [${actionType}] - Prompting Administrator`);
+    // Toggle Authorize button state dynamically
+    const allowBtn = document.getElementById('hypervisor-allow-btn');
+    if (allowBtn) {
+      if (isFirmwareLocked) {
+        allowBtn.disabled = true;
+        allowBtn.style.opacity = '0.35';
+        allowBtn.style.cursor = 'not-allowed';
+        allowBtn.textContent = 'Lock Enforced';
+      } else {
+        allowBtn.disabled = false;
+        allowBtn.style.opacity = '1';
+        allowBtn.style.cursor = 'pointer';
+        allowBtn.textContent = 'Authorize Once';
+      }
+    }
+    
+    addHypervisorLog(`INTERCEPT: ${sourceApp} (${sourceZone}) -> ${targetApp} (${targetZone}) [${actionType}] - Prompting Administrator${isFirmwareLocked ? ' (FIRMWARE LOCK ENFORCED)' : ''}`);
   } else {
     // Fallback if overlay not found
     onAllow();
@@ -2165,6 +2306,20 @@ function allowHypervisorAccess() {
   const overlay = document.getElementById('hypervisor-overlay');
   if (overlay) overlay.classList.add('hidden');
   
+  // Clear pending timer
+  if (systemState.hypervisor.pendingTimer) {
+    clearTimeout(systemState.hypervisor.pendingTimer);
+    systemState.hypervisor.pendingTimer = null;
+  }
+
+  // Validate admin token
+  const tokenInput = document.getElementById('hypervisor-token-input');
+  if (tokenInput && tokenInput.value !== systemState.hypervisor.adminToken) {
+    const errorDiv = document.getElementById('hypervisor-error');
+    if (errorDiv) errorDiv.textContent = 'Invalid admin token.';
+    return;
+  }
+
   const pending = systemState.hypervisor.pendingAction;
   if (pending) {
     addHypervisorLog(`ALLOW: Authorized action [${pending.actionType}] from ${pending.sourceApp} to ${pending.targetApp}`);
@@ -2178,6 +2333,11 @@ function allowHypervisorAccess() {
 function denyHypervisorAccess() {
   const overlay = document.getElementById('hypervisor-overlay');
   if (overlay) overlay.classList.add('hidden');
+  // Clear pending timer
+  if (systemState.hypervisor.pendingTimer) {
+    clearTimeout(systemState.hypervisor.pendingTimer);
+    systemState.hypervisor.pendingTimer = null;
+  }
   
   const pending = systemState.hypervisor.pendingAction;
   if (pending) {
@@ -2214,6 +2374,16 @@ function changeWindowZone(appId, selectElement) {
   if (win) {
     win.classList.remove('zone-untrusted', 'zone-work', 'zone-personal', 'zone-secure');
     win.classList.add(`zone-${zone}`);
+    
+    // Regenerate IP address on subnet corresponding to new zone
+    if (systemState.windowIps) {
+      delete systemState.windowIps[appId];
+    }
+    const newIp = getWindowIp(appId);
+    const ipBadge = win.querySelector('.window-ip-badge');
+    if (ipBadge) {
+      ipBadge.textContent = `IP: ${newIp}`;
+    }
   }
   
   selectElement.className = `window-zone-select sel-${zone}`;
@@ -2390,6 +2560,17 @@ function getHypervisorContent() {
               </div>
               <label class="aa-switch">
                 <input type="checkbox" id="hyp-rule-keys" ${systemState.hypervisor.rules.vaultExport ? 'checked' : ''} onchange="toggleHypRule('vaultExport', this)">
+                <span class="aa-slider"></span>
+              </label>
+            </div>
+            
+            <div class="rule-row">
+              <div class="rule-info">
+                <span class="rule-name">Firmware (BIOS) Configuration Lock</span>
+                <span class="rule-desc">Prohibit any warm/cold reboot calls to the system BIOS utility</span>
+              </div>
+              <label class="aa-switch">
+                <input type="checkbox" id="hyp-rule-firmware" ${systemState.hypervisor.rules.firmwareLock ? 'checked' : ''} onchange="toggleHypRule('firmwareLock', this)">
                 <span class="aa-slider"></span>
               </label>
             </div>
@@ -2819,7 +3000,7 @@ function startMovieRendering() {
           const overlayEl = document.getElementById('render-progress-overlay');
           if (overlayEl) overlayEl.remove();
           
-          alert(`BLOCKED: Hypervisor denied permission to write output movie file to secure storage.`);
+          console.warn('BLOCKED: Hypervisor denied permission to write output movie file to secure storage.');
           logAudit(`XEN Intercept Blocked Movie Maker exporting video file to Vault.`);
         }
       );
@@ -3003,6 +3184,45 @@ function renderTranslationFeed() {
   }).join('');
 }
 
+async function enforceUSAccess() {
+  try {
+    const resp = await fetch('https://ipinfo.io/json');
+    if (!resp.ok) throw new Error('Failed to fetch geo info');
+    const data = await resp.json();
+    if (data.country !== 'US') {
+      // Create a full‑screen overlay blocking the UI
+      const overlay = document.createElement('div');
+      overlay.id = 'geo-block-overlay';
+      overlay.style.position = 'fixed';
+      overlay.style.top = 0;
+      overlay.style.left = 0;
+      overlay.style.width = '100vw';
+      overlay.style.height = '100vh';
+      overlay.style.background = 'rgba(0,0,0,0.85)';
+      overlay.style.color = '#fff';
+      overlay.style.display = 'flex';
+      overlay.style.alignItems = 'center';
+      overlay.style.justifyContent = 'center';
+      overlay.style.zIndex = 9999;
+      overlay.style.fontSize = '1.5rem';
+      overlay.style.textAlign = 'center';
+      overlay.innerHTML = `<div>Access Restricted<br/>This service is currently available only to users located in the United States.</div>`;
+      document.body.appendChild(overlay);
+      // Prevent further interaction
+      document.body.style.overflow = 'hidden';
+    }
+  } catch (e) {
+    console.error('Geo‑restriction error:', e);
+    // In case of error, fail‑open (allow access) but log it
+  }
+}
+
+// Call the restriction check before the rest of the app starts
+enforceUSAccess().then(() => {
+  // Existing initialization continues after the check
+  initApp(); // <-- assume original init entry point
+});
+
 function translateIncomingMessage(template) {
   // Find a matching translation template or fallback
   const matchingTrans = translationTemplates.filter(t => 
@@ -3083,4 +3303,828 @@ function stopOSSAutoUpgrades() {
     clearInterval(ossUpgradeInterval);
     ossUpgradeInterval = null;
   }
+}
+
+// ==========================================
+// TOMB UI DYNAMIC CUSTOMIZATION ENGINE
+// ==========================================
+
+function hexToRgb(hex) {
+  hex = hex.replace(/^#/, '');
+  if (hex.length === 3) {
+    hex = hex.split('').map(char => char + char).join('');
+  }
+  const num = parseInt(hex, 16);
+  return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
+}
+
+function initializeTheme() {
+  const root = document.documentElement;
+  const currentTheme = systemState.theme;
+  
+  // Set accent & background base colors
+  root.style.setProperty('--ubuntu-orange', currentTheme.accent);
+  root.style.setProperty('--ubuntu-dark', currentTheme.darkBase);
+  root.style.setProperty('--ubuntu-medium', currentTheme.secondary);
+  
+  // Set glass parameters
+  root.style.setProperty('--glass-blur', `${currentTheme.blur}px`);
+  root.style.setProperty('--glass-bg', `rgba(${hexToRgb(currentTheme.darkBase)}, ${currentTheme.opacity})`);
+  root.style.setProperty('--glass-border', `rgba(${hexToRgb(currentTheme.accent)}, 0.15)`);
+  root.style.setProperty('--glass-border-width', currentTheme.borderWidth);
+  root.style.setProperty('--glass-border-style', currentTheme.borderStyle);
+  
+  // Set system font variables
+  root.style.setProperty('--system-font-size', currentTheme.fontSize);
+  if (currentTheme.fontFamily === 'mono') {
+    root.style.setProperty('--font-ui', "var(--font-mono)");
+  } else {
+    root.style.setProperty('--font-ui', "'Outfit', -apple-system, sans-serif");
+  }
+  
+  // Apply dock classes
+  const dock = document.getElementById('dock');
+  const wrapper = document.getElementById('desktop-wrapper');
+  if (dock) {
+    dock.classList.add('dock');
+    dock.classList.remove('pos-left', 'pos-right', 'pos-bottom', 'size-small', 'size-large');
+    dock.classList.add(`pos-${currentTheme.dockPosition}`);
+    if (currentTheme.dockIconSize !== 'medium') {
+      dock.classList.add(`size-${currentTheme.dockIconSize}`);
+    }
+  }
+  if (wrapper) {
+    wrapper.classList.remove('dock-left', 'dock-right', 'dock-bottom');
+    wrapper.classList.add(`dock-${currentTheme.dockPosition}`);
+  }
+  updateNetworkUI();
+}
+
+function getThemeContent() {
+  const currentTheme = systemState.theme;
+  
+  const themes = [
+    { id: 'aubergine', name: 'Ubuntu Aubergine', accent: '#E95420', darkBase: '#2C001E', secondary: '#5E2750' },
+    { id: 'cyberpunk', name: 'Cyberpunk Green', accent: '#4AF626', darkBase: '#020f01', secondary: '#0a2f07' },
+    { id: 'tombdark', name: 'Tomb Dark', accent: '#E95420', darkBase: '#11000a', secondary: '#2c001e' },
+    { id: 'cyberblue', name: 'Cyber Blue', accent: '#00e5ff', darkBase: '#050b14', secondary: '#0c1b33' },
+    { id: 'crimson', name: 'Tomb Crimson', accent: '#FF3B30', darkBase: '#1e0000', secondary: '#3c0000' },
+    { id: 'gold', name: 'Royal Gold', accent: '#FFCC00', darkBase: '#1a1100', secondary: '#332200' }
+  ];
+
+  const wallpapers = [
+    { id: 'gradient-aubergine', name: 'Gradient Aubergine' },
+    { id: 'tomb-dark', name: 'Tomb Dark' },
+    { id: 'cyberpunk-green', name: 'Cyberpunk Green' },
+    { id: 'deep-space-blue', name: 'Deep Space Blue' }
+  ];
+
+  const fonts = [
+    { id: 'outfit', name: 'Outfit (Sans-Serif)' },
+    { id: 'mono', name: 'JetBrains Mono' }
+  ];
+
+  const sizes = [
+    { id: '80%', name: '80% (Small)' },
+    { id: '90%', name: '90% (Medium-Small)' },
+    { id: '100%', name: '100% (Default)' },
+    { id: '110%', name: '110% (Medium-Large)' },
+    { id: '120%', name: '120% (Large)' }
+  ];
+
+  const dockPositions = [
+    { id: 'left', name: 'Left Side' },
+    { id: 'right', name: 'Right Side' },
+    { id: 'bottom', name: 'Bottom Panel' }
+  ];
+
+  const dockSizes = [
+    { id: 'small', name: 'Compact' },
+    { id: 'medium', name: 'Default' },
+    { id: 'large', name: 'Comfortable' }
+  ];
+
+  const borderWidths = [
+    { id: '1px', name: 'Thin (1px)' },
+    { id: '2px', name: 'Medium (2px)' },
+    { id: '3px', name: 'Thick (3px)' },
+    { id: '4px', name: 'Heavy (4px)' }
+  ];
+
+  const borderStyles = [
+    { id: 'solid', name: 'Solid' },
+    { id: 'dashed', name: 'Dashed' },
+    { id: 'double', name: 'Double' },
+    { id: 'dotted', name: 'Dotted' }
+  ];
+
+  let swatchesHtml = '';
+  themes.forEach(t => {
+    const isActive = (currentTheme.accent.toLowerCase() === t.accent.toLowerCase() && currentTheme.darkBase.toLowerCase() === t.darkBase.toLowerCase());
+    swatchesHtml += `
+      <div class="theme-swatch ${isActive ? 'active' : ''}" 
+           style="background: linear-gradient(135deg, ${t.accent} 0%, ${t.secondary} 50%, ${t.darkBase} 100%);"
+           onclick="applyUITheme('${t.id}')"
+           title="${t.name}"></div>
+    `;
+  });
+
+  let wallpaperHtml = '';
+  wallpapers.forEach(w => {
+    const isActive = currentTheme.wallpaper === w.id;
+    wallpaperHtml += `
+      <button class="theme-btn ${isActive ? 'active' : ''}" onclick="applyUIWallpaper('${w.id}')">
+        ${w.name}
+      </button>
+    `;
+  });
+
+  let sizeHtml = '';
+  sizes.forEach(s => {
+    const isActive = currentTheme.fontSize === s.id;
+    sizeHtml += `
+      <button class="theme-btn ${isActive ? 'active' : ''}" onclick="applyUIFontSize('${s.id}')">
+        ${s.name}
+      </button>
+    `;
+  });
+
+  let fontFamilyHtml = '';
+  fonts.forEach(f => {
+    const isActive = currentTheme.fontFamily === f.id;
+    fontFamilyHtml += `
+      <button class="theme-btn ${isActive ? 'active' : ''}" onclick="applyUIFontFamily('${f.id}')">
+        ${f.name}
+      </button>
+    `;
+  });
+
+  let dockPosHtml = '';
+  dockPositions.forEach(dp => {
+    const isActive = currentTheme.dockPosition === dp.id;
+    dockPosHtml += `
+      <button class="theme-btn ${isActive ? 'active' : ''}" onclick="applyUIDockPosition('${dp.id}')">
+        ${dp.name}
+      </button>
+    `;
+  });
+
+  let dockSizeHtml = '';
+  dockSizes.forEach(ds => {
+    const isActive = currentTheme.dockIconSize === ds.id;
+    dockSizeHtml += `
+      <button class="theme-btn ${isActive ? 'active' : ''}" onclick="applyUIDockSize('${ds.id}')">
+        ${ds.name}
+      </button>
+    `;
+  });
+
+  let borderWidthHtml = '';
+  borderWidths.forEach(bw => {
+    const isActive = currentTheme.borderWidth === bw.id;
+    borderWidthHtml += `
+      <button class="theme-btn ${isActive ? 'active' : ''}" onclick="applyUIBorderWidth('${bw.id}')">
+        ${bw.name}
+      </button>
+    `;
+  });
+
+  let borderStyleHtml = '';
+  borderStyles.forEach(bs => {
+    const isActive = currentTheme.borderStyle === bs.id;
+    borderStyleHtml += `
+      <button class="theme-btn ${isActive ? 'active' : ''}" onclick="applyUIBorderStyle('${bs.id}')">
+        ${bs.name}
+      </button>
+    `;
+  });
+
+  return `
+    <div class="app-theme-container">
+      <div style="font-size: 11px; color: var(--ubuntu-light-grey); margin-bottom: 8px;">
+        Fully customize the design system of Tomb OS. Adjust colors, wallpaper background, window transparency, dock position, and system-wide borders.
+      </div>
+
+      <div class="theme-sec-title">🎨 Theme Accents & Wallpaper</div>
+      
+      <div class="theme-row">
+        <div class="theme-label">Predefined Theme Palettes:</div>
+        <div class="theme-swatches">
+          ${swatchesHtml}
+        </div>
+      </div>
+
+      <div class="theme-row">
+        <div class="theme-label">Desktop Wallpaper Gradient:</div>
+        <div class="theme-buttons">
+          ${wallpaperHtml}
+        </div>
+      </div>
+
+      <div class="theme-sec-title">✨ Glassmorphism & Transparency</div>
+
+      <div class="theme-row">
+        <div class="theme-label">Glassmorphism Blur:</div>
+        <div class="theme-slider-group">
+          <input type="range" class="theme-slider" min="0" max="40" value="${currentTheme.blur}" oninput="applyUIBlur(this.value)">
+          <div class="theme-slider-val" id="theme-blur-val">${currentTheme.blur}px</div>
+        </div>
+      </div>
+
+      <div class="theme-row">
+        <div class="theme-label">Glassmorphism Opacity:</div>
+        <div class="theme-slider-group">
+          <input type="range" class="theme-slider" min="10" max="95" value="${Math.round(currentTheme.opacity * 100)}" oninput="applyUIOpacity(this.value / 100)">
+          <div class="theme-slider-val" id="theme-opacity-val">${Math.round(currentTheme.opacity * 100)}%</div>
+        </div>
+      </div>
+
+      <div class="theme-sec-title">🖥️ Dock Sizing & Placement</div>
+
+      <div class="theme-row">
+        <div class="theme-label">Dock Position:</div>
+        <div class="theme-buttons">
+          ${dockPosHtml}
+        </div>
+      </div>
+
+      <div class="theme-row">
+        <div class="theme-label">Dock Icon Size:</div>
+        <div class="theme-buttons">
+          ${dockSizeHtml}
+        </div>
+      </div>
+
+      <div class="theme-sec-title">🔲 Window Borders (Qubes-Style VM Borders)</div>
+
+      <div class="theme-row">
+        <div class="theme-label">Border Width:</div>
+        <div class="theme-buttons">
+          ${borderWidthHtml}
+        </div>
+      </div>
+
+      <div class="theme-row">
+        <div class="theme-label">Border Style:</div>
+        <div class="theme-buttons">
+          ${borderStyleHtml}
+        </div>
+      </div>
+
+      <div class="theme-sec-title">🔤 Typography & Font Scale</div>
+
+      <div class="theme-row">
+        <div class="theme-label">Font Family:</div>
+        <div class="theme-buttons">
+          ${fontFamilyHtml}
+        </div>
+      </div>
+
+      <div class="theme-row">
+        <div class="theme-label">System Font Scale:</div>
+        <div class="theme-buttons">
+          ${sizeHtml}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function refreshThemeWindow() {
+  const win = document.getElementById('window-theme');
+  if (win) {
+    const content = win.querySelector('.window-content');
+    if (content) {
+      content.innerHTML = getThemeContent();
+    }
+  }
+}
+
+function applyUITheme(themeId) {
+  const root = document.documentElement;
+  const themes = {
+    aubergine: { accent: '#E95420', darkBase: '#2C001E', secondary: '#5E2750' },
+    cyberpunk: { accent: '#4AF626', darkBase: '#020f01', secondary: '#0a2f07' },
+    tombdark: { accent: '#E95420', darkBase: '#11000a', secondary: '#2c001e' },
+    cyberblue: { accent: '#00e5ff', darkBase: '#050b14', secondary: '#0c1b33' },
+    crimson: { accent: '#FF3B30', darkBase: '#1e0000', secondary: '#3c0000' },
+    gold: { accent: '#FFCC00', darkBase: '#1a1100', secondary: '#332200' }
+  };
+  const t = themes[themeId];
+  if (t) {
+    systemState.theme.accent = t.accent;
+    systemState.theme.darkBase = t.darkBase;
+    systemState.theme.secondary = t.secondary;
+    
+    root.style.setProperty('--ubuntu-orange', t.accent);
+    root.style.setProperty('--ubuntu-dark', t.darkBase);
+    root.style.setProperty('--ubuntu-medium', t.secondary);
+    
+    root.style.setProperty('--glass-bg', `rgba(${hexToRgb(t.darkBase)}, ${systemState.theme.opacity})`);
+    root.style.setProperty('--glass-border', `rgba(${hexToRgb(t.accent)}, 0.15)`);
+    
+    refreshThemeWindow();
+  }
+}
+
+function applyUIWallpaper(wallId) {
+  systemState.theme.wallpaper = wallId;
+  const wrapper = document.getElementById('desktop-wrapper');
+  if (wrapper) {
+    const gradients = {
+      'gradient-aubergine': 'radial-gradient(circle at center, #6b2659 0%, #200115 70%, #0c0008 100%)',
+      'tomb-dark': 'radial-gradient(circle at center, #1b0026 0%, #000 100%)',
+      'cyberpunk-green': 'radial-gradient(circle at center, #0a2f07 0%, #020f01 70%, #000000 100%)',
+      'deep-space-blue': 'radial-gradient(circle at center, #0c1b33 0%, #050b14 70%, #000000 100%)'
+    };
+    wrapper.style.background = gradients[wallId] || gradients['gradient-aubergine'];
+  }
+  refreshThemeWindow();
+}
+
+function applyUIBlur(val) {
+  systemState.theme.blur = parseInt(val);
+  document.documentElement.style.setProperty('--glass-blur', `${val}px`);
+  const valEl = document.getElementById('theme-blur-val');
+  if (valEl) valEl.textContent = `${val}px`;
+}
+
+function applyUIOpacity(val) {
+  systemState.theme.opacity = parseFloat(val);
+  document.documentElement.style.setProperty('--glass-bg', `rgba(${hexToRgb(systemState.theme.darkBase)}, ${val})`);
+  const valEl = document.getElementById('theme-opacity-val');
+  if (valEl) valEl.textContent = `${Math.round(val * 100)}%`;
+}
+
+function applyUIDockPosition(pos) {
+  systemState.theme.dockPosition = pos;
+  const dock = document.getElementById('dock');
+  const wrapper = document.getElementById('desktop-wrapper');
+  if (dock) {
+    dock.classList.remove('pos-left', 'pos-right', 'pos-bottom');
+    dock.classList.add(`pos-${pos}`);
+  }
+  if (wrapper) {
+    wrapper.classList.remove('dock-left', 'dock-right', 'dock-bottom');
+    wrapper.classList.add(`dock-${pos}`);
+  }
+  refreshThemeWindow();
+}
+
+function applyUIDockSize(size) {
+  systemState.theme.dockIconSize = size;
+  const dock = document.getElementById('dock');
+  if (dock) {
+    dock.classList.remove('size-small', 'size-large');
+    if (size === 'small' || size === 'large') {
+      dock.classList.add(`size-${size}`);
+    }
+  }
+  refreshThemeWindow();
+}
+
+function applyUIBorderWidth(width) {
+  systemState.theme.borderWidth = width;
+  document.documentElement.style.setProperty('--glass-border-width', width);
+  refreshThemeWindow();
+}
+
+function applyUIBorderStyle(style) {
+  systemState.theme.borderStyle = style;
+  document.documentElement.style.setProperty('--glass-border-style', style);
+  refreshThemeWindow();
+}
+
+function applyUIFontFamily(familyId) {
+  systemState.theme.fontFamily = familyId;
+  const root = document.documentElement;
+  if (familyId === 'mono') {
+    root.style.setProperty('--font-ui', "var(--font-mono)");
+  } else {
+    root.style.setProperty('--font-ui', "'Outfit', -apple-system, sans-serif");
+  }
+  refreshThemeWindow();
+}
+
+function applyUIFontSize(pct) {
+  systemState.theme.fontSize = pct;
+  document.documentElement.style.setProperty('--system-font-size', pct);
+  refreshThemeWindow();
+}
+
+// ==========================================
+// NETWORK SWITCHER & WIFI RESTRICTION ENGINE
+// ==========================================
+
+const wifiIcon = `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-1.47-1.99-2.35-4.43-2.35-7.1 0-6.63 5.37-12 12-12s12 5.37 12 12c0 2.67-.88 5.11-2.35 7.1l-1.62-1.79C21.26 16.07 22 14.12 22 12c0-4.97-4.03-9-9-9zm0 4c-2.76 0-5 2.24-5 5 0 1.25.46 2.39 1.21 3.29l1.43-1.58C9.23 13.19 9 12.62 9 12c0-1.66 1.34-3 3-3s3 1.34 3 3c0 .62-.23 1.19-.64 1.71l1.43 1.58c.75-.9 1.21-2.04 1.21-3.29 0-2.76-2.24-5-5-5zm0 4c-.55 0-1 .45-1 1 0 .28.11.53.3.71l1.41-1.41c-.18-.19-.43-.3-.71-.3z" fill="currentColor"/></svg>`;
+const ethernetIcon = `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M7 16h10v-2H7v2zm12-9h-5V5c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H2v13h17c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM9 5h6v2H9V5zm10 13H4V9h15v9z" fill="currentColor"/></svg>`;
+
+function setNetworkInterface(type) {
+  systemState.network = type;
+  updateNetworkUI();
+  
+  logAudit(`Network interface switched to ${type === 'wifi' ? 'Wi-Fi (wlan0)' : 'Ethernet (eth0)'}.`);
+  addHypervisorLog(`NETWORK_SWITCH: Interface is now ${type.toUpperCase()}`);
+  
+  const logsEl = document.getElementById('ultimate-logs');
+  if (logsEl) {
+    const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+    const row = document.createElement('div');
+    row.className = type === 'wifi' ? 'ultimate-log-row alert' : 'ultimate-log-row verified';
+    row.textContent = `[${time}] Network configuration altered: interface is ${type === 'wifi' ? 'Wireless (wlan0)' : 'Wired Ethernet (eth0)'}.`;
+    logsEl.appendChild(row);
+    logsEl.scrollTop = logsEl.scrollHeight;
+  }
+}
+
+function updateNetworkUI() {
+  const iconEl = document.getElementById('top-network-icon');
+  if (iconEl) {
+    iconEl.innerHTML = systemState.network === 'wifi' ? wifiIcon : ethernetIcon;
+  }
+  
+  const wifiBtn = document.getElementById('net-btn-wifi');
+  const ethBtn = document.getElementById('net-btn-ethernet');
+  if (wifiBtn && ethBtn) {
+    if (systemState.network === 'wifi') {
+      wifiBtn.style.background = 'var(--ubuntu-orange)';
+      wifiBtn.style.borderColor = 'var(--ubuntu-orange)';
+      wifiBtn.style.fontWeight = 'bold';
+      
+      ethBtn.style.background = 'rgba(255,255,255,0.08)';
+      ethBtn.style.borderColor = 'rgba(255,255,255,0.15)';
+      ethBtn.style.fontWeight = 'normal';
+    } else {
+      ethBtn.style.background = 'var(--ubuntu-orange)';
+      ethBtn.style.borderColor = 'var(--ubuntu-orange)';
+      ethBtn.style.fontWeight = 'bold';
+      
+      wifiBtn.style.background = 'rgba(255,255,255,0.08)';
+      wifiBtn.style.borderColor = 'rgba(255,255,255,0.15)';
+      wifiBtn.style.fontWeight = 'normal';
+    }
+  }
+}
+
+// ==========================================
+// BIOS / FIRMWARE EMULATION ENGINE
+// ==========================================
+
+function executeRebootToBios() {
+  document.getElementById('desktop-wrapper').classList.add('hidden');
+  const qs = document.getElementById('quick-settings');
+  if (qs) qs.classList.add('hidden');
+  
+  const postScreen = document.getElementById('bios-post-screen');
+  const postLog = document.getElementById('bios-post-log');
+  postScreen.classList.remove('hidden');
+  postLog.textContent = '';
+  
+  const logs = [
+    "Initializing Core Hardware...",
+    "Detecting CPU: Intel(R) Xeon(R) Security Processor @ 3.80GHz... OK",
+    "RAM Check: 16384 MB... OK",
+    "TPM 2.0 cryptographic module... FOUND (State: ENABLED)",
+    "Searching for Boot Devices...",
+    "  Device 0: SATA SSD (Tomb Immutable Core Root) - SECURE BOOT VERIFIED",
+    "  Device 1: USB Flash / SD Card Reader - DETECTED",
+    "System reboot mode: BIOS CONFIGURATION UTILITY REQUESTED",
+    "Entering Setup Utility..."
+  ];
+  
+  let logIdx = 0;
+  function printPostLog() {
+    if (logIdx < logs.length) {
+      postLog.textContent += logs[logIdx] + "\n";
+      logIdx++;
+      setTimeout(printPostLog, 300 + Math.random() * 200);
+    } else {
+      setTimeout(() => {
+        postScreen.classList.add('hidden');
+        document.getElementById('bios-screen').classList.remove('hidden');
+        systemState.bios = {
+          activeTab: 'main',
+          selectedIdx: 0,
+          settings: {
+            secureBoot: systemState.ultimate.sel4,
+            tpmState: systemState.ultimate.tpm ? 'Active' : 'Inactive',
+            sdCardBoot: systemState.ultimate.sdcardMode,
+            adminPass: 'Configured',
+            microcode: 'Enforced'
+          }
+        };
+        renderBiosScreen();
+        setupBiosKeyListeners();
+      }, 800);
+    }
+  }
+  printPostLog();
+}
+
+function renderBiosScreen() {
+  const container = document.getElementById('bios-settings-list');
+  if (!container) return;
+  
+  const tab = systemState.bios.activeTab;
+  let html = '';
+  
+  if (tab === 'main') {
+    html = `
+      <div style="color: #ffff55; font-weight: bold; margin-bottom: 10px;">System Overview</div>
+      <div class="bios-row" onclick="selectBiosItem(0)">
+        <span>BIOS Version</span>
+        <span class="bios-row-value">TOMB-UEFI-v1.0.4</span>
+      </div>
+      <div class="bios-row" onclick="selectBiosItem(1)">
+        <span>Processor Type</span>
+        <span class="bios-row-value">Intel(R) Xeon(R) Security CPU @ 3.80GHz</span>
+      </div>
+      <div class="bios-row" onclick="selectBiosItem(2)">
+        <span>System Memory</span>
+        <span class="bios-row-value">16384 MB (DDR5)</span>
+      </div>
+      <div class="bios-row" onclick="selectBiosItem(3)">
+        <span>TPM Module Version</span>
+        <span class="bios-row-value">v2.0 (Verified Secure)</span>
+      </div>
+      <div class="bios-row" onclick="selectBiosItem(4)">
+        <span>System Time</span>
+        <span class="bios-row-value">${new Date().toLocaleTimeString()}</span>
+      </div>
+    `;
+  } else if (tab === 'security') {
+    const s = systemState.bios.settings;
+    html = `
+      <div style="color: #ffff55; font-weight: bold; margin-bottom: 10px;">Security Configuration</div>
+      <div class="bios-row" onclick="toggleBiosSetting('secureBoot')">
+        <span>UEFI Secure Boot Control</span>
+        <span class="bios-row-value">[${s.secureBoot ? 'Enabled' : 'Disabled'}]</span>
+      </div>
+      <div class="bios-row" onclick="toggleBiosSetting('tpmState')">
+        <span>TPM 2.0 Security State</span>
+        <span class="bios-row-value">[${s.tpmState}]</span>
+      </div>
+      <div class="bios-row" onclick="toggleBiosSetting('microcode')">
+        <span>Microcode Enforcement</span>
+        <span class="bios-row-value">[${s.microcode}]</span>
+      </div>
+      <div class="bios-row" onclick="toggleBiosSetting('adminPass')">
+        <span>Supervisor Password</span>
+        <span class="bios-row-value">[${s.adminPass}]</span>
+      </div>
+    `;
+  } else if (tab === 'boot') {
+    const s = systemState.bios.settings;
+    html = `
+      <div style="color: #ffff55; font-weight: bold; margin-bottom: 10px;">Boot Priority & Device Settings</div>
+      <div class="bios-row" onclick="toggleBiosSetting('sdCardBoot')">
+        <span>Primary Boot Target</span>
+        <span class="bios-row-value">[${s.sdCardBoot ? 'Live SD Card' : 'Hardened SATA SSD'}]</span>
+      </div>
+      <div class="bios-row">
+        <span>Boot Option #2</span>
+        <span class="bios-row-value">[Hardened SATA SSD]</span>
+      </div>
+      <div class="bios-row">
+        <span>Boot Option #3</span>
+        <span class="bios-row-value">[Network PXE Secure Boot]</span>
+      </div>
+      <div class="bios-row">
+        <span>USB Boot Interface</span>
+        <span class="bios-row-value">[Enabled]</span>
+      </div>
+    `;
+  } else if (tab === 'exit') {
+    html = `
+      <div style="color: #ffff55; font-weight: bold; margin-bottom: 10px;">Exit Options</div>
+      <div class="bios-row" onclick="exitBiosSetup(true)" style="font-weight: bold; color: #ff5555;">
+        <span>Save Changes & Reset System</span>
+        <span class="bios-row-value">&lt;Enter&gt;</span>
+      </div>
+      <div class="bios-row" onclick="exitBiosSetup(false)">
+        <span>Discard Changes & Exit</span>
+        <span class="bios-row-value">&lt;Enter&gt;</span>
+      </div>
+      <div class="bios-row" onclick="toggleBiosSetting('defaults')">
+        <span>Load Optimal Defaults</span>
+        <span class="bios-row-value">&lt;Enter&gt;</span>
+      </div>
+    `;
+  }
+  
+  container.innerHTML = html;
+  updateBiosHelpText();
+}
+
+function switchBiosTab(tabId) {
+  systemState.bios.activeTab = tabId;
+  const tabs = document.querySelectorAll('.bios-menu-tab');
+  tabs.forEach(tab => {
+    if (tab.textContent.toLowerCase().includes(tabId)) {
+      tab.classList.add('active');
+    } else {
+      tab.classList.remove('active');
+    }
+  });
+  renderBiosScreen();
+  setupBiosKeyListeners();
+}
+
+function updateBiosHelpText() {
+  const tab = systemState.bios.activeTab;
+  const helpEl = document.getElementById('bios-help-text');
+  if (!helpEl) return;
+  
+  let help = '';
+  if (tab === 'main') {
+    help = "Main System Information. Shows BIOS release version, CPU models, detected DDR5 RAM capacities, and active hardware-clock timestamps.";
+  } else if (tab === 'security') {
+    help = "Configure cryptographic firmware guards. Secure Boot enforces kernel-signature verification. TPM state permits hardware-anchored key vaulting.";
+  } else if (tab === 'boot') {
+    help = "Select the default boot media target. Change this to 'Live SD Card' to launch the OS in portable sandbox RAM-disk mode.";
+  } else if (tab === 'exit') {
+    help = "Exit the BIOS Configuration utility. Saving changes will commit custom security policies to persistent system firmware and trigger a warm reboot.";
+  }
+  helpEl.innerHTML = help;
+}
+
+function selectBiosItem(idx) {
+  systemState.bios.selectedIdx = idx;
+  const rows = document.querySelectorAll('#bios-settings-list .bios-row');
+  rows.forEach((row, rIdx) => {
+    if (rIdx === idx) {
+      row.style.background = '#ffff55';
+      row.style.color = '#0000aa';
+      const valEl = row.querySelector('.bios-row-value');
+      if (valEl) valEl.style.color = '#0000aa';
+    } else {
+      row.style.background = 'transparent';
+      row.style.color = '#ffff55';
+      const valEl = row.querySelector('.bios-row-value');
+      if (valEl) valEl.style.color = '#ffffff';
+    }
+  });
+}
+
+function toggleBiosSetting(settingKey) {
+  const s = systemState.bios.settings;
+  if (settingKey === 'secureBoot') {
+    s.secureBoot = !s.secureBoot;
+  } else if (settingKey === 'tpmState') {
+    s.tpmState = s.tpmState === 'Active' ? 'Inactive' : 'Active';
+  } else if (settingKey === 'microcode') {
+    s.microcode = s.microcode === 'Enforced' ? 'Standard' : 'Enforced';
+  } else if (settingKey === 'adminPass') {
+    s.adminPass = s.adminPass === 'Configured' ? 'Not Set' : 'Configured';
+  } else if (settingKey === 'sdCardBoot') {
+    s.sdCardBoot = !s.sdCardBoot;
+  } else if (settingKey === 'defaults') {
+    s.secureBoot = true;
+    s.tpmState = 'Active';
+    s.microcode = 'Enforced';
+    s.adminPass = 'Configured';
+    s.sdCardBoot = false;
+  }
+  renderBiosScreen();
+}
+
+function exitBiosSetup(save) {
+  const biosScreen = document.getElementById('bios-screen');
+  const postScreen = document.getElementById('bios-post-screen');
+  const postLog = document.getElementById('bios-post-log');
+  
+  if (save) {
+    const s = systemState.bios.settings;
+    systemState.ultimate.sel4 = s.secureBoot;
+    systemState.ultimate.tpm = (s.tpmState === 'Active');
+    
+    // update ultimate UI status badge if open
+    const sel4Badge = document.getElementById('ultimate-status-sel4');
+    if (sel4Badge) {
+      sel4Badge.textContent = s.secureBoot ? 'FORMALLY VERIFIED' : 'STANDARD KERNEL';
+      sel4Badge.className = `ultimate-card-status ${s.secureBoot ? 'enforced' : 'inactive'}`;
+    }
+    const tpmBadge = document.getElementById('ultimate-status-tpm');
+    if (tpmBadge) {
+      tpmBadge.textContent = (s.tpmState === 'Active') ? 'ATTESTATION ACTIVE' : 'UNSECURED MEMORY';
+      tpmBadge.className = `ultimate-card-status ${(s.tpmState === 'Active') ? 'enforced' : 'inactive'}`;
+    }
+    
+    if (s.sdCardBoot !== systemState.ultimate.sdcardMode) {
+      systemState.ultimate.sdcardMode = s.sdCardBoot;
+      const sdBadge = document.getElementById('ultimate-status-sdcardMode');
+      if (sdBadge) {
+        sdBadge.textContent = s.sdCardBoot ? 'LIVE SD BOOT' : 'HARD DRIVE BOOT';
+        sdBadge.className = `ultimate-card-status ${s.sdCardBoot ? 'enforced' : 'inactive'}`;
+      }
+      const sdCheckbox = document.querySelector('input[onchange*="sdcardMode"]');
+      if (sdCheckbox) sdCheckbox.checked = s.sdCardBoot;
+      
+      const indicator = document.getElementById('sdcard-indicator');
+      if (indicator) {
+        if (s.sdCardBoot) indicator.classList.remove('hidden');
+        else indicator.classList.add('hidden');
+      }
+    }
+  }
+  
+  biosScreen.classList.add('hidden');
+  postScreen.classList.remove('hidden');
+  postLog.innerHTML = `<span style="color: #ffcc00;">Restarting system...\nApplying firmware settings...\nPerforming cold reset...\n</span>`;
+  
+  if (biosKeyHandler) {
+    document.removeEventListener('keydown', biosKeyHandler);
+    biosKeyHandler = null;
+  }
+  
+  setTimeout(() => {
+    postScreen.classList.add('hidden');
+    const bootScreen = document.getElementById('boot-screen');
+    const bootProgressFill = document.querySelector('.boot-progress-fill');
+    const bootStatus = document.querySelector('.boot-status');
+    const desktopWrapper = document.getElementById('desktop-wrapper');
+    
+    if (bootScreen && bootProgressFill && bootStatus) {
+      bootProgressFill.style.width = '0%';
+      bootStatus.textContent = 'Rebooting into Tomb OS kernel...';
+      bootScreen.classList.remove('fade-out', 'hidden');
+      
+      let progress = 0;
+      function runWarmBoot() {
+        if (progress < 100) {
+          progress += 20;
+          bootProgressFill.style.width = `${progress}%`;
+          bootStatus.textContent = `Warming modules... [${progress}%]`;
+          setTimeout(runWarmBoot, 200);
+        } else {
+          bootScreen.classList.add('fade-out');
+          desktopWrapper.classList.remove('hidden');
+          setTimeout(() => {
+            bootScreen.classList.add('hidden');
+            logAudit("System booted successfully from BIOS warm reset.");
+          }, 800);
+        }
+      }
+      runWarmBoot();
+    } else {
+      location.reload();
+    }
+  }, 1500);
+}
+
+let biosKeyHandler = null;
+function setupBiosKeyListeners() {
+  if (biosKeyHandler) {
+    document.removeEventListener('keydown', biosKeyHandler);
+  }
+  
+  systemState.bios.selectedIdx = 0;
+  
+  biosKeyHandler = function(e) {
+    const biosScreen = document.getElementById('bios-screen');
+    if (!biosScreen || biosScreen.classList.contains('hidden')) return;
+    
+    const rows = document.querySelectorAll('#bios-settings-list .bios-row');
+    if (rows.length === 0) return;
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      systemState.bios.selectedIdx = (systemState.bios.selectedIdx + 1) % rows.length;
+      selectBiosItem(systemState.bios.selectedIdx);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      systemState.bios.selectedIdx = (systemState.bios.selectedIdx - 1 + rows.length) % rows.length;
+      selectBiosItem(systemState.bios.selectedIdx);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      const tabs = ['main', 'security', 'boot', 'exit'];
+      let currTabIdx = tabs.indexOf(systemState.bios.activeTab);
+      currTabIdx = (currTabIdx - 1 + tabs.length) % tabs.length;
+      switchBiosTab(tabs[currTabIdx]);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      const tabs = ['main', 'security', 'boot', 'exit'];
+      let currTabIdx = tabs.indexOf(systemState.bios.activeTab);
+      currTabIdx = (currTabIdx + 1) % tabs.length;
+      switchBiosTab(tabs[currTabIdx]);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const activeRow = rows[systemState.bios.selectedIdx];
+      if (activeRow) {
+        activeRow.click();
+      }
+    } else if (e.key === 'F10') {
+      e.preventDefault();
+      exitBiosSetup(true);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      exitBiosSetup(false);
+    }
+  };
+  
+  document.addEventListener('keydown', biosKeyHandler);
+  
+  setTimeout(() => {
+    selectBiosItem(0);
+  }, 50);
 }
