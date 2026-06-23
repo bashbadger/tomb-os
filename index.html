@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hardened Ubuntu Security OS Simulator</title>
+  <!-- Google Fonts for UI and Terminal -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;1,300&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- System Boot Overlay -->
+  <div id="boot-screen" class="boot-screen">
+    <div class="boot-logo-container">
+      <svg class="ubuntu-logo" viewBox="0 0 100 100" width="120" height="120">
+        <!-- Ubuntu-like circle logo with glowing elements -->
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#E95420" stroke-width="8" />
+        <circle cx="50" cy="18" r="8" fill="#E95420" />
+        <circle cx="28" cy="62" r="8" fill="#E95420" />
+        <circle cx="72" cy="62" r="8" fill="#E95420" />
+        <path d="M 50 26 A 24 24 0 0 1 68 38" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
+        <path d="M 64 62 A 24 24 0 0 1 40 72" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
+        <path d="M 36 48 A 24 24 0 0 1 46 26" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
+      </svg>
+      <div class="boot-title">Hardened Ubuntu 26.04 LTS</div>
+      <div class="boot-status">Loading Security Kernels & Sandbox Frameworks...</div>
+      <div class="boot-progress-bar"><div class="boot-progress-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- Main Desktop Environment -->
+  <div id="desktop-wrapper" class="desktop-wrapper hidden">
+    <!-- GNOME Top Bar -->
+    <header id="top-bar">
+      <div class="top-bar-left">
+        <span class="activities-btn">Activities</span>
+        <span class="app-menu-title">Security Core</span>
+      </div>
+      <div class="top-bar-center" id="live-time">
+        Tue Jun 23, 12:58 AM
+      </div>
+      <div class="top-bar-right">
+        <!-- Shield status indicating overall security health -->
+        <div class="status-shield" id="security-badge" onclick="toggleQuickSettings()">
+          <svg viewBox="0 0 24 24" width="16" height="16" class="icon-green">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="currentColor" />
+          </svg>
+          <span class="badge-text">SECURE</span>
+        </div>
+        <div class="system-indicators" onclick="toggleQuickSettings()">
+          <span class="network-status">
+            <svg viewBox="0 0 24 24" width="16" height="16">
+              <path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-1.47-1.99-2.35-4.43-2.35-7.1 0-6.63 5.37-12 12-12s12 5.37 12 12c0 2.67-.88 5.11-2.35 7.1l-1.62-1.79C21.26 16.07 22 14.12 22 12c0-4.97-4.03-9-9-9zm0 4c-2.76 0-5 2.24-5 5 0 1.25.46 2.39 1.21 3.29l1.43-1.58C9.23 13.19 9 12.62 9 12c0-1.66 1.34-3 3-3s3 1.34 3 3c0 .62-.23 1.19-.64 1.71l1.43 1.58c.75-.9 1.21-2.04 1.21-3.29 0-2.76-2.24-5-5-5zm0 4c-.55 0-1 .45-1 1 0 .28.11.53.3.71l1.41-1.41c-.18-.19-.43-.3-.71-.3z" fill="currentColor"/>
+            </svg>
+          </span>
+          <span class="battery-status">100%</span>
+          <span class="system-dropdown-arrow">▼</span>
+        </div>
+      </div>
+
+      <!-- Quick Settings Dropdown -->
+      <div id="quick-settings" class="quick-settings-popup hidden">
+        <div class="qs-header">
+          <h3>Security Center</h3>
+          <span class="qs-badge secure">UFW & AppArmor: Active</span>
+        </div>
+        <div class="qs-grid">
+          <div class="qs-item" onclick="toggleSecurityFeature('ufw')">
+            <div class="qs-icon-wrapper active" id="qs-ufw-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" fill="currentColor"/></svg>
+            </div>
+            <span>Firewall (UFW)</span>
+          </div>
+          <div class="qs-item" onclick="toggleSecurityFeature('apparmor')">
+            <div class="qs-icon-wrapper active" id="qs-apparmor-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 15l-4-4 1.41-1.41L10 13.17l7.59-7.59L19 7l-9 9z" fill="currentColor"/></svg>
+            </div>
+            <span>AppArmor Sandbox</span>
+          </div>
+          <div class="qs-item" onclick="toggleSecurityFeature('audit')">
+            <div class="qs-icon-wrapper active" id="qs-audit-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="currentColor"/></svg>
+            </div>
+            <span>Auditd Logging</span>
+          </div>
+          <div class="qs-item" onclick="toggleSecurityFeature('fail2ban')">
+            <div class="qs-icon-wrapper active" id="qs-fail2ban-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/></svg>
+            </div>
+            <span>Fail2Ban IPS</span>
+          </div>
+        </div>
+        <div class="qs-system-info">
+          <div><strong>IP Address:</strong> 10.0.2.15 (NAT)</div>
+          <div><strong>Kernel:</strong> Linux 6.13.0-hardened-lts</div>
+          <div><strong>Uptime:</strong> <span id="uptime-counter">0m</span></div>
+        </div>
+        <div class="qs-footer">
+          <button class="qs-btn" onclick="triggerOSAction('restart')">Restart OS</button>
+          <button class="qs-btn shutdown" onclick="triggerOSAction('shutdown')">Shutdown</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Desktop Area -->
+    <main id="desktop">
+      <!-- Desktop Icons -->
+      <div class="desktop-icons">
+        <div class="desktop-icon" onclick="openWindow('readme')">
+          <div class="icon-art text-file">
+            <svg viewBox="0 0 24 24" width="36" height="36">
+              <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM13 9V3.5L18.5 9H13z" fill="#FFFFFF"/>
+            </svg>
+          </div>
+          <span class="icon-label">README_SECURITY.md</span>
+        </div>
+      </div>
+
+      <!-- App Windows Container -->
+      <div id="windows-container"></div>
+    </main>
+
+    <!-- Interactive Tour Overlay -->
+    <div id="tour-overlay" class="tour-overlay hidden">
+      <div class="tour-card">
+        <div class="tour-header">
+          <h4 id="tour-title">Welcome to the Security Tour</h4>
+          <button class="tour-close" onclick="closeTour()">✕</button>
+        </div>
+        <div class="tour-body" id="tour-body">
+          This interactive guide will walk you through securing this Ubuntu OS and achieving SOC 2 / GDPR compliance.
+        </div>
+        <div class="tour-footer">
+          <span class="tour-steps" id="tour-step-indicator">Step 1 of 5</span>
+          <div class="tour-actions">
+            <button class="tour-btn secondary" id="tour-prev-btn" onclick="prevTourStep()">Previous</button>
+            <button class="tour-btn" id="tour-next-btn" onclick="nextTourStep()">Next Step</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ubuntu Left Dock -->
+    <nav id="dock">
+      <div class="dock-inner">
+        <!-- Terminal (Terminal emulator) -->
+        <div class="dock-item" data-app="terminal" onclick="openWindow('terminal')" title="Hardened Terminal">
+          <svg viewBox="0 0 24 24" class="dock-svg-icon terminal-color">
+            <rect width="20" height="16" x="2" y="4" rx="2" fill="#2c001e" stroke="#E95420" stroke-width="1.5" />
+            <path d="M6 8l4 4-4 4M12 15h6" stroke="#4AF626" stroke-width="2" stroke-linecap="round" fill="none" />
+          </svg>
+          <div class="dock-dot hidden" id="dot-terminal"></div>
+        </div>
+
+        <!-- IDS Shield (Network monitoring visualizer) -->
+        <div class="dock-item" data-app="ids" onclick="openWindow('ids')" title="Intrusion Detection System (IDS)">
+          <svg viewBox="0 0 24 24" class="dock-svg-icon ids-color">
+            <path d="M12 2L2 7v6c0 5.52 4.48 10 10 10s10-4.48 10-10V7l-10-5zm0 18c-4.41 0-8-3.59-8-8V8.38l8-4 8 4V12c0 4.41-3.59 8-8 8z" fill="#E95420"/>
+            <circle cx="12" cy="12" r="4" fill="#E95420" class="pulsing-core" />
+          </svg>
+          <div class="dock-dot hidden" id="dot-ids"></div>
+        </div>
+
+        <!-- AppArmor (Application Sandboxing Controller) -->
+        <div class="dock-item" data-app="apparmor" onclick="openWindow('apparmor')" title="AppArmor Control Center">
+          <svg viewBox="0 0 24 24" class="dock-svg-icon apparmor-color">
+            <path d="M12 2L3 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-9-4zm0 6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 12c-2.7 0-5.08-1.42-6.44-3.56C5.83 15.11 9.77 14.5 12 14.5s6.17.61 6.44 2.94C17.08 18.58 14.7 20 12 20z" fill="#E95420"/>
+          </svg>
+          <div class="dock-dot hidden" id="dot-apparmor"></div>
+        </div>
+
+        <!-- CIS Security Auditor (Compliance Scanner) -->
+        <div class="dock-item" data-app="cis" onclick="openWindow('cis')" title="CIS Benchmarks Security Auditor">
+          <svg viewBox="0 0 24 24" class="dock-svg-icon cis-color">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#E95420"/>
+          </svg>
+          <div class="dock-dot hidden" id="dot-cis"></div>
+        </div>
+
+        <!-- SOC 2 Compliance Center -->
+        <div class="dock-item" data-app="soc2" onclick="openWindow('soc2')" title="SOC 2 Compliance Auditor">
+          <svg viewBox="0 0 24 24" class="dock-svg-icon soc2-color">
+            <rect x="2" y="2" width="20" height="20" rx="3" fill="#E95420" />
+            <circle cx="12" cy="12" r="5" fill="none" stroke="#FFF" stroke-width="1.8" />
+            <path d="M12 9v6M9 12h6" stroke="#FFF" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+          <div class="dock-dot hidden" id="dot-soc2"></div>
+        </div>
+
+        <!-- Global Compliance Hub -->
+        <div class="dock-item" data-app="globalcom" onclick="openWindow('globalcom')" title="Global Regulatory Compliance Hub">
+          <svg viewBox="0 0 24 24" class="dock-svg-icon globalcom-color">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="#E95420"/>
+          </svg>
+          <div class="dock-dot hidden" id="dot-globalcom"></div>
+        </div>
+
+        <!-- Cryptographic Vault (AES/RSA key manager & text encryptor) -->
+        <div class="dock-item" data-app="vault" onclick="openWindow('vault')" title="Cryptographic Key Vault">
+          <svg viewBox="0 0 24 24" class="dock-svg-icon vault-color">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" fill="#E95420" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4M12 14v4" stroke="#FFF" stroke-width="2" stroke-linecap="round" fill="none" />
+          </svg>
+          <div class="dock-dot hidden" id="dot-vault"></div>
+        </div>
+
+        <!-- Ultimate Hardening Center -->
+        <div class="dock-item" data-app="ultimate" onclick="openWindow('ultimate')" title="Ultimate Hardening Center (ZTA, seL4, TPM)">
+          <svg viewBox="0 0 24 24" class="dock-svg-icon ultimate-color">
+            <path d="M12 2L3 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-9-4zm0 6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm5 8H7v-1.5c0-1.66 3.33-2.5 5-2.5s5 .84 5 2.5V16z" fill="#E95420" />
+          </svg>
+          <div class="dock-dot hidden" id="dot-ultimate"></div>
+        </div>
+
+        <!-- Interactive Tour Guide -->
+        <div class="dock-item" data-app="tour" onclick="startTour()" title="Interactive OS Tour" style="margin-top: 15px; border-color: rgba(74, 246, 38, 0.4);">
+          <svg viewBox="0 0 24 24" class="dock-svg-icon tour-color">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm0-4.5h-2v-5h2v5z" fill="#4AF626" />
+          </svg>
+          <div class="dock-dot hidden" id="dot-tour"></div>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
