@@ -1,8 +1,11 @@
 # Ignore compiled object files and binaries
 *.o
 *.bin
+*.iso
 kernel/*.o
 kernel/kernel.bin
+kernel/tomb-os.iso
+kernel/iso_root/
 
 # Dependency directories
 node_modules/
