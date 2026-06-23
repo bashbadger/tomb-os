@@ -1,4 +1,4 @@
-// Hardened Ubuntu Security Desktop Simulator Logic
+// Tomb OS Security Desktop Simulator Logic
 
 // System States
 const systemState = {
@@ -47,10 +47,10 @@ const systemState = {
 
 // Simulated Security Logs for auditd
 let auditLogs = [
-  "Jun 23 00:01:10 hardened-ubuntu auditd[412]: Audit daemon started successfully",
-  "Jun 23 00:01:15 hardened-ubuntu kernel: [    0.000000] AppArmor: AppArmor initialized",
-  "Jun 23 00:02:04 hardened-ubuntu ufw[618]: [UFW BLOCK] IN=eth0 OUT= MAC=00:11:22:33:44:55 SRC=198.51.100.42 DST=10.0.2.15 PROTO=TCP SPT=44211 DPT=22",
-  "Jun 23 00:03:42 hardened-ubuntu fail2ban.actions[812]: [ssh] Ban 198.51.100.42"
+  "Jun 23 00:01:10 tomb-os auditd[412]: Audit daemon started successfully",
+  "Jun 23 00:01:15 tomb-os kernel: [    0.000000] AppArmor: AppArmor initialized",
+  "Jun 23 00:02:04 tomb-os ufw[618]: [UFW BLOCK] IN=eth0 OUT= MAC=00:11:22:33:44:55 SRC=198.51.100.42 DST=10.0.2.15 PROTO=TCP SPT=44211 DPT=22",
+  "Jun 23 00:03:42 tomb-os fail2ban.actions[812]: [ssh] Ban 198.51.100.42"
 ];
 
 // Simulated IDS Event Queue
@@ -78,7 +78,7 @@ window.addEventListener('DOMContentLoaded', () => {
     { progress: 55, text: "Starting auditd (Linux Audit Daemon)..." },
     { progress: 75, text: "Starting fail2ban intrusion prevention agent..." },
     { progress: 90, text: "Starting GNOME Desktop Environment..." },
-    { progress: 100, text: "Welcome to Hardened Ubuntu 26.04!" }
+    { progress: 100, text: "Welcome to TOMB OS 1.0!" }
   ];
 
   let currentStep = 0;
@@ -211,7 +211,7 @@ function updateSecurityShield() {
 function logAudit(message) {
   const now = new Date();
   const timeStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + " " + now.toLocaleTimeString('en-US', { hour12: false });
-  auditLogs.push(`${timeStr} hardened-ubuntu admin-events: ${message}`);
+  auditLogs.push(`${timeStr} tomb-os admin-events: ${message}`);
 }
 
 // Sync compliance metrics dynamically
@@ -244,8 +244,8 @@ const windowConfig = {
     icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM13 9V3.5L18.5 9H13z" fill="#E95420"/></svg>`,
     getContent: () => `
       <div class="app-readme-container">
-        <h1>Hardened Ubuntu 26.04 LTS (Security Core Edition)</h1>
-        <p>Welcome to the hardened desktop of Ubuntu Core OS. This system has been fortified with top-tier kernel security frameworks to defend against advanced threats.</p>
+        <h1>Tomb OS 1.0 LTS (Ultimate Security Edition)</h1>
+        <p>Welcome to the secure desktop of Tomb OS. This system has been fortified with top-tier kernel security frameworks to defend against advanced threats.</p>
         
         <h2>Active Security Frameworks:</h2>
         <ul>
@@ -267,14 +267,14 @@ const windowConfig = {
     `
   },
   terminal: {
-    title: "sec-admin@hardened-ubuntu: ~",
+    title: "sec-admin@tomb-os: ~",
     width: 650,
     height: 440,
     icon: `<svg viewBox="0 0 24 24" width="16" height="16"><rect width="20" height="16" x="2" y="4" rx="2" fill="none" stroke="#FFF" stroke-width="1.5" /><path d="M6 8l4 4-4 4M12 15h6" stroke="#4AF626" stroke-width="1.5" stroke-linecap="round" fill="none" /></svg>`,
     getContent: () => `
       <div class="app-terminal-container" onclick="focusTerminalInput(this)">
         <div class="terminal-welcome">
-          Welcome to Hardened Ubuntu 26.04.1 LTS (GNU/Linux 6.13.0-hardened-lts x86_64)
+          Welcome to TOMB OS 1.0 LTS (GNU/Linux 6.13.0-tomb-hardened x86_64)
           <br>* AppArmor state: Active (Enforcing profiles)
           <br>* Firewall state: Active (UFW rules loaded)
           <br>* System auditd daemon: running
@@ -282,7 +282,7 @@ const windowConfig = {
         </div>
         <div class="terminal-history"></div>
         <div class="terminal-input-line">
-          <span class="terminal-prompt">sec-admin@hardened-ubuntu:~$</span>
+          <span class="terminal-prompt">sec-admin@tomb-os:~$</span>
           <input type="text" class="terminal-input" autofocus onkeydown="handleTerminalCommand(event, this)" spellcheck="false" aria-label="Terminal input prompt" />
         </div>
         <div class="terminal-chips-wrapper">
@@ -390,7 +390,7 @@ const windowConfig = {
     }
   },
   cis: {
-    title: "CIS Ubuntu Hardening Benchmark Auditor",
+    title: "CIS Tomb OS Hardening Benchmark Auditor",
     width: 600,
     height: 480,
     icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#E95420"/></svg>`,
@@ -399,7 +399,7 @@ const windowConfig = {
         <div class="cis-header">
           <div class="cis-intro">
             <h3>CIS Benchmarks Auditor</h3>
-            <p>Audits local Ubuntu configuration settings against the Center for Internet Security Hardening standards.</p>
+            <p>Audits local Tomb OS configuration settings against the Center for Internet Security Hardening standards.</p>
             <button class="cis-btn-scan" onclick="runCISAudit()" aria-label="Run Security Compliance Audit">Run Security Compliance Audit</button>
           </div>
           <div class="cis-score-panel">
@@ -669,7 +669,7 @@ function handleTerminalCommand(e, input) {
     if (!rawVal) return;
     const history = input.parentElement.previousElementSibling;
     
-    history.innerHTML += `<div class="terminal-line"><span class="terminal-prompt">sec-admin@hardened-ubuntu:~$</span> <span style="color: #fff;">${escapeHTML(rawVal)}</span></div>`;
+    history.innerHTML += `<div class="terminal-line"><span class="terminal-prompt">sec-admin@tomb-os:~$</span> <span style="color: #fff;">${escapeHTML(rawVal)}</span></div>`;
     
     // IMMUTABLE FILESYSTEM CONSTRAINT CHECK
     if (systemState.ultimate.immutable) {
@@ -1361,7 +1361,7 @@ function toggleSOC2IPSControl(checkbox) {
 function downloadSOC2Report() {
   const score = calculateSOC2Score();
   const reportText = `===========================================
-Hardened Ubuntu 26.04 SOC 2 Readiness Report
+Tomb OS 1.0 SOC 2 Readiness Report
 Generated: ${new Date().toUTCString()}
 Compliance Index: ${score}%
 ===========================================
