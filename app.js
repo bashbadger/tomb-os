@@ -2,6 +2,7 @@
 
 // System States
 const systemState = {
+  activeTaskIp: '185.220.101.42',
   features: {
     ufw: true,
     apparmor: true,
@@ -944,8 +945,18 @@ function getWindowIp(appId) {
   return systemState.windowIps[appId];
 }
 
+function rotateTaskIp() {
+  const o1 = 45 + Math.floor(Math.random() * 140);
+  const o2 = 100 + Math.floor(Math.random() * 100);
+  const o3 = 10 + Math.floor(Math.random() * 200);
+  const o4 = 2 + Math.floor(Math.random() * 250);
+  systemState.activeTaskIp = `${o1}.${o2}.${o3}.${o4}`;
+  logAudit(`[ROLLING NETWORK DAEMON] Task IP rotated cleanly: ${systemState.activeTaskIp} (Encrypted Tunnel).`);
+}
+
 // Open Window API
 function openWindow(appId) {
+  rotateTaskIp();
   const container = document.getElementById('windows-container');
   const dot = document.getElementById(`dot-${appId}`);
   
@@ -1133,6 +1144,7 @@ function focusTerminalInput(container) {
 // Terminal Commands handler
 function handleTerminalCommand(e, input) {
   if (e.key === 'Enter') {
+    rotateTaskIp();
     const rawVal = input.value.trim();
     input.value = '';
     
@@ -3666,6 +3678,7 @@ function getBrowserContent() {
         <span style="color: #4AF626; display: flex; align-items: center; gap: 6px;">
           <span>🖥️ DEDICATED MICRO-VM: <strong>${vmId}</strong></span>
           <span style="background: rgba(74,246,38,0.15); padding: 1px 6px; border-radius: 4px;">512MB RAM ISOLATED</span>
+          <span style="background: rgba(0,122,255,0.2); color: #007AFF; padding: 1px 6px; border-radius: 4px;">🌐 ROLLING IP: ${systemState.activeTaskIp}</span>
         </span>
         <span style="color: var(--sec-yellow);">seL4 Microkernel Hardware Sandbox</span>
       </div>
@@ -3773,14 +3786,21 @@ function handleBrowserUrlKey(e) {
 }
 
 function navigateBrowserUrl(url) {
+  rotateTaskIp();
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
     url = 'https://' + url;
   }
   systemState.browserUrl = url;
-  const vp = document.getElementById('browser-viewport');
-  const input = document.getElementById('browser-url-input');
-  if (input) input.value = url;
-  if (vp) vp.innerHTML = renderBrowserPageContent(url);
+  const win = document.getElementById('window-browser');
+  if (win) {
+    const content = win.querySelector('.window-body-content');
+    if (content) content.innerHTML = getBrowserContent();
+  } else {
+    const vp = document.getElementById('browser-viewport');
+    const input = document.getElementById('browser-url-input');
+    if (input) input.value = url;
+    if (vp) vp.innerHTML = renderBrowserPageContent(url);
+  }
 }
 
 function triggerBrowserDownloadTrigger() {
