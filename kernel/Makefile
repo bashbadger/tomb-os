@@ -9,11 +9,11 @@ ASM = nasm
 ifeq (, $(shell which i386-elf-gcc))
     CC = gcc
     LD = gcc
-    CFLAGS = -m32 -ffreestanding -O2 -Wall -Wextra -Wno-unused-parameter -Wno-unused-function -fno-pie -fno-stack-protector -fno-asynchronous-unwind-tables -nostdlib
-    LDFLAGS = -m32 -nostdlib -Wl,-e,_start
+    CFLAGS = -m32 -ffreestanding -O2 -Wall -Wextra -Wno-unused-parameter -Wno-unused-function -fno-pie -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-asynchronous-unwind-tables -nostdlib
+    LDFLAGS = -m32 -nostdlib -Wl,-e,_start -Wl,-z,relro,-z,now
 else
-    CFLAGS = -ffreestanding -O2 -Wall -Wextra -Wno-unused-parameter -Wno-unused-function -fno-pie -fno-stack-protector -fno-asynchronous-unwind-tables -nostdlib
-    LDFLAGS = -T linker.ld -nostdlib
+    CFLAGS = -ffreestanding -O2 -Wall -Wextra -Wno-unused-parameter -Wno-unused-function -fno-pie -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fno-asynchronous-unwind-tables -nostdlib
+    LDFLAGS = -T linker.ld -nostdlib -Wl,-z,relro,-z,now
 endif
 
 all: kernel.bin
