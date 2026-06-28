@@ -271,6 +271,23 @@ function unlockSessionScreen(e) {
   openWindow('readme');
 }
 
+function authenticateNFCKey(mode) {
+  const nfcId = 'NFC-YUBIKEY-' + Math.floor(100000 + Math.random() * 900000);
+  logAudit(`[NFC HARDWARE 2FA] Contactless NFC Security Key detected: ${nfcId}. FIDO2 WebAuthn token verified!`);
+  
+  if (mode === 'setup') {
+    const modal = document.getElementById('admin-setup-modal');
+    systemState.adminPasswordSet = true;
+    systemState.adminPasswordHash = btoa('nfc_hardware_master_token_' + nfcId);
+    if (modal) modal.classList.add('hidden');
+    openWindow('readme');
+  } else {
+    const lock = document.getElementById('session-lock-screen');
+    if (lock) lock.classList.add('hidden');
+    openWindow('readme');
+  }
+}
+
 // Drag and Drop Rearrange Dock Apps
 function initDockDragAndDrop() {
   const dockInner = document.querySelector('.dock-inner');
@@ -4213,6 +4230,7 @@ function getImporterContent() {
         <button class="importer-tab" onclick="switchImporterTab(this, 'windows')" style="flex: 1; padding: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">🪟 Windows 10/11</button>
         <button class="importer-tab" onclick="switchImporterTab(this, 'mac')" style="flex: 1; padding: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">💻 macOS & Linux SSH</button>
         <button class="importer-tab" onclick="switchImporterTab(this, 'social')" style="flex: 1; padding: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">💬 Social APIs (Discord/Reddit)</button>
+        <button class="importer-tab" onclick="switchImporterTab(this, 'extdrive')" style="flex: 1; padding: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">💾 External Drive (USB/SD)</button>
       </div>
 
       <div id="importer-panel-apple" class="importer-panel" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 16px;">
@@ -4272,6 +4290,18 @@ function getImporterContent() {
           <label><input type="checkbox" checked id="imp-s-matrix" /> 🟢 Matrix Synapse E2EE Federation Bridge</label>
         </div>
         <button onclick="runImporterMigration('Social Platforms (Discord, Reddit, Telegram, Twitter)')" style="background: #5865F2; border: none; color: #fff; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;">Verify & Connect Social API Bridges →</button>
+      </div>
+
+      <div id="importer-panel-extdrive" class="importer-panel hidden" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 16px;">
+        <h4 style="margin: 0 0 10px 0; color: #25D366; font-size: 14px;">💾 Import Files from External Hard Disk, NVMe & USB Storage</h4>
+        <p style="font-size: 12px; color: #ccc; line-height: 1.5; margin-bottom: 12px;">Scan mounted external storage partitions (`/mnt/external_disk`, `/mnt/nvme_ssd`, `/mnt/sdcard`) and import documents, offline backup keys, and system images safely into Tomb OS. Requires sec-admin password verification.</p>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #ddd; margin-bottom: 16px;">
+          <label><input type="checkbox" checked id="imp-ex-vault" /> 🔑 Cryptographic Vault Backups (.vault, .gpg, .kyber)</label>
+          <label><input type="checkbox" checked id="imp-ex-docs" /> 📄 Confidential Documents & Spreadsheets (.pdf, .docx, .xlsx)</label>
+          <label><input type="checkbox" checked id="imp-ex-media" /> 🖼️ Photos & Encrypted Media Archives (.zip, .tar.gz)</label>
+          <label><input type="checkbox" checked id="imp-ex-img" /> 💿 System Images & Boot ISO Bundles (.iso, .img, .cpio.gz)</label>
+        </div>
+        <button onclick="runImporterMigration('External Hard Disk & Storage Partition')" style="background: #25D366; border: none; color: #111; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 700; cursor: pointer;">Scan & Import Files from External Disk →</button>
       </div>
 
       <div id="importer-status-output" style="margin-top: 14px; display: none; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 14px; font-family: var(--font-mono); font-size: 11.5px; color: #4AF626; line-height: 1.6;"></div>

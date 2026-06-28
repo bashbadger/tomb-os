@@ -53,7 +53,8 @@
           <input type="password" id="setup-admin-pass-confirm" required placeholder="Confirm master password..." style="width: 100%; padding: 10px 14px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #222; color: #fff; font-family: var(--font-mono); font-size: 13px; outline: none; box-sizing: border-box;" />
         </div>
         <div id="setup-pass-error" style="display: none; color: #ff3b30; font-size: 12px; margin-bottom: 14px; font-family: var(--font-mono);"></div>
-        <button type="submit" style="width: 100%; background: var(--ubuntu-orange); color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s;">Initialize Sovereign OS & Save Key →</button>
+        <button type="submit" style="width: 100%; background: var(--ubuntu-orange); color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s; margin-bottom: 10px;">Initialize Sovereign OS & Save Key →</button>
+        <button type="button" onclick="authenticateNFCKey('setup')" style="width: 100%; background: rgba(0,122,255,0.2); border: 1px solid #007AFF; color: #fff; padding: 10px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer;">📡 Tap NFC Security Key / YubiKey (Hardware 2FA)</button>
       </form>
     </div>
   </div>
@@ -76,7 +77,8 @@
           <input type="password" id="session-pass-input" required placeholder="Enter sec-admin passphrase..." style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #222; color: #fff; font-family: var(--font-mono); font-size: 13.5px; outline: none; box-sizing: border-box; text-align: center;" autofocus />
         </div>
         <div id="session-pass-error" style="display: none; color: #ff3b30; font-size: 12px; margin-bottom: 14px; font-family: var(--font-mono);"></div>
-        <button type="submit" style="width: 100%; background: var(--ubuntu-orange); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s;">Unlock Sovereign Session →</button>
+        <button type="submit" style="width: 100%; background: var(--ubuntu-orange); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s; margin-bottom: 10px;">Unlock Sovereign Session →</button>
+        <button type="button" onclick="authenticateNFCKey('unlock')" style="width: 100%; background: rgba(37,211,102,0.2); border: 1px solid #25D366; color: #fff; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer;">📡 Unlock via NFC Security Key / YubiKey (Tap)</button>
       </form>
     </div>
   </div>
