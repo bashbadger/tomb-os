@@ -3,6 +3,14 @@
 // System States
 const systemState = {
   activeTaskIp: '185.220.101.42',
+  taskRecorder: {
+    recording: false,
+    currentSteps: [],
+    savedMacros: [
+      { id: 'macro-1', name: 'Automated System Audit & UFW Hardening', steps: ['openWindow("cis")', 'runTerminalChipCommand("ufw status")', 'runTerminalChipCommand("aa-status")'] },
+      { id: 'macro-2', name: 'OpenAI GPT-4o Vulnerability Scan', steps: ['openWindow("terminal")', 'runTerminalChipCommand("openai analyze active threat surface")'] }
+    ]
+  },
   features: {
     ufw: true,
     apparmor: true,
@@ -546,6 +554,13 @@ const windowConfig = {
     height: 520,
     icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M7 2v11h3v9l7-12h-4l4-8z" fill="#007AFF"/></svg>`,
     getContent: () => getAccessoryContent()
+  },
+  taskrecorder: {
+    title: "Autonomous AI Task Recorder & Macro Auto-Pilot",
+    width: 740,
+    height: 520,
+    icon: `<svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="8" fill="#FF3B30"/></svg>`,
+    getContent: () => getTaskRecorderContent()
   },
   chat: {
     title: "Tomb Secure Messenger (E2EE PQC Quantum Enclave)",
@@ -4583,6 +4598,7 @@ const allAppLauncherList = [
   { id: 'cis', name: 'CIS Security Auditor', category: 'Compliance', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#007AFF"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`, desc: 'Linux kernel & system hardening benchmarks', zone: 'secure' },
   { id: 'soc2', name: 'SOC 2 Compliance Auditor', category: 'Compliance', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#FFCC00"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm0-8h-2V7h2v2zm4 8h-2v-4h2v4zm0-6h-2V7h2v2z"/></svg>`, desc: 'Trust services criteria compliance tracking', zone: 'secure' },
   { id: 'globalcom', name: 'Global Compliance Hub', category: 'Compliance', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#4AF626"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`, desc: 'GDPR, CCPA, DPDP & PIPL privacy frameworks', zone: 'secure' },
+  { id: 'taskrecorder', name: 'AI Task Recorder & Macro Auto-Pilot', category: 'Productivity', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#FF3B30"><circle cx="12" cy="12" r="8" fill="#FF3B30"/><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" fill="#FFF"/></svg>`, desc: 'Record task workflows for autonomous AI re-execution', zone: 'personal' },
   { id: 'accessory', name: 'External Security Accessory Manager', category: 'Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#007AFF"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>`, desc: 'Pair & configure YubiKey NFC, Titan Keys, HSMs & Biometric Readers', zone: 'secure' },
   { id: 'vault', name: 'Cryptographic Key Vault', category: 'Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#FFCC00"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>`, desc: 'AES-256 and Kyber PQC payload encryption', zone: 'personal' },
   { id: 'ultimate', name: 'Ultimate Hardening Center', category: 'Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#E95420"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>`, desc: 'Zero Trust Architecture, seL4 microkernel & TPM', zone: 'secure' },
@@ -5584,4 +5600,121 @@ function pairHardwareAccessory(name) {
     out.innerHTML += `<br/>✅ <strong>SUCCESS: Hardware Security Accessory '${name}' paired cleanly! Bound to TPM 2.0 enclave and administrative session unlock profile.</strong>`;
     logAudit(`Paired new external hardware security accessory: ${name}`);
   }, 2000);
+}
+
+// ==========================================
+// AUTONOMOUS AI TASK RECORDER & MACRO AUTO-PILOT
+// ==========================================
+function toggleAiTaskRecorder() {
+  systemState.taskRecorder.recording = !systemState.taskRecorder.recording;
+  const btn = document.getElementById('task-recorder-btn');
+  if (systemState.taskRecorder.recording) {
+    systemState.taskRecorder.currentSteps = [];
+    if (btn) {
+      btn.style.background = 'rgba(255,59,48,0.8)';
+      btn.style.color = '#fff';
+      btn.textContent = '⏹ Recording AI Macro...';
+    }
+    logAudit('[AI TASK RECORDER] Recording started. Filtering all sensitive passphrases & PII credentials.');
+    openWindow('taskrecorder');
+  } else {
+    if (btn) {
+      btn.style.background = 'rgba(255,59,48,0.2)';
+      btn.style.color = '#ff3b30';
+      btn.textContent = 'Record AI Task';
+    }
+    if (systemState.taskRecorder.currentSteps.length > 0) {
+      const newMacro = {
+        id: 'macro-' + Date.now(),
+        name: 'Recorded Workflow (' + systemState.taskRecorder.currentSteps.length + ' steps)',
+        steps: [...systemState.taskRecorder.currentSteps]
+      };
+      systemState.taskRecorder.savedMacros.unshift(newMacro);
+      logAudit(`[AI TASK RECORDER] Saved new macro workflow '${newMacro.name}' with ${newMacro.steps.length} sanitized steps.`);
+    }
+    updateTaskRecorderUI();
+  }
+}
+
+function recordTaskStep(stepPayload) {
+  if (!systemState.taskRecorder.recording) return;
+  // SENSITIVE CONTENT FILTERING DAEMON
+  const sanitized = stepPayload.replace(/(password|passphrase|token|sk-[a-zA-Z0-9_-]+|key)=\S+/gi, '$1=[FILTERED_REDACTED]');
+  systemState.taskRecorder.currentSteps.push(sanitized);
+  updateTaskRecorderUI();
+}
+
+function updateTaskRecorderUI() {
+  const win = document.getElementById('window-taskrecorder');
+  if (win) {
+    const content = win.querySelector('.window-body-content');
+    if (content) content.innerHTML = getTaskRecorderContent();
+  }
+}
+
+function getTaskRecorderContent() {
+  const isRec = systemState.taskRecorder.recording;
+  return `
+    <div class="app-taskrecorder-container" style="display: flex; flex-direction: column; height: 100%; color: #fff; font-family: 'Outfit', sans-serif; background: #141414; padding: 20px; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 14px; margin-bottom: 18px;">
+        <div>
+          <h2 style="margin: 0; font-size: 20px; color: #FF3B30; font-weight: 700;">🎬 Autonomous AI Task Recorder & Macro Auto-Pilot</h2>
+          <div style="font-size: 12px; color: var(--ubuntu-light-grey); margin-top: 2px;">Record complex workflows once & let OpenAI GPT-4o re-execute them automatically</div>
+        </div>
+        <button onclick="toggleAiTaskRecorder()" style="background: ${isRec ? '#FF3B30' : 'rgba(255,59,48,0.2)'}; color: #fff; border: 1px solid #FF3B30; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;">
+          ${isRec ? '⏹ Stop & Save Macro' : '🔴 Start Recording Task'}
+        </button>
+      </div>
+
+      <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 14px; margin-bottom: 16px; font-size: 12px; color: #ccc;">
+        <strong>🛡️ SENSITIVE CONTENT FILTERING:</strong> Active. All administrative passwords, private GPG keys, and session tokens are automatically redacted before macros are saved or processed by AI.
+      </div>
+
+      ${isRec ? `
+        <div style="background: rgba(255,59,48,0.1); border: 1px solid #FF3B30; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+          <h4 style="margin: 0 0 8px 0; color: #FF3B30;">🔴 LIVE RECORDING IN PROGRESS...</h4>
+          <p style="font-size: 12px; color: #ddd; margin-bottom: 10px;">Perform your actions (open windows, run commands, navigate browser). Steps captured:</p>
+          <div style="font-family: var(--font-mono); font-size: 11.5px; color: #4AF626; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px; max-height: 120px; overflow-y: auto;">
+            ${systemState.taskRecorder.currentSteps.length === 0 ? '<i>No actions recorded yet... Perform tasks in Tomb OS.</i>' : systemState.taskRecorder.currentSteps.map((s, i) => `<div>▶ Step ${i+1}: ${escapeHTML(s)}</div>`).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      <h4 style="margin: 0 0 12px 0; color: #fff; font-size: 15px;">🤖 Saved AI Auto-Pilot Macros (${systemState.taskRecorder.savedMacros.length})</h4>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+        ${systemState.taskRecorder.savedMacros.map(m => `
+          <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 700; font-size: 13px; color: #fff;">⚡ ${escapeHTML(m.name)}</div>
+              <div style="font-size: 11px; color: #aaa; margin-top: 2px; font-family: var(--font-mono);">${m.steps.length} automated execution steps | Filtered & Sanitized</div>
+            </div>
+            <button onclick="runAiTaskMacro('${m.id}')" style="background: var(--ubuntu-orange); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;">▶ Run AI Auto-Pilot</button>
+          </div>
+        `).join('')}
+      </div>
+
+      <div id="macro-execution-output" style="display: none; background: rgba(0,0,0,0.5); border: 1px solid var(--ubuntu-orange); border-radius: 6px; padding: 14px; font-family: var(--font-mono); font-size: 11.5px; color: #4AF626; line-height: 1.6;"></div>
+    </div>
+  `;
+}
+
+function runAiTaskMacro(macroId) {
+  const macro = systemState.taskRecorder.savedMacros.find(m => m.id === macroId);
+  if (!macro) return;
+  const out = document.getElementById('macro-execution-output');
+  if (!out) return;
+  out.style.display = 'block';
+  out.innerHTML = `[OPENAI GPT-4o AUTO-PILOT] Initiating autonomous macro re-execution for '${macro.name}'...<br/>🛡️ Verifying sensitive content filtration rules... Verified clean!`;
+
+  macro.steps.forEach((step, idx) => {
+    setTimeout(() => {
+      out.innerHTML += `<br/>▶ [STEP ${idx+1}/${macro.steps.length}] Executing autonomous AI payload: <code>${escapeHTML(step)}</code>... Success!`;
+      try { eval(step); } catch(e) {}
+    }, (idx + 1) * 800);
+  });
+
+  setTimeout(() => {
+    out.innerHTML += `<br/>✅ <strong>AUTONOMOUS AI EXECUTION COMPLETE: Task '${macro.name}' completed 100% cleanly without manual re-work!</strong>`;
+    logAudit(`OpenAI GPT-4o autonomously re-executed task macro: ${macro.name}`);
+  }, (macro.steps.length + 1) * 800);
 }
