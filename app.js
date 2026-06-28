@@ -473,6 +473,48 @@ const windowConfig = {
     icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z" fill="#E95420"/></svg>`,
     getContent: () => getChatContent()
   },
+  discord: {
+    title: "Discord API Bot Relay Channel",
+    width: 760,
+    height: 520,
+    icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .373-.292.074.074 0 0 1 .077-.01c3.927 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.893.076.076 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028z" fill="#5865F2"/></svg>`,
+    getContent: () => { setTimeout(() => switchChatContact('discord-bot', '👾 Discord Bot API Stream'), 100); return getChatContent(); }
+  },
+  reddit: {
+    title: "Reddit r/NetSec Security OAuth Feed",
+    width: 760,
+    height: 520,
+    icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.563 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701z" fill="#FF4500"/></svg>`,
+    getContent: () => { setTimeout(() => switchChatContact('reddit-feed', '🤖 Reddit r/NetSec Feed'), 100); return getChatContent(); }
+  },
+  telegram: {
+    title: "Telegram Broadcast Bot API Channel",
+    width: 760,
+    height: 520,
+    icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.562 8.161c-.18.717-.962 4.084-1.362 5.752-.169.708-.432.945-.684.968-.549.051-.967-.361-1.498-.709-.831-.545-1.3-.883-2.109-1.416-.934-.616-.329-.955.204-1.508.139-.145 2.56-2.348 2.607-2.549.006-.026.012-.124-.047-.176-.059-.052-.146-.034-.209-.02-.089.02-1.507.959-4.254 2.815-.402.276-.766.412-1.092.405-.36-.008-1.052-.204-1.567-.371-.631-.206-1.133-.315-1.089-.664.023-.182.273-.368.751-.559 2.941-1.281 4.903-2.126 5.887-2.536 2.799-1.164 3.382-1.366 3.762-1.373.084-.002.272.02.394.119.103.084.132.197.146.277.014.08.031.262.017.404z" fill="#24A1DE"/></svg>`,
+    getContent: () => { setTimeout(() => switchChatContact('telegram-bot', '✈️ Telegram Broadcast Bot'), 100); return getChatContent(); }
+  },
+  twitter: {
+    title: "Twitter / X v2 Bearer API OSINT Stream",
+    width: 760,
+    height: 520,
+    icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="#1DA1F2"/></svg>`,
+    getContent: () => { setTimeout(() => switchChatContact('twitter-osint', '🐦 Twitter / X OSINT Stream'), 100); return getChatContent(); }
+  },
+  slack: {
+    title: "Slack SOC Incident Alert Webhook Bridge",
+    width: 760,
+    height: 520,
+    icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165c0-1.394 1.127-2.524 2.522-2.524h2.52v2.524zm1.271 0c0-1.394 1.127-2.524 2.522-2.524s2.522 1.13 2.522 2.524v6.313A2.528 2.528 0 0 1 8.835 24a2.528 2.528 0 0 1-2.522-2.523v-6.312z" fill="#4A154B"/></svg>`,
+    getContent: () => { setTimeout(() => switchChatContact('slack-relays', '💬 Slack SOC Alerts'), 100); return getChatContent(); }
+  },
+  matrix: {
+    title: "Matrix Synapse E2EE Decentralized Federation",
+    width: 760,
+    height: 520,
+    icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M.632 24.004v-24h1.761v1.657H2.4a16.8 16.8 0 0 1 4.793-1.423V2.11A14.6 14.6 0 0 0 2.4 3.41v17.18a14.6 14.6 0 0 0 4.793 1.3v1.88A16.8 16.8 0 0 1 2.4 22.346h-.008v1.658zm22.736 0h-1.761v-1.657H21.6a16.8 16.8 0 0 1-4.793 1.423v-1.88a14.6 14.6 0 0 0 4.793-1.3V3.41a14.6 14.6 0 0 0-4.793-1.3V.23a16.8 16.8 0 0 1 4.793 1.423h.008V0h1.761v24.004z" fill="#00FF66"/></svg>`,
+    getContent: () => { setTimeout(() => switchChatContact('sec-admin', '🔐 Sec-Admin Enclave'), 100); return getChatContent(); }
+  },
   terminal: {
     title: "sec-admin@tomb-os: ~",
     width: 650,
@@ -4134,6 +4176,41 @@ function getChatContent() {
               <div style="font-size: 11px; color: #8696a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Handshake channel active KB-994102</div>
             </div>
           </div>
+          <div onclick="switchChatContact('discord-bot', '👾 Discord Bot API Stream')" class="chat-contact-item" style="padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03);">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: #5865F2; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">DC</div>
+            <div style="flex: 1; overflow: hidden;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;"><span>👾 Discord API Bot</span><span style="font-size: 10px; color: #8696a0;">10:04</span></div>
+              <div style="font-size: 11px; color: #8696a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Webhook stream active v10</div>
+            </div>
+          </div>
+          <div onclick="switchChatContact('reddit-feed', '🤖 Reddit r/NetSec Feed')" class="chat-contact-item" style="padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03);">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: #FF4500; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">RD</div>
+            <div style="flex: 1; overflow: hidden;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;"><span>🤖 Reddit r/NetSec</span><span style="font-size: 10px; color: #8696a0;">09:45</span></div>
+              <div style="font-size: 11px; color: #8696a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">OAuth2 Client authenticated</div>
+            </div>
+          </div>
+          <div onclick="switchChatContact('telegram-bot', '✈️ Telegram Broadcast Bot')" class="chat-contact-item" style="padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03);">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: #24A1DE; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">TG</div>
+            <div style="flex: 1; overflow: hidden;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;"><span>✈️ Telegram Security</span><span style="font-size: 10px; color: #8696a0;">08:12</span></div>
+              <div style="font-size: 11px; color: #8696a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Bot API bridge connected</div>
+            </div>
+          </div>
+          <div onclick="switchChatContact('twitter-osint', '🐦 Twitter / X OSINT Stream')" class="chat-contact-item" style="padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03);">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: #1DA1F2; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">TW</div>
+            <div style="flex: 1; overflow: hidden;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;"><span>🐦 Twitter / X OSINT</span><span style="font-size: 10px; color: #8696a0;">07:30</span></div>
+              <div style="font-size: 11px; color: #8696a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Bearer token v2 stream online</div>
+            </div>
+          </div>
+          <div onclick="switchChatContact('slack-relays', '💬 Slack SOC Alerts')" class="chat-contact-item" style="padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03);">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: #4A154B; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">SL</div>
+            <div style="flex: 1; overflow: hidden;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;"><span>💬 Slack Incident Relays</span><span style="font-size: 10px; color: #8696a0;">Yesterday</span></div>
+              <div style="font-size: 11px; color: #8696a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Webhook alerts configured</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -4242,6 +4319,12 @@ function sendChatMessage() {
 // ==========================================
 const allAppLauncherList = [
   { id: 'chat', name: 'Tomb Secure Messenger', category: 'Productivity', icon: '💬', desc: 'E2EE Post-Quantum Instant Messaging & Ephemeral Chat', zone: 'personal' },
+  { id: 'discord', name: 'Discord API Relay', category: 'Social', icon: '👾', desc: 'Discord Bot API v10 & Webhook Security Log Stream', zone: 'untrusted' },
+  { id: 'reddit', name: 'Reddit NetSec Feed', category: 'Social', icon: '🤖', desc: 'Reddit r/NetSec & Cybersecurity OAuth Client', zone: 'untrusted' },
+  { id: 'telegram', name: 'Telegram Broadcast Bot', category: 'Social', icon: '✈️', desc: 'Telegram Bot API Security Channel Relay', zone: 'personal' },
+  { id: 'twitter', name: 'Twitter / X OSINT Stream', category: 'Social', icon: '🐦', desc: 'Real-time OSINT & Threat Feed v2 Bearer API', zone: 'untrusted' },
+  { id: 'slack', name: 'Slack SOC Incident Relay', category: 'Social', icon: '💬', desc: 'Slack Webhook Incident Alert Bridge', zone: 'work' },
+  { id: 'matrix', name: 'Matrix Synapse Federation', category: 'Social', icon: '🟢', desc: 'Decentralized E2EE Matrix Messaging Protocol', zone: 'secure' },
   { id: 'terminal', name: 'Hardened Terminal', category: 'System', icon: '💻', desc: 'CLI system diagnostics & admin tools', zone: 'work' },
   { id: 'browser', name: 'Chromium Web Browser', category: 'Internet', icon: '🌐', desc: 'Live web browsing & sandboxed downloads', zone: 'untrusted' },
   { id: 'notes', name: 'Tomb Secure Notes', category: 'Productivity', icon: '📝', desc: 'Encrypted notepad & cheat sheet manager', zone: 'personal' },
