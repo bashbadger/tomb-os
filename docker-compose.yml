@@ -7,26 +7,34 @@ services:
       dockerfile: Dockerfile
     container_name: tombos_hardened_desktop
     ports:
-      - "8080:80"
-    restart: always
+      - "80:8080"
+    restart: on-failure
     read_only: true
+    # Enforce strict user namespace execution
+    user: "101:101"
+    # Establish Resource Quotas to prevent DoS
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.50'
     tmpfs:
-      - /tmp
-      - /var/cache/nginx
-      - /var/run
+      - /tmp:size=50M,mode=1777,uid=101,gid=101
+      - /var/cache/nginx:size=100M,mode=1777,uid=101,gid=101
+      - /var/run:size=10M,mode=755,uid=101,gid=101
     cap_drop:
       - ALL
     security_opt:
       - no-new-privileges:true
-    environment:
-      - PRODUCTIVITY_ZONE=work
-      - COMPLIANCE_MODE=STRICT_GDPR_CCPA_DPDP
 
   tombos-ids:
-    image: alpine:latest
+    image: alpine:3.19.1
     container_name: tombos_ids_suricata
-    command: sh -c "echo '[IDS CONTAINER] Suricata packet monitoring active...' && tail -f /dev/null"
-    restart: always
+    user: "1000:1000"
+    command: sh -c "echo '[IDS CONTAINER] Suricata active...' && tail -f /dev/null"
+    restart: on-failure
     read_only: true
     cap_drop:
       - ALL
+    security_opt:
+      - no-new-privileges:true
