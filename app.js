@@ -3,6 +3,14 @@
 // System States
 const systemState = {
   activeTaskIp: '185.220.101.42',
+  securityModules: {
+    ztna: { name: 'Zero-Trust Network Architecture (ZTNA)', enabled: true, desc: 'Micro-segmentation & mTLS session verification' },
+    dlp: { name: 'Data Loss Prevention (DLP)', enabled: true, desc: 'Automated regex inspection blocking egress of PII & keys' },
+    pqc: { name: 'Post-Quantum Cryptography (PQC)', enabled: true, desc: 'Kyber-1024 lattice key encapsulation & Dilithium-5 signatures' },
+    rasp: { name: 'Runtime Application Self-Protection (RASP)', enabled: true, desc: 'In-memory telemetry checking for memory corruption & exploits' },
+    iam: { name: 'Identity & Access Management (IAM / RBAC)', enabled: true, desc: 'Role-based access control with multi-factor biometric attestation' },
+    edr: { name: 'Endpoint Detection & Response (EDR)', enabled: true, desc: 'Automated threat hunting & instant process isolation daemons' }
+  },
   typeSpeed: {
     enabled: false,
     startTime: null,
@@ -582,6 +590,13 @@ const windowConfig = {
     height: 500,
     icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.89 2 1.99 2H20c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zM5 8h2v2H5V8zm0 3h2v2H5v-2zm12 6H7v-2h10v2zm-1-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z" fill="#4AF626"/></svg>`,
     getContent: () => getTypeSpeedContent()
+  },
+  securityhub: {
+    title: "Modular Enterprise Security Framework Control Hub",
+    width: 760,
+    height: 540,
+    icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" fill="#007AFF"/></svg>`,
+    getContent: () => getSecurityHubContent()
   },
   chat: {
     title: "Tomb Secure Messenger (E2EE PQC Quantum Enclave)",
@@ -4661,6 +4676,7 @@ const allAppLauncherList = [
   { id: 'accessory', name: 'External Security Accessory Manager', category: 'Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#007AFF"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>`, desc: 'Pair & configure YubiKey NFC, Titan Keys, HSMs & Biometric Readers', zone: 'secure' },
   { id: 'vault', name: 'Cryptographic Key Vault', category: 'Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#FFCC00"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>`, desc: 'AES-256 and Kyber PQC payload encryption', zone: 'personal' },
   { id: 'ultimate', name: 'Ultimate Hardening Center', category: 'Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#E95420"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>`, desc: 'Zero Trust Architecture, seL4 microkernel & TPM', zone: 'secure' },
+  { id: 'securityhub', name: 'Modular Enterprise Security Framework Hub', category: 'Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#007AFF"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>`, desc: 'Modular ZTNA, DLP, PQC, RASP, IAM & EDR security controls', zone: 'secure' },
   { id: 'hypervisor', name: 'Hypervisor VM Manager', category: 'System', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#007AFF"><path d="M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14H4v-4h7v4zm0-6H4V7h7v4zm9 6h-7v-4h7v4zm0-6h-7V7h7v4z"/></svg>`, desc: 'Xen Dom0 virtual machine & isolation zones', zone: 'secure' },
   { id: 'teacher', name: 'AI Teacher & Translator', category: 'Education', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#9C27B0"><path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12A10 10 0 0 1 12 2zm1 5h-2v4H7v2h4v4h2v-4h4v-2h-4V7z"/></svg>`, desc: 'Multi-lingual rule translator & agent hub', zone: 'secure' },
   { id: 'theme', name: 'UI Customization Center', category: 'System', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#E95420"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.22 19.58 10.57 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-4 9c-.83 0-1.5-.67-1.5-1.5S7.17 9 8 9s1.5.67 1.5 1.5S8.83 12 8 12zm4 0c-.83 0-1.5-.67-1.5-1.5S11.17 9 12 9s1.5.67 1.5 1.5S12.83 12 12 12zm4 0c-.83 0-1.5-.67-1.5-1.5S15.17 9 16 9s1.5.67 1.5 1.5S16.83 12 16 12z"/></svg>`, desc: 'Theme colors, font size & glassmorphism', zone: 'personal' },
@@ -5896,4 +5912,55 @@ function getTypeSpeedContent() {
 function handleTypingTestInput(el) {
   if (!systemState.typeSpeed.enabled) return;
   systemState.typeSpeed.totalKeystrokes += 1;
+}
+
+// ==========================================
+// MODULAR ENTERPRISE SECURITY FRAMEWORK HUB
+// ==========================================
+function toggleSecurityModule(modKey) {
+  if (systemState.securityModules[modKey]) {
+    systemState.securityModules[modKey].enabled = !systemState.securityModules[modKey].enabled;
+    logAudit(`Modular security control '${systemState.securityModules[modKey].name}' set to: ${systemState.securityModules[modKey].enabled ? 'ENABLED' : 'DISABLED'}`);
+    updateSecurityShield();
+    const win = document.getElementById('window-securityhub');
+    if (win) {
+      const content = win.querySelector('.window-body-content');
+      if (content) content.innerHTML = getSecurityHubContent();
+    }
+  }
+}
+
+function getSecurityHubContent() {
+  const mods = systemState.securityModules;
+  return `
+    <div class="app-securityhub-container" style="display: flex; flex-direction: column; height: 100%; color: #fff; font-family: 'Outfit', sans-serif; background: #141414; padding: 20px; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 14px; margin-bottom: 18px;">
+        <div>
+          <h2 style="margin: 0; font-size: 20px; color: #007AFF; font-weight: 700;">🛡️ Modular Enterprise Security Framework Control Hub</h2>
+          <div style="font-size: 12px; color: var(--ubuntu-light-grey); margin-top: 2px;">Comprehensive industry-standard security controls partitioned into independent modular enclaves</div>
+        </div>
+        <span style="font-size: 10px; background: rgba(74,246,38,0.15); color: #4AF626; padding: 4px 10px; border-radius: 12px; font-family: var(--font-mono); font-weight: 600;">100% Modular Architecture</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px;">
+        ${Object.keys(mods).map(key => {
+          const m = mods[key];
+          return `
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid ${m.enabled ? 'rgba(74,246,38,0.3)' : 'rgba(255,255,255,0.1)'}; border-radius: 8px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <span style="font-weight: 700; font-size: 13px; color: #fff;">${escapeHTML(m.name)}</span>
+                  <span style="font-size: 9px; background: ${m.enabled ? 'rgba(74,246,38,0.15)' : 'rgba(255,59,48,0.15)'}; color: ${m.enabled ? '#4AF626' : '#ff3b30'}; padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-weight: 600;">${m.enabled ? 'ACTIVE' : 'INACTIVE'}</span>
+                </div>
+                <p style="font-size: 11.5px; color: #aaa; line-height: 1.4; margin: 0 0 12px 0;">${escapeHTML(m.desc)}</p>
+              </div>
+              <button onclick="toggleSecurityModule('${key}')" style="background: ${m.enabled ? 'rgba(255,59,48,0.2)' : 'rgba(74,246,38,0.2)'}; color: ${m.enabled ? '#ff3b30' : '#4AF626'}; border: 1px solid ${m.enabled ? '#ff3b30' : '#4AF626'}; padding: 6px 12px; border-radius: 4px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
+                ${m.enabled ? 'Disable Module' : 'Enable Module'}
+              </button>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
 }
