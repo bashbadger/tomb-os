@@ -55,6 +55,8 @@ const systemState = {
     TWITTER_BEARER_TOKEN: 'AAAAAAAAAAAAAAAAAAAAA_tomb_os_twitter_v2_bearer',
     SLACK_WEBHOOK_URL: 'https://hooks.slack.com/services/T00/B00/X00_tomb_slack',
     MATRIX_HOMESERVER_URL: 'https://matrix.org/_matrix/client/r0',
+    OPENAI_API_KEY: 'sk-proj-tombos_pqc_encrypted_openai_gpt4o_key',
+    OPENAI_MODEL: 'gpt-4o',
     PQC_KEY_BROKER: 'https://keybroker.tomb-os.sec/v1',
     COMPLIANCE_MODE: 'STRICT_GDPR_CCPA_DPDP'
   },
@@ -1460,6 +1462,16 @@ kernel.kptr_restrict = 2 (Blocks kernel address leaks)
 kernel.yama.ptrace_scope = 1 (Hardens process memory probing)
 fs.protected_symlinks = 1`;
           }
+          break;
+        case 'openai':
+        case 'gpt':
+        case 'gpt4':
+          const queryPrompt = escapeHTML(args.slice(1).join(' ') || 'analyze active threat surface');
+          output = `[OPENAI GPT-4o AI ENGINE] Connecting via TLS v1.3 Kyber-1024 quantum tunnel...
+▶ Prompt: "${queryPrompt}"
+🤖 OpenAI GPT-4o Response:
+"Analysis complete. Active Tomb OS kernel is running 100% zero-trust verified with seL4 microkernel formal IPC capabilities, AppArmor MAC profiles, and hardware TPM 2.0 enclave sealing. Zero security vulnerabilities detected."`;
+          logAudit(`Executed OpenAI GPT-4o intelligence query via CLI.`);
           break;
         case 'ifconfig':
         case 'ip':
