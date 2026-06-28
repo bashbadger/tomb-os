@@ -1168,6 +1168,37 @@ function handleTerminalCommand(e, input) {
           output = `[CLI LAUNCH] Executing ${systemState.env.CHAT_APP} ... Opening Tomb Secure Messenger (E2EE PQC Quantum Enclave)!`;
           logAudit(`Productivity app launched from terminal: tomb-chat`);
           break;
+        case 'discord':
+          openWindow('discord');
+          output = `[SEAMLESS IPC LAUNCH] Executing Discord Relay API ... Opening sandboxed Discord Stream inside AppArmor profile tombos_red_untrusted!`;
+          logAudit(`Social API launched from terminal: discord`);
+          break;
+        case 'reddit':
+          openWindow('reddit');
+          output = `[SEAMLESS IPC LAUNCH] Executing Reddit NetSec OAuth2 Feed ... Opening sandboxed Reddit Client inside AppArmor profile tombos_red_untrusted!`;
+          logAudit(`Social API launched from terminal: reddit`);
+          break;
+        case 'telegram':
+          openWindow('telegram');
+          output = `[SEAMLESS IPC LAUNCH] Executing Telegram Bot API Bridge ... Opening sandboxed Telegram Channel inside AppArmor profile tombos_green_work!`;
+          logAudit(`Social API launched from terminal: telegram`);
+          break;
+        case 'twitter':
+        case 'x':
+          openWindow('twitter');
+          output = `[SEAMLESS IPC LAUNCH] Executing Twitter / X OSINT v2 Bearer API ... Opening sandboxed OSINT Feed inside AppArmor profile tombos_red_untrusted!`;
+          logAudit(`Social API launched from terminal: twitter`);
+          break;
+        case 'slack':
+          openWindow('slack');
+          output = `[SEAMLESS IPC LAUNCH] Executing Slack Incident Webhook Relays ... Opening sandboxed Slack Channel inside AppArmor profile tombos_green_work!`;
+          logAudit(`Social API launched from terminal: slack`);
+          break;
+        case 'matrix':
+          openWindow('matrix');
+          output = `[SEAMLESS IPC LAUNCH] Executing Matrix Synapse Federation ... Opening sandboxed E2EE Matrix Node inside AppArmor profile tombos_blue_secure!`;
+          logAudit(`Social API launched from terminal: matrix`);
+          break;
         case 'build-iso':
         case 'update-iso':
         case 'tomb-iso':
