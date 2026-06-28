@@ -1,9 +1,9 @@
-# 🛡️ Tomb OS: Ultimate Sovereign Operating System & Hardened Security Platform
+# 🛡️ Tomb OS: Ultimate Hardened Operating System & High-Assurance Security Platform
 
-Welcome to **Tomb OS**, the world's most secure, post-quantum resilient, and architecturally verified sovereign operating system. Designed for high-threat enclaves, defense researchers, financial institutions, and privacy-conscious users, Tomb OS unifies bare-metal microkernel mathematical proofs with disposable hypervisor micro-segmentation and universal cross-platform mobile convergence.
+Welcome to **Tomb OS**, the world's most secure, post-quantum resilient, and architecturally verified hardened operating system. Designed for high-threat enclaves, researchers, financial institutions, and privacy-conscious users, Tomb OS unifies bare-metal microkernel mathematical proofs with disposable hypervisor micro-segmentation and universal cross-platform mobile convergence.
 
-### 🎯 Sovereign Mission
-> **"To deliver world-class military defense and post-quantum cryptographic security to every individual, enterprise, and sovereign entity at the absolute lowest financial barrier to entry."**
+### 🎯 Core Mission
+> **"To deliver world-class high-assurance security and post-quantum cryptographic protection to every individual and enterprise at the absolute lowest financial barrier to entry."**
 > By utilizing open-source seL4 mathematical proofs, commodity PC/Mac hardware, containerized sandboxes, and universal smartphone GSI flashing, Tomb OS delivers multi-million dollar enterprise defense security for $0 in licensing fees.
 
 ---
@@ -29,8 +29,8 @@ Welcome to **Tomb OS**, the world's most secure, post-quantum resilient, and arc
 - **seL4 Microkernel IPC Capabilities**: Formally verified, mathematically proven inter-process communication gates.
 - **Xen Dom0 Per-Window Micro-VMs**: Every browser window runs inside a isolated Xen micro-VM (`DomU-VM-XXXXX`). Closing a window triggers volatile RAM scrubbing (`kzero_memory()`).
 - **Post-Quantum Cryptography (PQC)**: Native lattice cryptography (**Kyber-1024** key exchange & **Dilithium-5** digital signatures) protecting all chat streams and payload vaults.
-- **Zero-Backdoor Sovereign Ownership**: 100% user encryption key authority (TPM 2.0 enclaves). Zero remote administrative overrides and zero cloud telemetry.
-- **Compiler Hardening**: Military-grade binary protection (`-fstack-protector-strong`, `-D_FORTIFY_SOURCE=2`, RELRO, BIND_NOW, KPTI, KASLR).
+- **Zero-Backdoor User Ownership**: 100% user encryption key authority (TPM 2.0 enclaves). Zero remote administrative overrides and zero cloud telemetry.
+- **Compiler Hardening**: Defense-grade binary protection (`-fstack-protector-strong`, `-D_FORTIFY_SOURCE=2`, RELRO, BIND_NOW, KPTI, KASLR).
 
 ---
 
@@ -165,12 +165,12 @@ tombOS-project-/
 │   └── flash_sdxc.sh        # External SD XC / NVMe raw disk flasher
 ├── Dockerfile               # Read-only multi-stage Nginx container definition
 ├── docker-compose.yml       # Production container orchestration
-├── index.html               # Sovereign UI desktop layout markup
+├── index.html               # High-assurance UI desktop layout markup
 ├── app.js                   # Master UI state, VM allocation & CLI engine
 └── style.css                # Ultra-hardened glassmorphism styling
 ```
 
 ---
 
-## ⚖️ License & Sovereign Manifesto
-Tomb OS is distributed under open sovereign security licenses. Built for absolute user privacy, zero telemetry, and maximum post-quantum resilience.
+## ⚖️ License & Open Security Guarantee
+Tomb OS is distributed under open security licenses. Built for absolute user privacy, zero telemetry, and maximum post-quantum resilience.

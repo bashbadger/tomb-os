@@ -1,11 +1,11 @@
 # 🛡️ Tomb OS Official Project Wiki & Master Architecture Scope
 
-Welcome to the official technical wiki for **Tomb OS**, the world's most advanced sovereign operating system and hardened cybersecurity architecture.
+Welcome to the official technical wiki for **Tomb OS**, the world's most advanced hardened operating system and cybersecurity architecture.
 
 ---
 
-## 🏛️ Project Vision & Sovereign Scope
-Tomb OS is engineered to eliminate the systemic vulnerabilities of conventional operating systems (telemetry backdoors, global state compromise, unisolated browser zero-days, and legacy RSA/ECC cryptographic degradation). It provides a formally verified, multi-tiered security enclave designed for defense enclaves, intelligence agencies, financial institutions, and privacy-conscious users.
+## 🏛️ Project Vision & Architectural Scope
+Tomb OS is engineered to eliminate the systemic vulnerabilities of conventional operating systems (telemetry backdoors, global state compromise, unisolated browser zero-days, and legacy RSA/ECC cryptographic degradation). It provides a formally verified, multi-tiered security enclave designed for researchers, financial institutions, and privacy-conscious users.
 
 ### 🎯 Core Mission: Maximum Security at Lowest Cost
 Our guiding principle is to democratize elite cybersecurity defense: **provide the absolute best, formally verified security protection at the lowest financial cost.** 
@@ -28,7 +28,7 @@ Our guiding principle is to democratize elite cybersecurity defense: **provide t
 - **Kyber-1024 Lattice Key Exchange**: Enforced across all internal messaging streams and storage vaults to defeat quantum decryption.
 - **Dilithium-5 Digital Signatures**: Protects administrative payloads, GPG keys, and software package manifests.
 
-### 4. Zero-Trust Sovereign Data Ownership
+### 4. Zero-Trust User Data Ownership
 - **TPM 2.0 Enclave Sealing**: Administrative passphrases (`sec-admin`) encrypt local hardware security enclaves.
 - **Contactless Hardware 2FA**: One-tap YubiKey NFC and Google Titan FIDO2 key authentication.
 - **Zero Remote Overrides**: 100% user encryption key authority with zero telemetry and zero backdoors.

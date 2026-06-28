@@ -41,7 +41,7 @@
         </div>
       </div>
       <p style="font-size: 13px; color: #ccc; line-height: 1.5; margin-bottom: 18px;">
-        As part of our zero-trust sovereign architecture, please define a master administrative passphrase. This password encrypts your local TPM 2.0 enclave and authorizes root system commands.
+        As part of our zero-trust user-owned architecture, please define a master administrative passphrase. This password encrypts your local TPM 2.0 enclave and authorizes root system commands.
       </p>
       <form onsubmit="saveAdminPassword(event)">
         <div style="margin-bottom: 14px;">
@@ -53,7 +53,7 @@
           <input type="password" id="setup-admin-pass-confirm" required placeholder="Confirm master password..." style="width: 100%; padding: 10px 14px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: #222; color: #fff; font-family: var(--font-mono); font-size: 13px; outline: none; box-sizing: border-box;" />
         </div>
         <div id="setup-pass-error" style="display: none; color: #ff3b30; font-size: 12px; margin-bottom: 14px; font-family: var(--font-mono);"></div>
-        <button type="submit" style="width: 100%; background: var(--ubuntu-orange); color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s; margin-bottom: 10px;">Initialize Sovereign OS & Save Key →</button>
+        <button type="submit" style="width: 100%; background: var(--ubuntu-orange); color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s; margin-bottom: 10px;">Initialize Tomb OS & Save Key →</button>
         <button type="button" onclick="authenticateNFCKey('setup')" style="width: 100%; background: rgba(0,122,255,0.2); border: 1px solid #007AFF; color: #fff; padding: 10px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer;">Tap NFC Security Key / YubiKey (Hardware 2FA)</button>
       </form>
     </div>
@@ -66,7 +66,7 @@
         SA
       </div>
       <h3 style="margin: 0 0 4px 0; font-size: 20px; color: #fff; font-weight: 700;">sec-admin</h3>
-      <div style="font-size: 12px; color: var(--ubuntu-light-grey); margin-bottom: 20px;">Tomb OS Sovereign Enclave Lock</div>
+      <div style="font-size: 12px; color: var(--ubuntu-light-grey); margin-bottom: 20px;">Tomb OS User Enclave Lock</div>
 
       <div style="background: rgba(255,59,48,0.12); border: 1px solid rgba(255,59,48,0.3); border-radius: 8px; padding: 12px; margin-bottom: 20px; text-align: left; font-size: 11.5px; color: #ffbaba; line-height: 1.5;">
         <strong>ZERO-TRUST WARNING:</strong> If you forget this master passphrase, your encrypted data is permanently unrecoverable. Ensure you maintain an external offline SD / NVMe backup.
@@ -77,7 +77,7 @@
           <input type="password" id="session-pass-input" required placeholder="Enter sec-admin passphrase..." style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #222; color: #fff; font-family: var(--font-mono); font-size: 13.5px; outline: none; box-sizing: border-box; text-align: center;" autofocus />
         </div>
         <div id="session-pass-error" style="display: none; color: #ff3b30; font-size: 12px; margin-bottom: 14px; font-family: var(--font-mono);"></div>
-        <button type="submit" style="width: 100%; background: var(--ubuntu-orange); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s; margin-bottom: 10px;">Unlock Sovereign Session →</button>
+        <button type="submit" style="width: 100%; background: var(--ubuntu-orange); color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s; margin-bottom: 10px;">Unlock User Session →</button>
         <button type="button" onclick="authenticateNFCKey('unlock')" style="width: 100%; background: rgba(37,211,102,0.2); border: 1px solid #25D366; color: #fff; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer;">Unlock via NFC Security Key / YubiKey (Tap)</button>
       </form>
     </div>

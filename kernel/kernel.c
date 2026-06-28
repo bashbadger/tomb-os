@@ -296,7 +296,7 @@ void kernel_main(void) {
     kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Enumerated PCI Hardware Buses & Device Subsystems\n", text_color);
     kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Verified seL4 Microkernel formal IPC capability routing\n", text_color);
     kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Configured Xen Dom0 Hypervisor Multidomain Isolation\n", text_color);
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Verified ZERO BACKDOORS: 100% Sovereign User Enclave Control\n", text_color);
+    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Verified ZERO BACKDOORS: 100% Independent User Enclave Control\n", text_color);
     kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Enforced Air-Gapped Memory Compartmentalization & Entropy Seeding\n", text_color);
     kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Enforced Kernel Page Table Isolation (KPTI) & KASLR Entropy Randomization\n", text_color);
     kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Bound keyring crypt-keys to physical TPM 2.0 hardware enclaves\n", text_color);
