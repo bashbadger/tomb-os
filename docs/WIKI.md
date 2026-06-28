@@ -7,6 +7,11 @@ Welcome to the official technical wiki for **Tomb OS**, the world's most advance
 ## 🏛️ Project Vision & Sovereign Scope
 Tomb OS is engineered to eliminate the systemic vulnerabilities of conventional operating systems (telemetry backdoors, global state compromise, unisolated browser zero-days, and legacy RSA/ECC cryptographic degradation). It provides a formally verified, multi-tiered security enclave designed for defense enclaves, intelligence agencies, financial institutions, and privacy-conscious users.
 
+### 🎯 Core Mission: Maximum Security at Lowest Cost
+Our guiding principle is to democratize elite cybersecurity defense: **provide the absolute best, formally verified security protection at the lowest financial cost.** 
+- **Zero Licensing Fees**: 100% open-source software, removing expensive vendor lock-in and hardware appliance tax.
+- **Commodity Hardware Universal Boot**: Runs on existing laptops, PCs, live SD cards, and standard Android smartphones via universal GSI flashing.
+
 ---
 
 ## 🔬 Core Architectural Pillars

@@ -2,6 +2,10 @@
 
 Welcome to **Tomb OS**, the world's most secure, post-quantum resilient, and architecturally verified sovereign operating system. Designed for high-threat enclaves, defense researchers, financial institutions, and privacy-conscious users, Tomb OS unifies bare-metal microkernel mathematical proofs with disposable hypervisor micro-segmentation and universal cross-platform mobile convergence.
 
+### 🎯 Sovereign Mission
+> **"To deliver world-class military defense and post-quantum cryptographic security to every individual, enterprise, and sovereign entity at the absolute lowest financial barrier to entry."**
+> By utilizing open-source seL4 mathematical proofs, commodity PC/Mac hardware, containerized sandboxes, and universal smartphone GSI flashing, Tomb OS delivers multi-million dollar enterprise defense security for $0 in licensing fees.
+
 ---
 
 ## 📋 Table of Contents
