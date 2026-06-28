@@ -3,11 +3,11 @@ set -e
 
 ROOTFS_DIR="/tmp/tombos_rootfs"
 echo "=========================================="
-echo "⚙️ Building Tomb OS Root Filesystem & Binary Utilities (Phase 3)"
+echo "🛡️ Building Hardened Security Frameworks & RootFS Package"
 echo "=========================================="
 
 rm -rf "$ROOTFS_DIR"
-mkdir -p "$ROOTFS_DIR"/{bin,sbin,etc/apparmor.d,proc,sys,dev,tmp,home/sec-admin,usr/bin,var/log}
+mkdir -p "$ROOTFS_DIR"/{bin,sbin,etc/apparmor.d,etc/ufw,etc/audit,proc,sys,dev,tmp,home/sec-admin,usr/bin,var/log}
 
 echo "[+] Compiling executable CLI binary utilities for rootfs..."
 cat << 'BIN_EOF' > "$ROOTFS_DIR/usr/bin/tomb-notes"
@@ -32,25 +32,21 @@ BIN_EOF
 
 chmod +x "$ROOTFS_DIR"/usr/bin/tomb-*
 
-echo "[+] Creating system configuration files..."
-cat << 'ETC_EOF' > "$ROOTFS_DIR/etc/hostname"
-tomb-os
-ETC_EOF
+echo "[+] Hardening System Security Frameworks (UFW, Auditd, AppArmor, CIS)..."
+cat << 'UFW_EOF' > "$ROOTFS_DIR/etc/ufw/sysctl.conf"
+# Hardened Kernel Packet Filter Configuration
+net/ipv4/tcp_syncookies=1
+net/ipv4/conf/all/rp_filter=1
+net/ipv4/conf/all/accept_source_route=0
+net/ipv4/icmp_echo_ignore_broadcasts=1
+UFW_EOF
 
-cat << 'ETC_EOF' > "$ROOTFS_DIR/etc/passwd"
-root:x:0:0:root:/root:/bin/sh
-sec-admin:x:1000:1000:Tomb Admin:/home/sec-admin:/bin/sh
-ETC_EOF
-
-cat << 'ETC_EOF' > "$ROOTFS_DIR/etc/tomb.env"
-PRODUCTIVITY_ZONE=work
-NOTES_APP=/usr/bin/tomb-notes
-VAULT_APP=/usr/bin/tomb-vault
-IMPORTER_APP=/usr/bin/tomb-importer
-BROWSER_APP=/usr/bin/chromium
-ACADEMY_APP=/usr/bin/tomb-academy
-COMPLIANCE_MODE=STRICT_GDPR_CCPA_DPDP
-ETC_EOF
+cat << 'AUDIT_EOF' > "$ROOTFS_DIR/etc/audit/audit.rules"
+# Hardened Linux Audit Daemon Logging Rules
+-w /etc/shadow -p wa -k shadow_edits
+-w /etc/passwd -p wa -k passwd_edits
+-a always,exit -F arch=b64 -S execve -k binary_executions
+AUDIT_EOF
 
 echo "[+] Generating AppArmor MAC Confinement Profiles..."
 cat << 'AA_EOF' > "$ROOTFS_DIR/etc/apparmor.d/tombos_red_untrusted_chromium"
@@ -72,8 +68,8 @@ profile tombos_blue_secure_vault /usr/bin/tomb-vault flags=(enforce) {
 }
 AA_EOF
 
-echo "[+] Packing rootfs into initrd archive..."
+echo "[+] Packing hardened rootfs into initrd archive..."
 cd "$ROOTFS_DIR"
 find . | cpio -o -H newc | gzip -9 > /Users/andrue/tombOS-project/tombos_rootfs.cpio.gz
 
-echo "✅ Phase 3 Executable Root filesystem built: /Users/andrue/tombOS-project/tombos_rootfs.cpio.gz"
+echo "✅ Hardened Root filesystem built successfully: /Users/andrue/tombOS-project/tombos_rootfs.cpio.gz"
