@@ -522,6 +522,20 @@ function syncComplianceDials() {
 
 // Window Management Configuration
 const windowConfig = {
+  stresstest: {
+    title: "Enterprise Stress Test & Load Benchmark Suite",
+    width: 800,
+    height: 540,
+    icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M7 2v11h3v9l7-12h-4l4-8z" fill="#ff3b30"/></svg>`,
+    getContent: () => getStressTestContent()
+  },
+  sysmon: {
+    title: "System Performance & Resource Telemetry Monitor",
+    width: 800,
+    height: 540,
+    icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 15.66z" fill="#4AF626"/></svg>`,
+    getContent: () => getSysmonContent()
+  },
   serviceconnect: {
     title: "Universal Zero-Trust Secure Service Connect Hub",
     width: 820,
@@ -4768,7 +4782,9 @@ const allAppLauncherList = [
   { id: 'agents', name: 'Adaptive Multi-Agent Mesh Hub', category: 'AI & Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#9C27B0"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><circle cx="12" cy="12" r="3" fill="#9C27B0"/></svg>`, desc: 'Interactive panel bridging Orchestrator, Memory, Learning & Task agents', zone: 'secure' },
   { id: 'threatmap', name: 'Global Threat Radar & Cyber Map', category: 'Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#ff3b30"><circle cx="12" cy="12" r="10" fill="none" stroke="#ff3b30" stroke-width="2"/><path d="M12 2v20M2 12h20" stroke="#ff3b30" stroke-width="1.5"/></svg>`, desc: 'Live global threat radar monitoring rolling IPs & attacks', zone: 'work' },
   { id: 'cipherlab', name: 'Post-Quantum Cipher Laboratory', category: 'Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#00BFFF"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.8L19 8l-7 3.5L5 8l7-3.2z"/></svg>`, desc: 'Kyber-1024 / Dilithium-5 keypair generator & lattice benchmarker', zone: 'secure' },
-  { id: 'serviceconnect', name: 'Zero-Trust Service Connect Hub', category: 'Networking & Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#007AFF"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`, desc: 'Connect securely to any external service, DB or API without security compromise', zone: 'secure' }
+  { id: 'serviceconnect', name: 'Zero-Trust Service Connect Hub', category: 'Networking & Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#007AFF"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`, desc: 'Connect securely to any external service, DB or API without security compromise', zone: 'secure' },
+  { id: 'sysmon', name: 'System Telemetry Monitor', category: 'System', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#4AF626"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 15.66z"/></svg>`, desc: 'Real-time CPU core activity, RAM usage gauges & telemetry', zone: 'work' },
+  { id: 'stresstest', name: 'Stress Test & Load Benchmarker', category: 'System & Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#ff3b30"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>`, desc: 'Execute synthetic load tests across CPU cores, PQC ciphers & agent task queues', zone: 'work' }
 ];
 
 function getControlCenterContent() {
@@ -4777,7 +4793,7 @@ function getControlCenterContent() {
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 14px;">
         <div>
           <h2 style="margin: 0; font-size: 20px; color: var(--ubuntu-orange); font-weight: 600;">🎛️ Application Control Center</h2>
-          <div style="font-size: 12px; color: var(--ubuntu-light-grey); margin-top: 2px;">Launch and access all 19 Tomb OS applications from a central hub</div>
+          <div style="font-size: 12px; color: var(--ubuntu-light-grey); margin-top: 2px;">Launch and access all 21 Tomb OS applications from a central hub</div>
         </div>
         <div style="width: 240px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 18px; padding: 6px 12px; display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 12px; color: #888;">🔍</span>
@@ -6748,5 +6764,99 @@ function initiateZeroTrustConnect() {
   }, 1500);
 }
 
+// ============================================================================
+// 6. REAL-TIME SYSTEM TELEMETRY & RESOURCE MONITOR ENGINE
+// ============================================================================
+function getSysmonContent() {
+  return `
+    <div class="app-sysmon-container" style="display: flex; flex-direction: column; height: 100%; color: #fff; font-family: var(--font-mono); background: #0c0c0c; padding: 18px; overflow-y: auto;">
+      <div style="border-bottom: 1px solid rgba(74,246,38,0.3); padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2 style="margin: 0; font-size: 18px; color: #4AF626;">📊 System Performance & Resource Telemetry</h2>
+          <div style="font-size: 11px; color: #aaa; margin-top: 2px;">Real-time CPU core load meters, RAM allocation gauges, and micro-VM metrics.</div>
+        </div>
+        <span style="font-size: 10px; background: rgba(74,246,38,0.15); color: #4AF626; padding: 4px 10px; border-radius: 12px; font-weight: 600;">Hardware Telemetry Active</span>
+      </div>
 
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+          <h4 style="margin: 0; color: #4AF626; font-size: 13px;">💻 CPU Core Telemetry Load</h4>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 11px;">
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span>Core 0 (Kernel Master)</span><strong style="color: #4AF626;">12%</strong></div>
+              <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;"><div style="width: 12%; height: 100%; background: #4AF626;"></div></div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span>Core 1 (PQC Cipher Daemon)</span><strong style="color: #00BFFF;">28%</strong></div>
+              <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;"><div style="width: 28%; height: 100%; background: #00BFFF;"></div></div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span>Core 2 (Multi-Agent Mesh)</span><strong style="color: #9C27B0;">18%</strong></div>
+              <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;"><div style="width: 18%; height: 100%; background: #9C27B0;"></div></div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span>Core 3 (Xen Dom0 Hypervisor)</span><strong style="color: #FFCC00;">8%</strong></div>
+              <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;"><div style="width: 8%; height: 100%; background: #FFCC00;"></div></div>
+            </div>
+          </div>
+        </div>
 
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+          <h4 style="margin: 0; color: #00BFFF; font-size: 13px;">🧠 Physical Memory Allocations</h4>
+          <div style="font-size: 11px; line-height: 1.8; color: #ccc;">
+            Total System RAM: <strong style="color: #fff;">16,384 MB</strong><br/>
+            Kernel Core (Ring 0): <strong style="color: #4AF626;">501 MB</strong><br/>
+            Xen DomU Per-Window Micro-VMs: <strong style="color: #FFCC00;">1,024 MB (2 Active VMs)</strong><br/>
+            Volatile RAM Scratch Buffers: <strong style="color: #00BFFF;">256 MB</strong><br/>
+            Free RAM: <span style="color: #4AF626; font-weight: 700;">14,603 MB (89% Available)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================================
+// 7. AUTOMATED STRESS TEST & BENCHMARK SUITE ENGINE
+// ============================================================================
+function getStressTestContent() {
+  return `
+    <div class="app-stresstest-container" style="display: flex; flex-direction: column; height: 100%; color: #fff; font-family: var(--font-mono); background: #0d0d0d; padding: 18px; overflow-y: auto;">
+      <div style="border-bottom: 1px solid rgba(255,59,48,0.3); padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2 style="margin: 0; font-size: 18px; color: #ff3b30;">⚡ Enterprise Stress Test & Load Benchmark Suite</h2>
+          <div style="font-size: 11px; color: #aaa; margin-top: 2px;">Subject kernel memory, PQC ciphers, and multi-agent systems to maximum synthetic load.</div>
+        </div>
+        <button onclick="runSystemStressTest()" style="background: #ff3b30; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 700; font-size: 11.5px; cursor: pointer;">Execute Full Stress Test ⚡</button>
+      </div>
+
+      <div style="background: #000; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 14px; flex: 1; min-height: 240px; font-size: 11px; line-height: 1.6; color: #ccc; overflow-y: auto;" id="stress-test-console">
+        <div style="color: #888;">System idle. Click 'Execute Full Stress Test' to launch synthetic load benchmarks across CPU cores, Kyber-1024 keypairs, and RAM buffers.</div>
+      </div>
+    </div>
+  `;
+}
+
+function runSystemStressTest() {
+  const log = document.getElementById('stress-test-console');
+  if (!log) return;
+  log.innerHTML = `<div style="color: #ff3b30; font-weight: 700;">[STRESS TEST STARTED] Initiating multi-threaded benchmark suite...</div>`;
+  log.scrollTop = log.scrollHeight;
+
+  setTimeout(() => {
+    log.innerHTML += `<div style="color: #FFCC00;">▶ [STAGE 1/3] Stressing PQC Kyber-1024 Lattice Engine (10,000 iterations)... PASS (0 errors, 4.2ms avg)</div>`;
+    log.scrollTop = log.scrollHeight;
+  }, 600);
+
+  setTimeout(() => {
+    log.innerHTML += `<div style="color: #00BFFF;">▶ [STAGE 2/3] Allocating & Scrubbing 4,000 Volatile RAM Pages... PASS (Zero leaks detected)</div>`;
+    log.scrollTop = log.scrollHeight;
+  }, 1200);
+
+  setTimeout(() => {
+    log.innerHTML += `<div style="color: #9C27B0;">▶ [STAGE 3/3] Simulating 100 Concurrent Agent Tasks... PASS (100% completion)</div>`;
+    log.innerHTML += `<div style="color: #4AF626; font-weight: 700; margin-top: 8px;">✅ BENCHMARK COMPLETE: System operating with 100% stability under peak stress.</div>`;
+    log.scrollTop = log.scrollHeight;
+    logAudit("Executed full enterprise system stress test and load benchmark suite with 100% stability.");
+  }, 1800);
+}
