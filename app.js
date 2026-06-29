@@ -4708,6 +4708,7 @@ function uploadEncryptedDriveFile() {
 // ==========================================
 let currentChatContact = 'sec-admin';
 let isChatEphemeralActive = false;
+let userChatCredits = 50; // Chat agent session credits
 
 function getChatContent() {
   return `
@@ -4792,9 +4793,9 @@ function getChatContent() {
             <div style="font-size: 10px; color: #25D366;">online • End-to-End Encrypted (Signal Protocol / Meta Open Spec + Kyber PQC)</div>
           </div>
           <div style="display: flex; gap: 10px; align-items: center;">
+            <span id="chat-credits-display" style="font-size: 11.5px; color: #4AF626; background: rgba(74,246,38,0.1); border: 1px solid rgba(74,246,38,0.25); padding: 3px 8px; border-radius: 12px; font-weight: 700;">Credits: ${userChatCredits}</span>
+            <button onclick="topUpChatCredits()" style="background: #E95420; border: none; color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s;">+ Add Credits</button>
             <button onclick="toggleChatEphemeral()" id="chat-ephemeral-btn" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 10px; cursor: pointer;"> Ephemeral Off</button>
-            <button onclick="alert('Initiating Quantum-Encrypted Voice Call...')" style="background: transparent; border: none; color: #aebac1; cursor: pointer; font-size: 14px;"></button>
-            <button onclick="alert('Initiating HD Video Conference Enclave...')" style="background: transparent; border: none; color: #aebac1; cursor: pointer; font-size: 14px;"></button>
           </div>
         </div>
 
@@ -4851,10 +4852,26 @@ function toggleChatEphemeral() {
 function sendChatMessage() {
   const input = document.getElementById('chat-msg-input');
   const thread = document.getElementById('chat-thread');
-  if (!input || !thread || !input.value.trim()) return;
+  if (!input || !thread) return;
+
+  if (userChatCredits < 10) {
+    const errorEl = document.createElement('div');
+    errorEl.style.cssText = 'align-self: center; background: rgba(255,59,48,0.15); border: 1px solid #ff3b30; color: #ff3b30; padding: 10px 14px; border-radius: 8px; max-width: 90%; font-size: 11px; line-height: 1.4; margin: 8px 0; text-align: center; font-family: var(--font-mono);';
+    errorEl.innerHTML = `[SYSTEM ERROR] Insufficient Credits (10 Credits required per interaction). Current Balance: ${userChatCredits}. Please top up your credits to continue interacting with Tomb Chat Agents.`;
+    thread.appendChild(errorEl);
+    thread.scrollTop = thread.scrollHeight;
+    logAudit("Tomb Messenger: Blocked outbound message due to insufficient credit balance.");
+    return;
+  }
 
   const text = input.value.trim();
+  if (!text) return;
   input.value = '';
+
+  // Deduct credits
+  userChatCredits -= 10;
+  const credEl = document.getElementById('chat-credits-display');
+  if (credEl) credEl.textContent = `Credits: ${userChatCredits}`;
 
   const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
   const msgEl = document.createElement('div');
@@ -4881,6 +4898,14 @@ function sendChatMessage() {
     thread.appendChild(replyEl);
     thread.scrollTop = thread.scrollHeight;
   }, 1000);
+}
+
+function topUpChatCredits() {
+  userChatCredits += 100;
+  const credEl = document.getElementById('chat-credits-display');
+  if (credEl) credEl.textContent = `Credits: ${userChatCredits}`;
+  logAudit("Tomb Messenger: User topped up credit balance by 100 credits.");
+  alert("Credit Account Refilled! 100 credits successfully added to your secure wallet.");
 }
 
 // ==========================================
