@@ -475,12 +475,28 @@ function updateSecurityShield() {
   }
 }
 
-// Log message to auditd
+// Log message to auditd and broadcast cross-module reactive event
 function logAudit(message) {
   const now = new Date();
   const timeStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + " " + now.toLocaleTimeString('en-US', { hour12: false });
   const hash = generateInteractionHash();
   auditLogs.push(`${timeStr} tomb-os admin-events: ${message} | INTEGRITY_KEY: [${hash}]`);
+  broadcastSystemStateUpdate(message);
+}
+
+function broadcastSystemStateUpdate(lastEventMsg) {
+  syncComplianceDials();
+  
+  // Dynamic update for Threat Radar egress IP
+  const radarIpEl = document.getElementById('radar-egress-ip');
+  if (radarIpEl) radarIpEl.textContent = systemState.activeTaskIp;
+
+  // Dynamic update for Agent Console Log
+  const agentLog = document.getElementById('agent-console-log');
+  if (agentLog && lastEventMsg) {
+    agentLog.innerHTML += `<div style="color: #007AFF;">[SystemEvent] ${escapeHTML(lastEventMsg)}</div>`;
+    agentLog.scrollTop = agentLog.scrollHeight;
+  }
 }
 
 // Sync compliance metrics dynamically
