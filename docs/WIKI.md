@@ -63,13 +63,15 @@ Tomb OS partitions modern data security controls into standalone, toggleable mod
 
 ---
 
-## 📱 Universal Cross-Platform Deployment
+## 📱 Universal Cross-Platform Deployment & Public Downloads
 
-- **Native macOS App**: Compiled via Electron (`npm run dist`).
-- **Hardened Docker Sandbox**: Read-only root filesystem container infrastructure (`./scripts/docker_run.sh`).
-- **Bare-Metal x86_64 ISO**: Bootable OS image (`tombos_secure_amd64.iso`).
-- **Live SD XC / NVMe Drive**: Portable bootable media flasher (`./scripts/flash_sdxc.sh`).
-- **Universal Smartphone Mobile GSI**: Project Treble GrapheneOS integration (`./scripts/flash_phone.sh`).
+Anyone can freely download pre-compiled packages for Windows, macOS, Linux, Docker, and Mobile:
+- **🍎 Native macOS App (`.dmg` / `.pkg`)**: Compiled via Electron ([Download Latest macOS Release](https://github.com/bashbadger/tombOS-project-/releases/latest)).
+- **🪟 Windows Setup (`.exe` / `.msi`)**: Executable installer for Windows 10/11 ([Download Latest Windows Release](https://github.com/bashbadger/tombOS-project-/releases/latest)).
+- **🐧 Bare-Metal x86_64 ISO (`.iso` / `.deb`)**: Bootable live OS image `tombos_secure_amd64.iso` ([Download Latest Linux Release](https://github.com/bashbadger/tombOS-project-/releases/latest)).
+- **🐳 Hardened Docker Container**: Read-only root filesystem container (`docker pull ghcr.io/bashbadger/tomb-os:latest`).
+- **📱 Universal Smartphone Mobile GSI (`.zip`)**: Project Treble GrapheneOS integration (`./scripts/flash_phone.sh`).
+- **💾 Live SD XC / NVMe Drive**: Portable bootable media flasher (`./scripts/flash_sdxc.sh`).
 
 ---
 

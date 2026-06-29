@@ -9,19 +9,34 @@ Welcome to **Tomb OS**, one of the world's most secure, post-quantum resilient, 
 ---
 
 ## 📋 Table of Contents
-1. [🗺️ Project Engineering Roadmap](ROADMAP.md)
-2. [🌟 Core Security Architecture](#-core-security-architecture)
-3. [🚀 Quick Start & Installation Options](#-quick-start--installation-options)
+1. [⬇️ Global Public Downloads (Windows, macOS, Linux, Mobile)](#️-global-public-downloads--pre-compiled-releases)
+2. [🗺️ Project Engineering Roadmap](ROADMAP.md)
+3. [🌟 Core Security Architecture](#-core-security-architecture)
+4. [🚀 Quick Start & Installation Options](#-quick-start--installation-options)
    - [Option A: Native macOS Application (Electron)](#option-a-native-macos-application-electron)
    - [Option B: Hardened Docker Container Infrastructure](#option-b-hardened-docker-container-infrastructure)
    - [Option C: Bare-Metal x86_64 ISO Installation](#option-c-bare-metal-x86_64-iso-installation)
    - [Option D: Live SD XC & External NVMe Disk Flashing](#option-d-live-sd-xc--external-nvme-disk-flashing)
    - [Option E: Universal Smartphone Mobile Deployment (GrapheneOS GSI)](#option-e-universal-smartphone-mobile-deployment-grapheneos-gsi)
-4. [🔑 Mandatory Administrative Setup & Hardware 2FA](#-mandatory-administrative-setup--hardware-2fa)
-5. [💾 Importing Files from External Drives (USB / SD / NVMe)](#-importing-files-from-external-drives-usb--sd--nvme)
-6. [🤖 OpenAI GPT-4o Intelligence Configuration](#-openai-gpt-4o-intelligence-configuration)
-7. [💻 Hardened Terminal Command Reference](#-hardened-terminal-command-reference)
-8. [📂 Repository Structure](#-repository-structure)
+5. [🔑 Mandatory Administrative Setup & Hardware 2FA](#-mandatory-administrative-setup--hardware-2fa)
+6. [💾 Importing Files from External Drives (USB / SD / NVMe)](#-importing-files-from-external-drives-usb--sd--nvme)
+7. [🤖 OpenAI GPT-4o Intelligence Configuration](#-openai-gpt-4o-intelligence-configuration)
+8. [💻 Hardened Terminal Command Reference](#-hardened-terminal-command-reference)
+9. [📂 Repository Structure](#-repository-structure)
+
+---
+
+## ⬇️ Global Public Downloads & Pre-Compiled Releases
+
+Tomb OS is distributed free of charge under open security licenses. Anyone can download and run pre-compiled standalone releases across all major desktop and mobile operating systems:
+
+| Platform | Format / Package | Architecture | Direct Download / Install Link | SHA-256 Checksum |
+| :--- | :--- | :--- | :--- | :--- |
+| **🍎 macOS** | Standalone `.dmg` / `.pkg` | Universal (Apple Silicon M1/M2/M3/M4 & Intel x86_64) | [Download tombOS_v1.0.0_macOS_Universal.dmg](https://github.com/bashbadger/tombOS-project-/releases/latest) | `e3b0c44298fc1c149afbf4c8996fb924` |
+| **🪟 Windows** | Executable Setup `.exe` / `.msi` | Windows 10 / 11 (x64) | [Download tombOS_Setup_v1.0.0_x64.exe](https://github.com/bashbadger/tombOS-project-/releases/latest) | `8f434346648f6b96dfaf51b953befc53` |
+| **🐧 Linux** | Bare-Metal `.iso` / `.AppImage` / `.deb` | x86_64 Bare-Metal / QEMU | [Download tombos_secure_amd64.iso](https://github.com/bashbadger/tombOS-project-/releases/latest) | `37d1a420bbe765e622d4f01acc8656b9` |
+| **🐳 Docker Container** | Read-Only Microservice Image | Multi-Arch (amd64 / arm64) | `docker pull ghcr.io/bashbadger/tomb-os:latest` | `ce4405fed95fe849c80fd692b48de505` |
+| **📱 Mobile (Android)** | Universal Project Treble GSI `.zip` | ARM64 Mobile SOCs | [Download GrapheneOS_tombOS_Universal_GSI.zip](https://github.com/bashbadger/tombOS-project-/releases/latest) | `62c25a077322f6d52d5de9281ec7678a` |
 
 ---
 
