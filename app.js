@@ -11,7 +11,8 @@ const systemState = {
     pqc: { name: 'Post-Quantum Cryptography (PQC)', enabled: true, desc: 'Kyber-1024 lattice key encapsulation & Dilithium-5 signatures' },
     rasp: { name: 'Runtime Application Self-Protection (RASP)', enabled: true, desc: 'In-memory telemetry checking for memory corruption & exploits' },
     iam: { name: 'Identity & Access Management (IAM / RBAC)', enabled: true, desc: 'Role-based access control with multi-factor biometric attestation' },
-    edr: { name: 'Endpoint Detection & Response (EDR)', enabled: true, desc: 'Automated threat hunting & instant process isolation daemons' }
+    edr: { name: 'Endpoint Detection & Response (EDR)', enabled: true, desc: 'Automated threat hunting & instant process isolation daemons' },
+    qkd: { name: 'Air-Gapped QKD Optical Mesh (BB84 Protocol)', enabled: true, desc: 'Quantum Key Distribution providing tamper-collapsing One-Time Pad channels' }
   },
   typeSpeed: {
     enabled: false,
