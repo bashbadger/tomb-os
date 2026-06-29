@@ -276,36 +276,5 @@ void kernel_main(void) {
     pci_scan_bus();
     seL4_Yield();
 
-    unsigned char logo_color = COLOR_LIGHT_GREEN;
-    kprint_color("  _________  __  ___ ___    ____  _____\n", logo_color);
-    kprint_color(" /_  __/ __ \\/  |/  / __ )  / __ \\/ ___/\n", logo_color);
-    kprint_color("  / / / / / / /|_/ / __  | / / / /\\__ \\ \n", logo_color);
-    kprint_color(" / / / /_/ / /  / / /_/ / / /_/ /___/ / \n", logo_color);
-    kprint_color("/_/  \\____/_/  /_/_____/  \\____//____/  \n\n", logo_color);
-
-    unsigned char ok_color = COLOR_LIGHT_GREEN;
-    unsigned char info_color = COLOR_LIGHT_CYAN;
-    unsigned char text_color = COLOR_WHITE;
-
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Initialized Core GDT & Memory Paging Descriptor Tables\n", text_color);
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Installed IDT Vector Dispatcher & Interrupt Handlers\n", text_color);
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Initialized Physical Memory Page Allocator (128 MB RAM)\n", text_color);
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Activated Control Flow Integrity (CFI) & Stack Canary Guards\n", text_color);
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Enabled Zero-Memory Cryptographic RAM Scrubbing Daemon\n", text_color);
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Initialized Serial UART COM1 (0x3F8) Debug Logging\n", text_color);
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Enumerated PCI Hardware Buses & Device Subsystems\n", text_color);
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Verified seL4 Microkernel formal IPC capability routing\n", text_color);
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Configured Xen Dom0 Hypervisor Multidomain Isolation\n", text_color);
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Verified ZERO BACKDOORS: 100% Independent User Enclave Control\n", text_color);
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Enforced Air-Gapped Memory Compartmentalization & Entropy Seeding\n", text_color);
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Enforced Kernel Page Table Isolation (KPTI) & KASLR Entropy Randomization\n", text_color);
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Bound keyring crypt-keys to physical TPM 2.0 hardware enclaves\n", text_color);
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Mounted root filesystem overlay `/` as read-only (IMMUTABLE)\n", text_color);
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Initialized Post-Quantum Cryptography lattices (Kyber-1024 & Dilithium-5)\n", text_color);
-    kprint_color(" [  ", text_color); kprint_color("OK", ok_color); kprint_color("  ] Verification state checks: ABSOLUTE ZERO-TRUST (100% Max Rating)\n\n", ok_color);
-
-    kprint_color("sec-admin@tomb-os:~$ ", info_color);
-    kprint_color("_", COLOR_WHITE);
-}
 
 
