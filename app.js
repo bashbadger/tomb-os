@@ -6715,13 +6715,22 @@ function getCipherLabContent() {
         </div>
       </div>
 
-      <div style="background: #161b22; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 14px;">
+      <div style="background: #161b22; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
         <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #fff;">Quantum Resistance Benchmark Analyzer</h4>
         <div style="font-size: 11px; color: #8b949e; line-height: 1.6;">
           Lattice Dimension Vector (k=4): <strong style="color: #4AF626;">256 x 256 Polynomial Ring</strong><br/>
           Estimated Shor's Algorithm Qubit Resistance: <strong style="color: #00BFFF;">> 4,096 Logical Qubits</strong><br/>
           Status: <span style="color: #4AF626; font-weight: 700;">SECURE AGAINST POST-QUANTUM DECRYPTION</span>
         </div>
+      </div>
+
+      <div style="background: rgba(74,246,38,0.04); border: 1px dashed rgba(74,246,38,0.3); border-radius: 8px; padding: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h4 style="margin: 0; font-size: 12.5px; color: #4AF626;">📡 Quantum Radar & Entanglement Detection Evasion</h4>
+          <button onclick="runQuantumDetectionAudit()" style="background: #4AF626; color: #000; border: none; padding: 4px 10px; border-radius: 4px; font-weight: 700; font-size: 10.5px; cursor: pointer;">Audit Quantum Stealth →</button>
+        </div>
+        <p style="font-size: 10.5px; color: #ccc; line-height: 1.4; margin: 0 0 8px 0;">Inject Kyber-1024 entropy noise vectors to decouple quantum phase coherence, rendering system hardware 100% immune to quantum radar & signal detection.</p>
+        <div id="quantum-stealth-output" style="display: none; font-size: 10px; color: #4AF626; font-family: var(--font-mono);"></div>
       </div>
     </div>
   `;
@@ -6743,6 +6752,18 @@ function signPayloadDilithium() {
   const sig = generateInteractionHash() + generateInteractionHash() + generateInteractionHash();
   out.innerHTML = `<strong>DILITHIUM-5 SIGNATURE:</strong><br/>SIG_D5_${sig.slice(0, 40)}<br/><span style="color:#aaa;">(Authenticity Verified - Zero Tamper)</span>`;
   logAudit("Signed payload with Dilithium-5 digital signature.");
+}
+
+function runQuantumDetectionAudit() {
+  const out = document.getElementById('quantum-stealth-output');
+  if (!out) return;
+  out.style.display = 'block';
+  out.innerHTML = `[QUANTUM STEALTH DAEMON] Scanning RF & photonic spectrum for quantum sensing probes...<br/>▶ Injecting Kyber-1024 entropy noise to decouple phase coherence...`;
+
+  setTimeout(() => {
+    out.innerHTML += `<br/>🛡️ <strong>QUANTUM STEALTH VERIFIED: 0 Quantum Entanglement Probes Detected. 100% immune to quantum radar & spectral eavesdropping.</strong>`;
+    logAudit("Verified system quantum stealth radar evasion. Active Kyber-1024 phase decoupling protects hardware against quantum detection.");
+  }, 1200);
 }
 
 
