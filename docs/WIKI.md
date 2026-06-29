@@ -72,6 +72,7 @@ Anyone can freely download pre-compiled packages for Windows, macOS, Linux, Dock
 - **🐳 Hardened Docker Container**: Read-only root filesystem container (`docker pull ghcr.io/bashbadger/tomb-os:latest`).
 - **📱 Universal Smartphone Mobile GSI (`.zip`)**: Project Treble GrapheneOS integration (`./scripts/flash_phone.sh`).
 - **💾 Live SD XC / NVMe Drive**: Portable bootable media flasher (`./scripts/flash_sdxc.sh`).
+- **🖥️ Dedicated Bare-Metal Host OS**: Disk wiper & GRUB2 bootloader installer (`sudo ./scripts/install_baremetal.sh /dev/sda`).
 
 ---
 

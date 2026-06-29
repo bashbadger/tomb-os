@@ -18,6 +18,7 @@ Welcome to **Tomb OS**, one of the world's most secure, post-quantum resilient, 
    - [Option C: Bare-Metal x86_64 ISO Installation](#option-c-bare-metal-x86_64-iso-installation)
    - [Option D: Live SD XC & External NVMe Disk Flashing](#option-d-live-sd-xc--external-nvme-disk-flashing)
    - [Option E: Universal Smartphone Mobile Deployment (GrapheneOS GSI)](#option-e-universal-smartphone-mobile-deployment-grapheneos-gsi)
+   - [Option F: Dedicated Bare-Metal Host Installation (Wipe & Install Tomb OS as Sole OS)](#option-f-dedicated-bare-metal-host-installation-wipe--install-tomb-os-as-sole-os)
 5. [🔑 Mandatory Administrative Setup & Hardware 2FA](#-mandatory-administrative-setup--hardware-2fa)
 6. [💾 Importing Files from External Drives (USB / SD / NVMe)](#-importing-files-from-external-drives-usb--sd--nvme)
 7. [🤖 OpenAI GPT-4o Intelligence Configuration](#-openai-gpt-4o-intelligence-configuration)
@@ -116,6 +117,20 @@ Flash Tomb OS onto *any modern Android smartphone* supporting Project Treble via
 # 1. Connect smartphone in fastboot mode via USB
 # 2. Execute universal smartphone flasher script
 ./scripts/flash_phone.sh out/graphene_gsi/out/target/product/generic_arm64/system.img
+```
+
+---
+
+### Option F: Dedicated Bare-Metal Host Installation (Wipe & Install Tomb OS as Sole OS)
+If you wish to make Tomb OS the **dedicated, sole operating system** on your physical computer, use the bare-metal disk installer script. This utility wipes the target storage drive (`/dev/sda` or `/dev/nvme0n1`), formats FAT32 EFI Boot and Ext4 Hardened Rootfs partitions, installs GRUB2, and boots directly onto Ring 0:
+
+```bash
+# 1. Boot computer from live USB/CD media
+# 2. Identify target storage drive (e.g. /dev/sda or /dev/nvme0n1)
+sudo lsblk
+
+# 3. Execute dedicated bare-metal installer (WARNING: Wipes host drive)
+sudo ./scripts/install_baremetal.sh /dev/sda
 ```
 
 ---
