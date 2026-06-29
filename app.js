@@ -6344,11 +6344,11 @@ function getOpenClawContent() {
         </div>
         <div id="openclaw-hud" style="font-size: 11px; display: flex; gap: 14px;">
           <span id="oc-score" style="color: #FFCC00; font-weight: 600;">Gold: 0</span>
-          <span id="oc-lives" style="color: #ff3b30; font-weight: 600;">  </span>
+          <span id="oc-lives" style="color: #ff3b30; font-weight: 600;">LIVES: 3</span>
         </div>
       </div>
       <div style="flex: 1; position: relative; background: #111; display: flex; justify-content: center; align-items: center;">
-        <canvas id="openclaw-canvas" width="690" height="420" style="display: block; background: #1a1e29; image-rendering: pixelated; border: 1px solid rgba(255,255,255,0.1);"></canvas>
+        <canvas id="openclaw-canvas" tabindex="0" width="690" height="420" style="display: block; background: #1a1e29; image-rendering: pixelated; border: 1px solid rgba(255,255,255,0.1); outline: none;"></canvas>
       </div>
       <div style="padding: 6px 14px; background: #141414; border-top: 1px solid rgba(255,255,255,0.1); font-size: 10px; color: #888; display: flex; justify-content: space-between;">
         <span>Controls: <strong>A/D</strong> or <strong>←/→</strong> Move | <strong>W / Space</strong> Jump | <strong>F / Enter</strong> Sword Slash</span>
@@ -6523,7 +6523,7 @@ function initOpenClawGame() {
       ) {
         lives--;
         const livesEl = document.getElementById('oc-lives');
-        if (livesEl) livesEl.textContent = ' '.repeat(Math.max(0, lives));
+        if (livesEl) livesEl.textContent = 'LIVES: ' + Math.max(0, lives);
         player.x = 50;
         player.y = 300;
         if (lives <= 0) {
@@ -6611,6 +6611,7 @@ function initOpenClawGame() {
     }
   }
 
+  canvas.focus();
   loop();
 }
 
