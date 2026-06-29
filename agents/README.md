@@ -178,5 +178,15 @@ To auto-schedule and launch Google Meet video rooms for security incident war-ro
    GOOGLE_APPLICATION_CREDENTIALS="/opt/tombos/agents/google-service-account.json" GOOGLE_MEET_ORGANIZER_EMAIL="admin@domain.com" npm start
    ```
 
+### 📹 Zoom Meeting Scheduling & API
+To auto-create Zoom meeting spaces and security war-rooms during critical threat incidents:
+1. Register a Server-to-Server OAuth App in the Zoom App Marketplace.
+2. Retrieve your Account ID, Client ID, and Client Secret.
+3. Start the agent mesh with the credentials:
+   ```bash
+   ZOOM_ACCOUNT_ID="your_account_id" ZOOM_CLIENT_ID="your_client_id" ZOOM_CLIENT_SECRET="your_client_secret" npm start
+   ```
+
+
 
 
