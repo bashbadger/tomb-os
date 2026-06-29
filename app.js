@@ -6999,9 +6999,16 @@ function runImmunePhagocytosisCycle() {
   }, 1200);
 
   setTimeout(() => {
-    log.innerHTML += `<div style="color: #4AF626; font-weight: 700; margin-top: 8px;">🩸 <strong>INTRUSION NEUTRALIZED: Phagocyte agents successfully destroyed malicious PID 4092 and purged RAM sector. Homeostasis restored!</strong></div>`;
+    log.innerHTML += `<div style="color: #4AF626; font-weight: 700; margin-top: 8px;">🩸 <strong>INTRUSION NEUTRALIZED: Phagocyte agents successfully destroyed malicious PID 4092 and purged RAM sector.</strong></div>`;
     log.scrollTop = log.scrollHeight;
-    logAudit("Autonomous White Blood Cell immune agents engaged phagocytosis, destroying malicious process PID 4092 and restoring system homeostasis.");
   }, 1800);
+
+  setTimeout(() => {
+    log.innerHTML += `<div style="color: #9C27B0; font-weight: 700; margin-top: 8px;">🧬 [ADAPTIVE IMMUNE LEARNING] Analyzing threat model signature 0x7F-MEM-PROBE...</div>`;
+    log.innerHTML += `<div style="color: #00BFFF;">🛡️ <strong>SYSTEM HARDENED: Generated custom AppArmor kernel antibody rule ('deny_ptrace_mem_access') & sealed rule into persistent immune memory!</strong></div>`;
+    log.scrollTop = log.scrollHeight;
+    logAudit("Immune agents analyzed threat model signature, synthesizing an adaptive AppArmor antibody rule to harden the system against future probes.");
+  }, 2600);
 }
+
 
