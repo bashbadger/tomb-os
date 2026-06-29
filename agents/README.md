@@ -149,3 +149,23 @@ To pull real-time threat intelligence and zero-day advisories from security subr
    REDDIT_CLIENT_ID="your_client_id" REDDIT_CLIENT_SECRET="your_client_secret" REDDIT_USER_AGENT="tombOS:v1.0.0 (by /u/bashbadger)" npm start
    ```
 
+### 🔵 Facebook Messenger Threads Integration
+To interact with users and dispatch alert responses directly via Facebook Messenger threads:
+1. Create a Facebook Page and register an App in Meta App Dashboard.
+2. Under Messenger settings, generate a Page Access Token and configure a Webhook callback endpoint (`https://your-agent-domain.com/webhooks/messenger`).
+3. Start the agent with the Meta credentials:
+   ```bash
+   FB_PAGE_ACCESS_TOKEN="EAAGxx..." FB_VERIFY_TOKEN="messenger_secret_verify_token" npm start
+   ```
+
+### 📸 Instagram Direct Messaging (DM) Threads
+To listen and respond to security advisories and query status via Instagram DMs:
+1. Link your Instagram Professional/Business Account to a Facebook Page.
+2. Enable "Allow Access to Messages" in your Instagram Account Settings -> Privacy -> Messages.
+3. Configure the webhook subscriptions for `instagram_messages` on your Meta App Dashboard.
+4. Launch the agent mesh:
+   ```bash
+   INSTAGRAM_ACCOUNT_ID="178xxxxxxxxxx" INSTAGRAM_PAGE_ACCESS_TOKEN="EAAGxx..." INSTAGRAM_VERIFY_TOKEN="instagram_secret_verify_token" npm start
+   ```
+
+
