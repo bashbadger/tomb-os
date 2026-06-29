@@ -187,6 +187,22 @@ To auto-create Zoom meeting spaces and security war-rooms during critical threat
    ZOOM_ACCOUNT_ID="your_account_id" ZOOM_CLIENT_ID="your_client_id" ZOOM_CLIENT_SECRET="your_client_secret" npm start
    ```
 
+### 💬 Apple iMessage (macOS Daemon / BlueBubbles Bridge)
+Since Apple iMessage lacks a direct public HTTP API, agents interface via macOS AppleScript polling of the local messages SQLite database or through a BlueBubbles server bridge API:
+1. **Option A: Local macOS Daemon (SQLite chat.db)**:
+   - Provide read access to `~/Library/Messages/chat.db` (Full Disk Access permission on macOS host) to listen for incoming messages.
+   - Start the agent:
+     ```bash
+     IMESSAGE_SQLITE_PATH="/Users/tombos/Library/Messages/chat.db" npm start
+     ```
+2. **Option B: BlueBubbles API Gateway**:
+   - Install the BlueBubbles server on an active macOS host to act as a bridge.
+   - Provide your BlueBubbles server URL and API password:
+     ```bash
+     BLUEBUBBLES_SERVER_URL="http://192.168.1.15:8567" BLUEBUBBLES_PASSWORD="your_secure_password" npm start
+     ```
+
+
 
 
 
