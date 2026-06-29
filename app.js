@@ -728,11 +728,11 @@ const windowConfig = {
     getContent: () => getSecurityHubContent()
   },
   chat: {
-    title: "Tomb Secure Messenger (E2EE PQC Quantum Enclave)",
-    width: 760,
-    height: 520,
+    title: "Tomb Unified Workspace Hub (Chat Enclave, Telemetry & OpenClaw Game)",
+    width: 1180,
+    height: 650,
     icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z" fill="#E95420"/></svg>`,
-    getContent: () => getChatContent()
+    getContent: () => getUnifiedWorkspaceContent()
   },
   discord: {
     title: "Discord API Bot Relay Channel",
@@ -4709,6 +4709,85 @@ function uploadEncryptedDriveFile() {
 let currentChatContact = 'sec-admin';
 let isChatEphemeralActive = false;
 let userChatCredits = 50; // Chat agent session credits
+
+function getUnifiedWorkspaceContent() {
+  setTimeout(() => {
+    initOpenClawGame();
+    // Periodically update telemetry items
+    const cpuEl = document.getElementById('hub-telemetry-cpu');
+    const shieldEl = document.getElementById('hub-telemetry-shield');
+    const ipEl = document.getElementById('hub-telemetry-ip');
+    if (cpuEl) cpuEl.textContent = Math.round(15 + Math.random() * 8) + '%';
+    if (shieldEl) shieldEl.textContent = 'Coherent (' + Math.round(98.5 + Math.random() * 1.5) + '%)';
+    if (ipEl) ipEl.textContent = '198.51.100.' + Math.round(2 + Math.random() * 250);
+  }, 100);
+
+  return `
+    <div class="unified-workspace-container" style="display: flex; height: 100%; color: #fff; font-family: var(--font-mono); background: #080d16; overflow: hidden; box-sizing: border-box;">
+      <!-- PANEL 1: Secure Chat Enclave (Left) -->
+      <div style="width: 380px; background: #0c121e; border-right: 1px solid rgba(0,229,255,0.15); display: flex; flex-direction: column;">
+        <div style="padding: 10px 14px; background: #111b27; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-weight: 700; font-size: 12.5px; color: #25d366;">Tomb Chat Enclave</span>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span id="chat-credits-display" style="font-size: 10px; color: #4AF626; background: rgba(74,246,38,0.1); border: 1px solid rgba(74,246,38,0.25); padding: 2px 6px; border-radius: 10px; font-weight: 700;">Credits: ${userChatCredits}</span>
+            <button onclick="topUpChatCredits()" style="background: #E95420; border: none; color: #fff; padding: 2px 6px; border-radius: 10px; font-size: 9px; font-weight: 700; cursor: pointer;">+ Refill</button>
+          </div>
+        </div>
+        <div id="chat-thread" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #070a10;">
+          <div style="align-self: flex-start; background: #162235; padding: 8px 12px; border-radius: 8px; max-width: 85%; font-size: 11px; line-height: 1.45;">
+            <div>Security Wall status updated. Agent Mesh actively protecting local memory boundaries.</div>
+            <div style="font-size: 8px; color: #8696a0; text-align: right; margin-top: 4px;">16:50</div>
+          </div>
+        </div>
+        <div style="padding: 8px 12px; background: #111b27; border-top: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 8px;">
+          <input type="text" id="chat-msg-input" onkeydown="if(event.key==='Enter')sendChatMessage()" placeholder="Ask Security Wall..." style="flex: 1; padding: 8px 12px; border-radius: 6px; border: none; background: #1a2536; color: #fff; font-size: 11px; outline: none;" />
+          <button onclick="sendChatMessage()" style="background: #00a884; border: none; color: #fff; padding: 7px 12px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 11px;">Send</button>
+        </div>
+      </div>
+
+      <!-- PANEL 2: OpenClaw 2-Bit platformer (Center) -->
+      <div style="flex: 1; background: #0a0a0f; display: flex; flex-direction: column; border-right: 1px solid rgba(0,229,255,0.15);">
+        <div style="padding: 10px 14px; background: #111116; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-weight: 700; font-size: 12.5px; color: #FFCC00;">OpenClaw (Cat Care & Explore)</span>
+          <div style="display: flex; gap: 10px; font-size: 10.5px;">
+            <span id="oc-score" style="color: #FFCC00;">Gold: 0</span>
+            <span id="oc-friends" style="color: #00e5ff;">Mice: 0</span>
+            <span id="oc-hunger" style="color: #FF7F50;">HUNGER: 100%</span>
+            <span id="oc-map-size" style="color: #4AF626;">Map: 700px</span>
+            <span id="oc-lives" style="color: #ff3b30;">LIVES: 3</span>
+          </div>
+        </div>
+        <div style="flex: 1; display: flex; justify-content: center; align-items: center; position: relative; background: #101017; overflow: hidden; padding: 10px;">
+          <canvas id="openclaw-canvas" tabindex="0" width="480" height="340" style="display: block; background: #080d16; image-rendering: pixelated; border: 1px solid rgba(0,229,255,0.2); outline: none;"></canvas>
+        </div>
+        <div style="padding: 6px 12px; background: #111116; font-size: 9.5px; color: #888; text-align: center; border-top: 1px solid rgba(255,255,255,0.08);">
+          Use <strong>W/A/S/D</strong> or <strong>Arrows</strong> to move/jump. Rescue Mice to expand the map width!
+        </div>
+      </div>
+
+      <!-- PANEL 3: Live System Telemetry (Right) -->
+      <div style="width: 320px; background: #0c121e; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+        <h3 style="margin: 0; font-size: 12.5px; color: #00e5ff; font-weight: 700; border-bottom: 1px solid rgba(0,229,255,0.2); padding-bottom: 6px;">Live System Audit</h3>
+        <div style="font-size: 11px; display: flex; flex-direction: column; gap: 8px; color: #ccc;">
+          <div style="display: flex; justify-content: space-between;"><span>Microkernel:</span><strong style="color: #4AF626;">seL4 Formally Verified</strong></div>
+          <div style="display: flex; justify-content: space-between;"><span>Kyber Shield:</span><strong id="hub-telemetry-shield" style="color: #00e5ff;">Coherent (99.1%)</strong></div>
+          <div style="display: flex; justify-content: space-between;"><span>CPU Load:</span><strong id="hub-telemetry-cpu" style="color: #4AF626;">18%</strong></div>
+          <div style="display: flex; justify-content: space-between;"><span>Egress Tunnel IP:</span><strong id="hub-telemetry-ip" style="color: #ff9f0a;">198.51.100.82</strong></div>
+          <div style="display: flex; justify-content: space-between;"><span>Threat Filter:</span><strong style="color: #4AF626;">AppArmor active</strong></div>
+        </div>
+        <div style="flex: 1; background: #070a10; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
+          <div style="font-size: 10px; color: #00e5ff; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 4px;">Defensive Stream</div>
+          <div style="font-size: 9px; line-height: 1.4; color: #aaa; font-family: var(--font-mono);">
+            <div>[16:50] seL4 capabilities loaded</div>
+            <div>[16:51] Kyber-1024 audit loop started</div>
+            <div>[16:52] VPN Egress IP rotated</div>
+            <div>[16:53] Shield integrity 99.8% stable</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
 
 function getChatContent() {
   return `
