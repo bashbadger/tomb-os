@@ -2,3 +2,6 @@ node_modules/
 dist/
 out/
 .DS_Store
+agents/node_modules/
+agents/dist/
+agents/data/
