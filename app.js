@@ -4890,10 +4890,36 @@ function sendChatMessage() {
   // Auto response simulation
   setTimeout(() => {
     const replyEl = document.createElement('div');
-    replyEl.style.cssText = 'align-self: flex-start; background: #202c33; padding: 8px 12px; border-radius: 8px; max-width: 70%; font-size: 12px; line-height: 1.4; animation: fadeIn 0.2s ease;';
+    replyEl.style.cssText = 'align-self: flex-start; background: #202c33; padding: 10px 14px; border-radius: 8px; max-width: 75%; font-size: 11.5px; line-height: 1.45; font-family: var(--font-mono); animation: fadeIn 0.2s ease;';
+    
+    let content = '';
+    if (currentChatContact === 'sec-admin') {
+      content = `
+        <div style="border-left: 3px solid #4AF626; padding-left: 10px;">
+          <strong style="color: #4AF626;">[SECURITY WALL AGENT MESH STATUS]</strong><br/>
+          Defensive shield active. The Security Wall agent mesh is monitoring all vectors:<br/>
+          * <strong style="color: #00e5ff;">Orchestrator-01</strong>: Task routing: Active.<br/>
+          * <strong style="color: #ff9f0a;">Memory-01</strong>: Secure outbox & ledger keys: Encrypted.<br/>
+          * <strong style="color: #bf5af2;">Learning-01</strong>: Anomaly heuristic updates: Synchronized.<br/>
+          * <strong style="color: #ffd60a;">Task-01</strong>: Background sandbox verification: Verified.<br/>
+          * <strong style="color: #ff453a;">Immune-01</strong>: seL4 microkernel Trojan scan: Clear.<br/>
+          <span style="color: #aaa; font-size: 10px; display: block; margin-top: 6px;">Report generated and logged to Administrator enclave successfully.</span>
+        </div>
+      `;
+    } else {
+      content = `
+        <div style="border-left: 3px solid #007AFF; padding-left: 10px;">
+          <strong style="color: #007AFF;">[PQC SECURE CHANNELS]</strong><br/>
+          Encrypted frame received from endpoint <code>${currentChatContact}</code>.<br/>
+          Lattice signature: Verified.<br/>
+          Decrypt status: 100% authentic.
+        </div>
+      `;
+    }
+    
     replyEl.innerHTML = `
-      <div>[PQC ENCLAVE ACK] Received payload sealed with Kyber-1024 lattice key. Verified 100% authentic.</div>
-      <div style="font-size: 9px; color: #8696a0; text-align: right; margin-top: 4px;">${timeStr}</div>
+      ${content}
+      <div style="font-size: 9px; color: #8696a0; text-align: right; margin-top: 6px;">${timeStr}</div>
     `;
     thread.appendChild(replyEl);
     thread.scrollTop = thread.scrollHeight;
