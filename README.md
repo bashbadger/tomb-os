@@ -203,6 +203,27 @@ tombOS-project-/
 
 ---
 
+## 🤖 Running & Deploying Autonomous Multi-Agent Mesh
+
+Tomb OS integrates a TypeScript multi-agent orchestration mesh (Orchestrator, Memory, Learning, Task, and ImmuneSystem agents).
+
+### Local Execution
+```bash
+cd agents
+npm install
+npm run dev      # Development execution
+npm run build    # Production compiled build
+npm start        # Start production daemon
+```
+
+### Docker Deployment
+```bash
+docker build -t tombos-agent-mesh ./agents
+docker run -d --name tomb-agent-mesh --read-only tombos-agent-mesh
+```
+
+---
+
 ## ⚖️ License & Open Security Guarantee
 Tomb OS is distributed under open security licenses. Built for absolute user privacy, zero telemetry, and maximum post-quantum resilience.
 
