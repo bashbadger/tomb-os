@@ -598,6 +598,37 @@ To activate a specific cross-platform relay channel, start the agent mesh with t
   RELAY_ENABLED="true" RELAY_SOURCE="snapchat" RELAY_DEST="discord" SNAPCHAT_CLIENT_ID="xxx" SNAPCHAT_CLIENT_SECRET="xxx" DISCORD_WEBHOOK_URL="https://discord.com/..." npm start
   ```
 
+---
+
+## 🤖 10. Large Language Model (LLM) Engine Integrations
+
+Tomb OS utilizes state-of-the-art LLMs to power the autonomous multi-agent mesh planning, code analysis, and system auditing processes. Configure your preferred model engine using the credentials below.
+
+### ♊ Google Gemini API (Recommended)
+Excellent for quick tool calling, multi-agent mesh coordination, and complex planning logic:
+1. Obtain an API Key from Google AI Studio.
+2. Launch the agent mesh:
+   ```bash
+   LLM_PROVIDER="gemini" GEMINI_API_KEY="AIzaSy..." GEMINI_MODEL="gemini-1.5-pro" npm start
+   ```
+
+### 🦉 Anthropic Claude API
+Recommended for safety verification, security heuristics, and reviewing code before promoting it from the isolated VM sandbox to the core system:
+1. Obtain an API Key from Anthropic Console.
+2. Launch the agent mesh:
+   ```bash
+   LLM_PROVIDER="anthropic" ANTHROPIC_API_KEY="sk-ant-..." ANTHROPIC_MODEL="claude-3-5-sonnet" npm start
+   ```
+
+### 🧠 OpenAI Codex / GPT API
+Recommended for raw code auto-generation, system patching, and microkernel scripting:
+1. Obtain an API Key from OpenAI Platform.
+2. Launch the agent mesh:
+   ```bash
+   LLM_PROVIDER="openai" OPENAI_API_KEY="sk-proj-..." OPENAI_MODEL="gpt-4o" npm start
+   ```
+
+
 
 
 
