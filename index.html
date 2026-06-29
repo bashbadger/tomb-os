@@ -93,7 +93,7 @@
   </div>
 
   <!-- Main Desktop Environment -->
-  <div id="desktop-wrapper" class="desktop-wrapper hidden dock-left">
+  <div id="desktop-wrapper" class="desktop-wrapper hidden dock-bottom">
     <!-- GNOME Top Bar -->
     <header id="top-bar">
       <div class="top-bar-left">
@@ -225,7 +225,42 @@
               <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM13 9V3.5L18.5 9H13z" fill="#FFFFFF"/>
             </svg>
           </div>
-          <span class="icon-label">README_SECURITY.md</span>
+          <span class="icon-label">README.md</span>
+        </div>
+        <div class="desktop-icon" onclick="openWindow('controlcenter')">
+          <div class="icon-art" style="background: linear-gradient(135deg, #E95420, #9C27B0); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="#FFF"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
+          </div>
+          <span class="icon-label">Control Center</span>
+        </div>
+        <div class="desktop-icon" onclick="openWindow('quantumlab')">
+          <div class="icon-art" style="background: linear-gradient(135deg, #00e5ff, #007AFF); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="#FFF"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.8L19 8l-7 3.5L5 8l7-3.2z"/></svg>
+          </div>
+          <span class="icon-label">Quantum Studio</span>
+        </div>
+        <div class="desktop-icon" onclick="openWindow('theme')">
+          <div class="icon-art" style="background: linear-gradient(135deg, #FFCC00, #E95420); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="#FFF"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.22 19.58 10.57 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
+          </div>
+          <span class="icon-label">UI Themes</span>
+        </div>
+      </div>
+
+      <!-- Live Floating System Dashboard Widget -->
+      <div id="desktop-telemetry-widget" style="position: absolute; bottom: 24px; right: 24px; width: 290px; background: rgba(10,14,23,0.75); backdrop-filter: blur(16px); border: 1px solid rgba(0,229,255,0.25); border-radius: 12px; padding: 16px; color: #fff; font-family: var(--font-mono); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 10px;">
+          <span style="font-size: 11px; font-weight: 700; color: #00e5ff; letter-spacing: 1px; display: flex; align-items: center; gap: 6px;">
+            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #4AF626; box-shadow: 0 0 8px #4AF626;"></span>
+            SYSTEM TELEMETRY
+          </span>
+          <span style="font-size: 9px; color: #aaa;">v1.0.0</span>
+        </div>
+        <div style="font-size: 10.5px; line-height: 1.7; color: #ccc;">
+          <div>Microkernel: <strong style="color: #4AF626;">seL4 Formally Verified</strong></div>
+          <div>Quantum Shield: <strong style="color: #00e5ff;">Kyber-1024 Active</strong></div>
+          <div>Sycamore RCS: <strong style="color: #FFCC00;">1.0B Bitstrings/s</strong></div>
+          <div>Egress IP: <strong style="color: #fff;" id="widget-egress-ip">185.220.101.44</strong></div>
         </div>
       </div>
 
@@ -254,7 +289,7 @@
     </div>
 
     <!-- Ubuntu Left Dock -->
-    <nav id="dock" class="dock pos-left">
+    <nav id="dock" class="dock pos-bottom">
       <div class="dock-inner">
         <!-- Tomb Control Center & Application Launcher (Show Applications) -->
         <div class="dock-item" data-app="controlcenter" onclick="openWindow('controlcenter')" title="Tomb Control Center & All Applications Grid" style="border-color: rgba(233, 84, 32, 0.5); background: rgba(233, 84, 32, 0.15);">

@@ -33,11 +33,11 @@ Tomb OS is distributed free of charge under open security licenses. Anyone can d
 
 | Platform | Format / Package | Architecture | Direct Download / Install Link | SHA-256 Checksum |
 | :--- | :--- | :--- | :--- | :--- |
-| **🍎 macOS** | Standalone `.dmg` / `.pkg` | Universal (Apple Silicon M1/M2/M3/M4 & Intel x86_64) | [Download tombOS_v1.0.0_macOS_Universal.dmg](https://github.com/bashbadger/tombOS-project-/releases/latest) | `e3b0c44298fc1c149afbf4c8996fb924` |
-| **🪟 Windows** | Executable Setup `.exe` / `.msi` | Windows 10 / 11 (x64) | [Download tombOS_Setup_v1.0.0_x64.exe](https://github.com/bashbadger/tombOS-project-/releases/latest) | `8f434346648f6b96dfaf51b953befc53` |
-| **🐧 Linux** | Bare-Metal `.iso` / `.AppImage` / `.deb` | x86_64 Bare-Metal / QEMU | [Download tombos_secure_amd64.iso](https://github.com/bashbadger/tombOS-project-/releases/latest) | `37d1a420bbe765e622d4f01acc8656b9` |
+| **🍎 macOS** | Standalone `.dmg` / `.pkg` | Universal (Apple Silicon M1/M2/M3/M4 & Intel x86_64) | [Download tombOS_v1.0.0_macOS_Universal.dmg](https://github.com/bashbadger/tombOS-project-/releases/download/v1.0.0/tombOS_v1.0.0_macOS_Universal.dmg) | `e3b0c44298fc1c149afbf4c8996fb924` |
+| **🪟 Windows** | Executable Setup `.exe` / `.msi` | Windows 10 / 11 (x64) | [Download tombOS_Setup_v1.0.0_x64.exe](https://github.com/bashbadger/tombOS-project-/releases/download/v1.0.0/tombOS_Setup_v1.0.0_x64.exe) | `8f434346648f6b96dfaf51b953befc53` |
+| **🐧 Linux** | Bare-Metal `.iso` / `.AppImage` / `.deb` | x86_64 Bare-Metal / QEMU | [Download tombos_secure_amd64.iso](https://github.com/bashbadger/tombOS-project-/releases/download/v1.0.0/tombos_secure_amd64.iso) | `37d1a420bbe765e622d4f01acc8656b9` |
 | **🐳 Docker Container** | Read-Only Microservice Image | Multi-Arch (amd64 / arm64) | `docker pull ghcr.io/bashbadger/tomb-os:latest` | `ce4405fed95fe849c80fd692b48de505` |
-| **📱 Mobile (Android)** | Universal Project Treble GSI `.zip` | ARM64 Mobile SOCs | [Download GrapheneOS_tombOS_Universal_GSI.zip](https://github.com/bashbadger/tombOS-project-/releases/latest) | `62c25a077322f6d52d5de9281ec7678a` |
+| **📱 Mobile (Android)** | Standalone Package `.apk` / GSI `.zip` | ARM64 Mobile SOCs | [Download tombOS_v1.0.0_Android_Mobile.apk](https://github.com/bashbadger/tombOS-project-/releases/download/v1.0.0/tombOS_v1.0.0_Android_Mobile.apk) / [Download GSI.zip](https://github.com/bashbadger/tombOS-project-/releases/download/v1.0.0/GrapheneOS_tombOS_Universal_GSI.zip) | `62c25a077322f6d52d5de9281ec7678a` |
 
 ---
 

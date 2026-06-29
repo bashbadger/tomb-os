@@ -96,7 +96,7 @@ const systemState = {
     blur: 15,
     fontFamily: 'outfit',
     fontSize: '100%',
-    dockPosition: 'left',
+    dockPosition: 'bottom',
     dockIconSize: 'medium',
     borderWidth: '1px',
     borderStyle: 'solid'
@@ -1131,6 +1131,8 @@ function rotateTaskIp() {
   const o3 = 10 + Math.floor(Math.random() * 200);
   const o4 = 2 + Math.floor(Math.random() * 250);
   systemState.activeTaskIp = `${o1}.${o2}.${o3}.${o4}`;
+  const el = document.getElementById('widget-egress-ip');
+  if (el) el.textContent = systemState.activeTaskIp;
   logAudit(`[ROLLING NETWORK DAEMON] Task IP rotated cleanly: ${systemState.activeTaskIp} (Encrypted Tunnel).`);
 }
 
@@ -5232,6 +5234,28 @@ function getThemeContent() {
         Fully customize the design system of Tomb OS. Adjust colors, wallpaper background, window transparency, dock position, and system-wide borders.
       </div>
 
+      <div class="theme-sec-title"> External Media & Custom Wallpaper (USB-C / SD)</div>
+      
+      <div class="theme-row" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 12px; margin-bottom: 12px;">
+        <div style="font-size: 11.5px; color: #eee; margin-bottom: 8px; font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
+          <span>Select image from USB-C Drive / SD Card:</span>
+          <span style="font-size: 10px; background: rgba(74,246,38,0.15); color: #4AF626; padding: 2px 8px; border-radius: 4px; font-family: var(--font-mono);" id="media-status-badge">Media Mount Ready</span>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <input type="file" id="wallpaper-upload-input" accept="image/*" onchange="handleCustomWallpaperUpload(event)" style="display: none;" />
+          <button onclick="document.getElementById('wallpaper-upload-input').click()" style="background: var(--ubuntu-orange); color: #fff; border: none; padding: 8px 14px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer; flex: 1;">
+            Choose Image File...
+          </button>
+          <button onclick="simulateExternalMediaMount()" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 8px 14px; border-radius: 4px; font-size: 11px; cursor: pointer;" id="btn-simulate-media">
+            Simulate USB-C Mount
+          </button>
+        </div>
+        <div id="wallpaper-upload-preview" style="margin-top: 10px; display: none; align-items: center; gap: 10px;">
+          <div id="preview-thumbnail" style="width: 50px; height: 35px; border-radius: 4px; background-size: cover; background-position: center; border: 1px solid rgba(255,255,255,0.2);"></div>
+          <span style="font-size: 11px; color: #aaa;" id="preview-filename"></span>
+        </div>
+      </div>
+
       <div class="theme-sec-title"> Theme Accents & Wallpaper</div>
       
       <div class="theme-row">
@@ -5382,6 +5406,50 @@ function applyUIWallpaper(wallId) {
     wrapper.style.background = gradients[wallId] || gradients['gradient-aubergine'];
   }
   refreshThemeWindow();
+}
+
+function handleCustomWallpaperUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    systemState.theme.customWallpaper = dataUrl;
+    
+    const wrapper = document.getElementById('desktop-wrapper');
+    if (wrapper) {
+      wrapper.style.background = `url(${dataUrl}) center/cover no-repeat`;
+    }
+    
+    const preview = document.getElementById('wallpaper-upload-preview');
+    const thumb = document.getElementById('preview-thumbnail');
+    const filename = document.getElementById('preview-filename');
+    
+    if (preview && thumb && filename) {
+      preview.style.display = 'flex';
+      thumb.style.backgroundImage = `url(${dataUrl})`;
+      filename.textContent = `Applied: ${file.name} (${Math.round(file.size / 1024)} KB)`;
+    }
+    
+    logAudit(`Loaded custom desktop wallpaper from external media: ${file.name}`);
+  };
+  reader.readAsDataURL(file);
+}
+
+function simulateExternalMediaMount() {
+  const badge = document.getElementById('media-status-badge');
+  const btn = document.getElementById('btn-simulate-media');
+  
+  if (badge) {
+    badge.textContent = 'USB-C / SD Card Mounted (/media/usb0)';
+    badge.style.background = 'rgba(0,229,255,0.2)';
+    badge.style.color = '#00e5ff';
+  }
+  if (btn) {
+    btn.textContent = 'Media Storage Active';
+  }
+  logAudit("Simulated mounting external storage block device /dev/sdb1 (/media/usb0).");
 }
 
 function applyUIBlur(val) {

@@ -66,11 +66,11 @@ Tomb OS partitions modern data security controls into standalone, toggleable mod
 ## 📱 Universal Cross-Platform Deployment & Public Downloads
 
 Anyone can freely download pre-compiled packages for Windows, macOS, Linux, Docker, and Mobile:
-- **🍎 Native macOS App (`.dmg` / `.pkg`)**: Compiled via Electron ([Download Latest macOS Release](https://github.com/bashbadger/tombOS-project-/releases/latest)).
-- **🪟 Windows Setup (`.exe` / `.msi`)**: Executable installer for Windows 10/11 ([Download Latest Windows Release](https://github.com/bashbadger/tombOS-project-/releases/latest)).
-- **🐧 Bare-Metal x86_64 ISO (`.iso` / `.deb`)**: Bootable live OS image `tombos_secure_amd64.iso` ([Download Latest Linux Release](https://github.com/bashbadger/tombOS-project-/releases/latest)).
+- **🍎 Native macOS App (`.dmg` / `.pkg`)**: Compiled via Electron ([Download tombOS_v1.0.0_macOS_Universal.dmg](https://github.com/bashbadger/tombOS-project-/releases/download/v1.0.0/tombOS_v1.0.0_macOS_Universal.dmg)).
+- **🪟 Windows Setup (`.exe` / `.msi`)**: Executable installer for Windows 10/11 ([Download tombOS_Setup_v1.0.0_x64.exe](https://github.com/bashbadger/tombOS-project-/releases/download/v1.0.0/tombOS_Setup_v1.0.0_x64.exe)).
+- **🐧 Bare-Metal x86_64 ISO (`.iso` / `.deb`)**: Bootable live OS image `tombos_secure_amd64.iso` ([Download tombos_secure_amd64.iso](https://github.com/bashbadger/tombOS-project-/releases/download/v1.0.0/tombos_secure_amd64.iso)).
 - **🐳 Hardened Docker Container**: Read-only root filesystem container (`docker pull ghcr.io/bashbadger/tomb-os:latest`).
-- **📱 Universal Smartphone Mobile GSI (`.zip`)**: Project Treble GrapheneOS integration (`./scripts/flash_phone.sh`).
+- **📱 Standalone Mobile Package (`.apk` / `.zip`)**: Universal Android installer ([Download tombOS_v1.0.0_Android_Mobile.apk](https://github.com/bashbadger/tombOS-project-/releases/download/v1.0.0/tombOS_v1.0.0_Android_Mobile.apk) / [Download GSI.zip](https://github.com/bashbadger/tombOS-project-/releases/download/v1.0.0/GrapheneOS_tombOS_Universal_GSI.zip)).
 - **💾 Live SD XC / NVMe Drive**: Portable bootable media flasher (`./scripts/flash_sdxc.sh`).
 - **🖥️ Dedicated Bare-Metal Host OS**: Disk wiper & GRUB2 bootloader installer (`sudo ./scripts/install_baremetal.sh /dev/sda`).
 
