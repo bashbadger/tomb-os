@@ -506,6 +506,13 @@ function syncComplianceDials() {
 
 // Window Management Configuration
 const windowConfig = {
+  serviceconnect: {
+    title: "Universal Zero-Trust Secure Service Connect Hub",
+    width: 820,
+    height: 560,
+    icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="#007AFF"/></svg>`,
+    getContent: () => getServiceConnectContent()
+  },
   agents: {
     title: "Adaptive Autonomous Multi-Agent Mesh Hub",
     width: 820,
@@ -4744,7 +4751,8 @@ const allAppLauncherList = [
   { id: 'openclaw', name: 'OpenClaw Retro Platformer', category: 'Gaming', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#FFCC00"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`, desc: 'Captain Claw 1997 pirate platformer game engine', zone: 'personal' },
   { id: 'agents', name: 'Adaptive Multi-Agent Mesh Hub', category: 'AI & Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#9C27B0"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><circle cx="12" cy="12" r="3" fill="#9C27B0"/></svg>`, desc: 'Interactive panel bridging Orchestrator, Memory, Learning & Task agents', zone: 'secure' },
   { id: 'threatmap', name: 'Global Threat Radar & Cyber Map', category: 'Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#ff3b30"><circle cx="12" cy="12" r="10" fill="none" stroke="#ff3b30" stroke-width="2"/><path d="M12 2v20M2 12h20" stroke="#ff3b30" stroke-width="1.5"/></svg>`, desc: 'Live global threat radar monitoring rolling IPs & attacks', zone: 'work' },
-  { id: 'cipherlab', name: 'Post-Quantum Cipher Laboratory', category: 'Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#00BFFF"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.8L19 8l-7 3.5L5 8l7-3.2z"/></svg>`, desc: 'Kyber-1024 / Dilithium-5 keypair generator & lattice benchmarker', zone: 'secure' }
+  { id: 'cipherlab', name: 'Post-Quantum Cipher Laboratory', category: 'Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#00BFFF"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.8L19 8l-7 3.5L5 8l7-3.2z"/></svg>`, desc: 'Kyber-1024 / Dilithium-5 keypair generator & lattice benchmarker', zone: 'secure' },
+  { id: 'serviceconnect', name: 'Zero-Trust Service Connect Hub', category: 'Networking & Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#007AFF"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`, desc: 'Connect securely to any external service, DB or API without security compromise', zone: 'secure' }
 ];
 
 function getControlCenterContent() {
@@ -4753,7 +4761,7 @@ function getControlCenterContent() {
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 14px;">
         <div>
           <h2 style="margin: 0; font-size: 20px; color: var(--ubuntu-orange); font-weight: 600;">🎛️ Application Control Center</h2>
-          <div style="font-size: 12px; color: var(--ubuntu-light-grey); margin-top: 2px;">Launch and access all 18 Tomb OS applications from a central hub</div>
+          <div style="font-size: 12px; color: var(--ubuntu-light-grey); margin-top: 2px;">Launch and access all 19 Tomb OS applications from a central hub</div>
         </div>
         <div style="width: 240px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 18px; padding: 6px 12px; display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 12px; color: #888;">🔍</span>
@@ -6617,5 +6625,86 @@ function getKernelDebugContent() {
     </div>
   `;
 }
+
+
+// ============================================================================
+// 5. UNIVERSAL ZERO-TRUST SECURE SERVICE CONNECT ENGINE
+// ============================================================================
+function getServiceConnectContent() {
+  return `
+    <div class="app-serviceconnect-container" style="display: flex; flex-direction: column; height: 100%; color: #fff; font-family: var(--font-mono); background: #0c0c0c; padding: 18px; overflow-y: auto;">
+      <div style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2 style="margin: 0; font-size: 18px; color: #007AFF;">🌐 Universal Zero-Trust Secure Service Connect Hub</h2>
+          <div style="font-size: 11px; color: #aaa; margin-top: 2px;">Establish E2EE encrypted micro-segmented tunnels to external databases, cloud APIs, & remote servers with zero security compromise.</div>
+        </div>
+        <span style="font-size: 10px; background: rgba(0,122,255,0.2); color: #007AFF; padding: 4px 10px; border-radius: 12px; font-weight: 600;">ZTNA Gateway Active</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+          <h4 style="margin: 0; color: #007AFF; font-size: 13px;">🔗 Establish Outbound Service Connection</h4>
+          
+          <div>
+            <label style="display: block; font-size: 10.5px; color: #888; margin-bottom: 4px;">Service Target Type:</label>
+            <select id="zt-target-type" style="width: 100%; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 8px; color: #fff; font-family: var(--font-mono); font-size: 11px; outline: none;">
+              <option value="https">Secure HTTPS Web API (GraphQL / REST)</option>
+              <option value="database">SQL / NoSQL Database (PostgreSQL, Redis, MongoDB)</option>
+              <option value="ssh">E2EE Remote Terminal (SSH / SFTP)</option>
+              <option value="cloud">Cloud Resource (AWS / GCP / Azure Private Link)</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 10.5px; color: #888; margin-bottom: 4px;">Endpoint / Host URL:</label>
+            <input type="text" id="zt-target-url" placeholder="e.g. db.internal.company.com:5432 or api.github.com" style="width: 100%; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 8px; color: #fff; font-family: var(--font-mono); font-size: 11px; outline: none; box-sizing: border-box;" />
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center; font-size: 10.5px; color: #ccc;">
+            <input type="checkbox" id="zt-pqc-toggle" checked />
+            <label for="zt-pqc-toggle">Enforce Kyber-1024 Post-Quantum Proxy Tunnel</label>
+          </div>
+
+          <button onclick="initiateZeroTrustConnect()" style="background: #007AFF; color: #fff; border: none; padding: 9px; border-radius: 4px; font-weight: 700; font-size: 11.5px; cursor: pointer; margin-top: 4px;">Connect Securely →</button>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 14px; display: flex; flex-direction: column;">
+          <h4 style="margin: 0 0 10px 0; color: #4AF626; font-size: 13px;">🛡️ Active Zero-Trust Tunnel Monitor</h4>
+          <div id="zt-connect-output" style="flex: 1; min-height: 160px; background: #000; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 10px; font-size: 10.5px; line-height: 1.6; color: #ccc; overflow-y: auto;">
+            <div style="color: #888;">No active outbound connections. Select a target service to establish an isolated E2EE tunnel.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background: #141414; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; font-size: 11px; line-height: 1.6; color: #aaa;">
+        <strong style="color: #fff;">Zero-Compromise Security Guarantee:</strong> All outbound connection streams are automatically intercepted by DLP scanning daemons to prevent credential leaks, wrapped in ephemeral WireGuard/PQC tunnels, and routed through a dynamic rolling egress IP node.
+      </div>
+    </div>
+  `;
+}
+
+function initiateZeroTrustConnect() {
+  const type = document.getElementById('zt-target-type')?.value;
+  const url = document.getElementById('zt-target-url')?.value;
+  const pqc = document.getElementById('zt-pqc-toggle')?.checked;
+  const out = document.getElementById('zt-connect-output');
+  if (!out) return;
+
+  const target = url && url.trim() ? url.trim() : 'api.internal.service.net';
+
+  out.innerHTML = `<div style="color: #007AFF;">[ZTNA GATEWAY] Intercepting connection request for '${escapeHTML(target)}'...</div>`;
+  out.innerHTML += `<div style="color: #888;">▶ Running DLP packet payload inspection (0 secrets exposed)...</div>`;
+
+  setTimeout(() => {
+    out.innerHTML += `<div style="color: #FFCC00;">▶ [PQC ENCRYPTION] Wrapping payload in Kyber-1024 key encapsulation envelope...</div>`;
+  }, 700);
+
+  setTimeout(() => {
+    rotateTaskIp();
+    out.innerHTML += `<div style="color: #4AF626;">✅ <strong>CONNECTED: E2EE Tunnel established to '${escapeHTML(target)}'!</strong><br/>Egress IP: ${systemState.activeTaskIp} | Latency: 14ms | Status: ULTRA-SECURE</div>`;
+    logAudit(`Established Zero-Trust connection tunnel to external service '${target}'.`);
+  }, 1500);
+}
+
 
 
