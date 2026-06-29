@@ -177,6 +177,16 @@ export class TaskAgent extends BaseAgent {
         await new Promise(resolve => setTimeout(resolve, ms));
         return { waited: ms };
 
+      case 'read_file':
+      case 'list_directory':
+        const userGranted = (step.params.userGrantedFsAccess as boolean) ?? false;
+        if (!userGranted) {
+          throw new Error('PERMISSION_DENIED: Host filesystem access requires explicit user authorization.');
+        }
+        const targetPath = (step.params.path as string) ?? '/';
+        console.log(`[TaskStep] [FS ACCESS GRANTED] Accessing host disk path: ${targetPath}`);
+        return { accessed: true, path: targetPath, status: 'HOST_FILESYSTEM_INDEXED' };
+
       default:
         // Generic execution — extensible via plugin registration
         console.log(`[TaskStep] Executing generic action: ${step.action}`);

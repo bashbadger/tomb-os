@@ -6367,9 +6367,14 @@ function getAgentsDashboardContent() {
             <div style="font-size: 9px; color: #4AF626;">STATUS: READY (0 Pending)</div>
           </div>
         </div>
-        <div style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; font-size: 10px; color: #888;">
-          Memory Decay Rate: <strong style="color: #FFCC00;">0.02 / hr</strong><br/>
-          Learning Threshold: <strong style="color: #007AFF;">2 Obs</strong>
+        <div style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; font-size: 10px; color: #888; display: flex; flex-direction: column; gap: 8px;">
+          <div>Memory Decay: <strong style="color: #FFCC00;">0.02 / hr</strong></div>
+          <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 6px;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #fff; font-size: 9.5px; font-weight: 600;">
+              <input type="checkbox" id="agent-fs-permission-toggle" onchange="toggleAgentFsPermission(this)" />
+              🔓 Grant Full Host Filesystem Access
+            </label>
+          </div>
         </div>
       </div>
       <div style="flex: 1; display: flex; flex-direction: column; padding: 16px; gap: 14px; background: #111; overflow-y: auto;">
@@ -6383,7 +6388,7 @@ function getAgentsDashboardContent() {
           <div style="color: #FFCC00;">[LearningAgent] Proactive adaptation rule active: "Suggest network scan after terminal boot".</div>
         </div>
         <div style="display: flex; gap: 10px;">
-          <input type="text" id="agent-user-input" placeholder="Type prompt to send to Orchestrator Agent (e.g. 'run scan', 'remember IP 10.0.0.1')..." style="flex: 1; background: #1e1e1e; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 10px; color: #fff; font-family: var(--font-mono); font-size: 11.5px; outline: none;" onkeydown="if(event.key==='Enter') sendAgentPrompt()" />
+          <input type="text" id="agent-user-input" placeholder="Type prompt to send to Orchestrator Agent (e.g. 'read files', 'index disk', 'run scan')..." style="flex: 1; background: #1e1e1e; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 10px; color: #fff; font-family: var(--font-mono); font-size: 11.5px; outline: none;" onkeydown="if(event.key==='Enter') sendAgentPrompt()" />
           <button onclick="sendAgentPrompt()" style="background: #4AF626; color: #000; border: none; padding: 0 16px; border-radius: 4px; font-weight: 700; font-size: 12px; cursor: pointer;">Send →</button>
         </div>
       </div>
@@ -6393,6 +6398,19 @@ function getAgentsDashboardContent() {
 
 function initAgentsDashboardUI() {
   logAudit("Multi-Agent System Dashboard initialized in user enclave.");
+  const toggle = document.getElementById('agent-fs-permission-toggle');
+  if (toggle) toggle.checked = systemState.agentFsAccess?.granted ?? false;
+}
+
+function toggleAgentFsPermission(el) {
+  if (!systemState.agentFsAccess) systemState.agentFsAccess = { granted: false };
+  systemState.agentFsAccess.granted = el.checked;
+  logAudit(`User ${el.checked ? 'AUTHORIZED' : 'REVOKED'} full host filesystem access for Autonomous Agents.`);
+  const log = document.getElementById('agent-console-log');
+  if (log) {
+    log.innerHTML += `<div style="color: ${el.checked ? '#4AF626' : '#ff3b30'}; font-weight: 700; margin-top: 6px;">[SECURITY POLICY UPDATE] User ${el.checked ? 'GRANTED' : 'REVOKED'} full host disk access permissions for TaskAgent & MemoryAgent.</div>`;
+    log.scrollTop = log.scrollHeight;
+  }
 }
 
 function sendAgentPrompt() {
@@ -6407,7 +6425,15 @@ function sendAgentPrompt() {
   log.scrollTop = log.scrollHeight;
 
   setTimeout(() => {
-    if (val.toLowerCase().includes('scan') || val.toLowerCase().includes('run')) {
+    if (val.toLowerCase().includes('read') || val.toLowerCase().includes('file') || val.toLowerCase().includes('index') || val.toLowerCase().includes('disk')) {
+      const isGranted = systemState.agentFsAccess?.granted ?? false;
+      if (!isGranted) {
+        log.innerHTML += `<div style="color: #ff3b30;">[TaskAgent] ❌ PERMISSION DENIED: Cannot access host filesystem. Please check '🔓 Grant Full Host Filesystem Access' in the sidebar to authorize agent file indexing.</div>`;
+      } else {
+        log.innerHTML += `<div style="color: #4AF626;">[TaskAgent] 🔓 HOST FILESYSTEM ACCESS GRANTED. Indexing root storage sectors ('/')... Scanned 124,102 files across user directories. Data indexed into MemoryAgent store.</div>`;
+        log.innerHTML += `<div style="color: #007AFF;">[MemoryAgent] Created 128 new structured semantic embeddings from host document indexing.</div>`;
+      }
+    } else if (val.toLowerCase().includes('scan') || val.toLowerCase().includes('run')) {
       log.innerHTML += `<div style="color: #4AF626;">[TaskAgent] Executing task 'Security Vulnerability Scan'... Step 1: log... Step 2: compute... Step 3: notify. SUCCESS (12ms).</div>`;
       log.innerHTML += `<div style="color: #FFCC00;">[LearningAgent] Observed action pattern. Increasing confidence metric to 0.45.</div>`;
     } else if (val.toLowerCase().includes('remember') || val.toLowerCase().includes('ip')) {
