@@ -6344,6 +6344,8 @@ function getOpenClawContent() {
         </div>
         <div id="openclaw-hud" style="font-size: 11px; display: flex; gap: 14px;">
           <span id="oc-score" style="color: #FFCC00; font-weight: 600;">Gold: 0</span>
+          <span id="oc-friends" style="color: #00e5ff; font-weight: 600;">Mice: 0</span>
+          <span id="oc-map-size" style="color: #4AF626; font-weight: 600;">Map: 700px</span>
           <span id="oc-lives" style="color: #ff3b30; font-weight: 600;">LIVES: 3</span>
         </div>
       </div>
@@ -6351,7 +6353,7 @@ function getOpenClawContent() {
         <canvas id="openclaw-canvas" tabindex="0" width="690" height="420" style="display: block; background: #1a1e29; image-rendering: pixelated; border: 1px solid rgba(255,255,255,0.1); outline: none;"></canvas>
       </div>
       <div style="padding: 6px 14px; background: #141414; border-top: 1px solid rgba(255,255,255,0.1); font-size: 10px; color: #888; display: flex; justify-content: space-between;">
-        <span>Controls: <strong>A/D</strong> or <strong>←/→</strong> Move | <strong>W / Space</strong> Jump | <strong>F / Enter</strong> Sword Slash</span>
+        <span>Controls: <strong>A/D</strong> or <strong>←/→</strong> Move | <strong>W / Space</strong> Jump | <strong>Collect Mice, follow paths to Milk & Water</strong></span>
         <span style="color: #007AFF;">Installed via Tomb OS Package Manager</span>
       </div>
     </div>
@@ -6366,6 +6368,9 @@ function initOpenClawGame() {
   let score = 0;
   let lives = 3;
   let gameOver = false;
+  let friendsCount = 0;
+  let virtualWidth = 700; // Starts at 700px, expands as you collect mice
+  let cameraX = 0;
 
   const player = {
     x: 50,
@@ -6375,16 +6380,18 @@ function initOpenClawGame() {
     vx: 0,
     vy: 0,
     speed: 4,
+    normalSpeed: 4,
+    boostSpeed: 6.5,
+    boostTimer: 0,
     jumpStrength: -11,
     grounded: false,
-    attacking: false,
-    attackTimer: 0,
-    direction: 1 // 1 right, -1 left
+    direction: 1, // 1 right, -1 left
+    history: [] // Tracks historical positions for trailing friends
   };
 
   const gravity = 0.5;
 
-  const platforms = [
+  let platforms = [
     { x: 0, y: 380, width: 700, height: 40, color: '#3e2723' }, // Ground
     { x: 120, y: 300, width: 120, height: 16, color: '#5d4037' },
     { x: 300, y: 240, width: 140, height: 16, color: '#5d4037' },
@@ -6392,15 +6399,26 @@ function initOpenClawGame() {
     { x: 200, y: 140, width: 100, height: 16, color: '#5d4037' }
   ];
 
-  let coins = [
-    { x: 150, y: 270, collected: false },
-    { x: 180, y: 270, collected: false },
-    { x: 340, y: 210, collected: false },
-    { x: 380, y: 210, collected: false },
-    { x: 530, y: 150, collected: false },
-    { x: 230, y: 110, collected: false }
+  // Mice friends waiting to be rescued
+  let mice = [
+    { x: 180, y: 275, collected: false },
+    { x: 370, y: 215, collected: false },
+    { x: 550, y: 155, collected: false },
+    { x: 820, y: 255, collected: false }, // Lies in expansion 1
+    { x: 1100, y: 185, collected: false }, // Lies in expansion 2
+    { x: 1450, y: 135, collected: false }  // Lies in expansion 3
   ];
 
+  // Refreshments: Water (W) and Milk (M)
+  let refreshments = [
+    { type: 'water', x: 250, y: 110, collected: false },
+    { type: 'milk', x: 520, y: 150, collected: false },
+    { type: 'water', x: 750, y: 290, collected: false }, // Expansion 1
+    { type: 'milk', x: 1020, y: 210, collected: false }, // Expansion 2
+    { type: 'water', x: 1350, y: 150, collected: false } // Expansion 3
+  ];
+
+  // Enemies block patrolling
   let enemies = [
     { x: 320, y: 210, width: 22, height: 30, vx: 1, minX: 300, maxX: 420, alive: true },
     { x: 520, y: 150, width: 22, height: 30, vx: -1, minX: 500, maxX: 600, alive: true }
@@ -6424,10 +6442,36 @@ function initOpenClawGame() {
   window.addEventListener('keydown', handleKeyDown);
   window.addEventListener('keyup', handleKeyUp);
 
+  function expandMap() {
+    virtualWidth += 250;
+    if (virtualWidth > 2000) virtualWidth = 2000;
+    
+    // Add new platforms dynamically on expansion
+    const newX = virtualWidth - 250;
+    platforms.push(
+      { x: newX + 40, y: 320 - Math.random() * 80, width: 130, height: 16, color: '#5d4037' },
+      { x: newX + 150, y: 200 - Math.random() * 60, width: 100, height: 16, color: '#5d4037' }
+    );
+    // Expand ground platform width
+    platforms[0].width = virtualWidth;
+
+    const mapSizeEl = document.getElementById('oc-map-size');
+    if (mapSizeEl) mapSizeEl.textContent = `Map: ${virtualWidth}px`;
+    logAudit(`OpenClaw: Map expanded! New boundaries unlocked up to ${virtualWidth}px.`);
+  }
+
   function update() {
     if (gameOver) return;
 
-    // Movement
+    // Handle speed boost timer
+    if (player.boostTimer > 0) {
+      player.boostTimer--;
+      player.speed = player.boostSpeed;
+    } else {
+      player.speed = player.normalSpeed;
+    }
+
+    // Movement Controls
     if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
       player.vx = -player.speed;
       player.direction = -1;
@@ -6443,26 +6487,20 @@ function initOpenClawGame() {
       player.grounded = false;
     }
 
-    if ((keys['Enter'] || keys['f'] || keys['F']) && !player.attacking) {
-      player.attacking = true;
-      player.attackTimer = 15;
-    }
-
-    if (player.attacking) {
-      player.attackTimer--;
-      if (player.attackTimer <= 0) {
-        player.attacking = false;
-      }
-    }
-
-    // Apply Gravity
+    // Apply gravity & physics
     player.vy += gravity;
     player.x += player.vx;
     player.y += player.vy;
 
-    // Boundary check
+    // Store history for friend trails
+    player.history.push({ x: player.x, y: player.y });
+    if (player.history.length > 200) {
+      player.history.shift();
+    }
+
+    // Keep player in bounds of dynamic map width
     if (player.x < 0) player.x = 0;
-    if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+    if (player.x + player.width > virtualWidth) player.x = virtualWidth - player.width;
 
     // Platform collisions
     player.grounded = false;
@@ -6479,17 +6517,43 @@ function initOpenClawGame() {
       }
     }
 
-    // Collect coins
-    for (let c of coins) {
-      if (!c.collected && Math.hypot(player.x + 12 - c.x, player.y + 18 - c.y) < 20) {
-        c.collected = true;
-        score += 100;
+    // Collect Mice friends
+    for (let m of mice) {
+      if (!m.collected && Math.hypot(player.x + 12 - m.x, player.y + 18 - m.y) < 25) {
+        m.collected = true;
+        friendsCount++;
+        score += 500;
+        expandMap(); // Dynamically grow level map!
+
+        const friendsEl = document.getElementById('oc-friends');
+        if (friendsEl) friendsEl.textContent = `Mice: ${friendsCount}`;
+        
         const scoreEl = document.getElementById('oc-score');
         if (scoreEl) scoreEl.textContent = `Gold: ${score}`;
       }
     }
 
-    // Update Enemies
+    // Collect Refreshments (Water & Milk)
+    for (let r of refreshments) {
+      if (!r.collected && Math.hypot(player.x + 12 - r.x, player.y + 18 - r.y) < 22) {
+        r.collected = true;
+        if (r.type === 'milk') {
+          score += 300;
+          player.boostTimer = 180; // Speed boost
+          logAudit("OpenClaw: Collected milk! Speed boost activated.");
+        } else {
+          score += 200;
+          lives = Math.min(3, lives + 1); // Heal
+          const livesEl = document.getElementById('oc-lives');
+          if (livesEl) livesEl.textContent = `LIVES: ${lives}`;
+          logAudit("OpenClaw: Collected fresh water! Extra health restored.");
+        }
+        const scoreEl = document.getElementById('oc-score');
+        if (scoreEl) scoreEl.textContent = `Gold: ${score}`;
+      }
+    }
+
+    // Patrolling Enemies collision check
     for (let enemy of enemies) {
       if (!enemy.alive) continue;
       enemy.x += enemy.vx;
@@ -6497,25 +6561,7 @@ function initOpenClawGame() {
         enemy.vx *= -1;
       }
 
-      // Attack enemy check
-      if (player.attacking) {
-        const attackX = player.direction === 1 ? player.x + player.width : player.x - 30;
-        if (
-          attackX < enemy.x + enemy.width &&
-          attackX + 30 > enemy.x &&
-          player.y < enemy.y + enemy.height &&
-          player.y + player.height > enemy.y
-        ) {
-          enemy.alive = false;
-          score += 250;
-          const scoreEl = document.getElementById('oc-score');
-          if (scoreEl) scoreEl.textContent = `Gold: ${score}`;
-        }
-      }
-
-      // Player hurt check
       if (
-        enemy.alive &&
         player.x < enemy.x + enemy.width &&
         player.x + player.width > enemy.x &&
         player.y < enemy.y + enemy.height &&
@@ -6523,7 +6569,7 @@ function initOpenClawGame() {
       ) {
         lives--;
         const livesEl = document.getElementById('oc-lives');
-        if (livesEl) livesEl.textContent = 'LIVES: ' + Math.max(0, lives);
+        if (livesEl) livesEl.textContent = `LIVES: ${Math.max(0, lives)}`;
         player.x = 50;
         player.y = 300;
         if (lives <= 0) {
@@ -6531,72 +6577,133 @@ function initOpenClawGame() {
         }
       }
     }
+
+    // Smooth camera scroll following player
+    const targetCameraX = player.x - canvas.width / 2;
+    cameraX += (targetCameraX - cameraX) * 0.1;
+    if (cameraX < 0) cameraX = 0;
+    if (cameraX > virtualWidth - canvas.width) cameraX = virtualWidth - canvas.width;
   }
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Background Sky
-    ctx.fillStyle = '#1e2638';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(-cameraX, 0);
 
-    // Draw Platforms
+    // Background sky grid
+    ctx.fillStyle = '#090d16';
+    ctx.fillRect(0, 0, virtualWidth, canvas.height);
+
+    // Draw platforms
     for (let p of platforms) {
       ctx.fillStyle = p.color;
       ctx.fillRect(p.x, p.y, p.width, p.height);
-      ctx.fillStyle = '#4ea367'; // Grass top
-      ctx.fillRect(p.x, p.y, p.width, 4);
+      ctx.fillStyle = '#00e5ff'; // Neon blue ledge top
+      ctx.fillRect(p.x, p.y, p.width, 3);
     }
 
-    // Draw Coins
-    for (let c of coins) {
-      if (!c.collected) {
-        ctx.fillStyle = '#FFCC00';
-        ctx.beginPath();
-        ctx.arc(c.x, c.y, 6, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#FFA500';
-        ctx.stroke();
+    // Draw uncollected Mice waiting to be rescued
+    for (let m of mice) {
+      if (!m.collected) {
+        ctx.fillStyle = '#e0e0e0';
+        // Simple 2-bit mouse shape
+        ctx.fillRect(m.x - 6, m.y - 4, 12, 8);
+        ctx.fillStyle = '#ff8a80'; // Pink ears
+        ctx.fillRect(m.x - 4, m.y - 8, 3, 4);
+        ctx.fillRect(m.x + 1, m.y - 8, 3, 4);
       }
     }
 
-    // Draw Enemies (Red Pirates)
+    // Draw Refreshments: Water (W) and Milk (M)
+    for (let r of refreshments) {
+      if (!r.collected) {
+        ctx.fillStyle = r.type === 'milk' ? '#ffffff' : '#00e5ff';
+        ctx.fillRect(r.x - 6, r.y - 12, 12, 24);
+        // Cap
+        ctx.fillStyle = '#ff3b30';
+        ctx.fillRect(r.x - 4, r.y - 16, 8, 4);
+        // Letter indicator label
+        ctx.fillStyle = '#000000';
+        ctx.font = '700 9px var(--font-mono)';
+        ctx.textAlign = 'center';
+        ctx.fillText(r.type === 'milk' ? 'M' : 'W', r.x, r.y + 3);
+      }
+    }
+
+    // Draw Trailing collected Mice friends
+    for (let i = 0; i < friendsCount; i++) {
+      const idx = player.history.length - 1 - (i + 1) * 12;
+      if (idx >= 0 && player.history[idx]) {
+        const friendPos = player.history[idx];
+        ctx.fillStyle = '#8e8e93';
+        ctx.fillRect(friendPos.x + 6, friendPos.y + 18, 12, 8);
+        ctx.fillStyle = '#ff8a80';
+        ctx.fillRect(friendPos.x + 8, friendPos.y + 14, 2, 4);
+        ctx.fillRect(friendPos.x + 14, friendPos.y + 14, 2, 4);
+
+        // Guiding vectors: draw dynamic leading path pointing from the leading friend to closest milk/water
+        if (i === 0) {
+          let closest = null;
+          let minDist = Infinity;
+          for (let r of refreshments) {
+            if (!r.collected) {
+              const d = Math.hypot(friendPos.x - r.x, friendPos.y - r.y);
+              if (d < minDist) {
+                minDist = d;
+                closest = r;
+              }
+            }
+          }
+          if (closest) {
+            // Draw a dotted path pointing to target refreshment
+            ctx.strokeStyle = 'rgba(0, 229, 255, 0.4)';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(friendPos.x + 12, friendPos.y + 22);
+            ctx.lineTo(closest.x, closest.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }
+      }
+    }
+
+    // Draw Patrol Enemies
     for (let enemy of enemies) {
       if (enemy.alive) {
         ctx.fillStyle = '#ff3b30';
         ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
-        // Pirate hat
-        ctx.fillStyle = '#111';
-        ctx.fillRect(enemy.x - 2, enemy.y - 6, enemy.width + 4, 6);
+        // Eye patch
+        ctx.fillStyle = '#000';
+        ctx.fillRect(enemy.x + 4, enemy.y + 6, 8, 4);
       }
     }
 
-    // Draw Player (Captain Claw - Pirate Cat)
-    ctx.fillStyle = '#007AFF'; // Blue coat
+    // Draw Player (Captain Claw - Cat avatar)
+    ctx.fillStyle = player.boostTimer > 0 ? '#4AF626' : '#FFCC00'; // Coat changes on boost
     ctx.fillRect(player.x, player.y + 10, player.width, player.height - 10);
-    ctx.fillStyle = '#ffcc80'; // Head
-    ctx.fillRect(player.x + 2, player.y, 20, 12);
-    ctx.fillStyle = '#d84315'; // Pirate hat
-    ctx.fillRect(player.x - 2, player.y - 6, 28, 6);
+    // Cat ears
+    ctx.fillStyle = '#ffcc80';
+    ctx.fillRect(player.x + 2, player.y, 20, 10);
+    ctx.fillStyle = '#d84315'; // Ear inner
+    ctx.fillRect(player.x + 4, player.y - 4, 4, 4);
+    ctx.fillRect(player.x + 16, player.y - 4, 4, 4);
 
-    // Sword attack animation
-    if (player.attacking) {
-      ctx.fillStyle = '#e0e0e0';
-      const swordX = player.direction === 1 ? player.x + player.width : player.x - 24;
-      ctx.fillRect(swordX, player.y + 14, 24, 6);
-    }
+    ctx.restore();
 
-    // Game Over overlay
+    // Game Over display
     if (gameOver) {
       ctx.fillStyle = 'rgba(0,0,0,0.85)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#ff3b30';
       ctx.font = '700 24px var(--font-mono)';
       ctx.textAlign = 'center';
-      ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 10);
+      ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 15);
       ctx.fillStyle = '#fff';
-      ctx.font = '14px var(--font-mono)';
-      ctx.fillText(`Final Gold Score: ${score}`, canvas.width / 2, canvas.height / 2 + 20);
+      ctx.font = '13px var(--font-mono)';
+      ctx.fillText(`Final Score: ${score} | Friends Rescued: ${friendsCount}`, canvas.width / 2, canvas.height / 2 + 15);
     }
   }
 
