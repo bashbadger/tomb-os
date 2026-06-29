@@ -3101,13 +3101,13 @@ function getHypervisorContent() {
     <div class="app-hypervisor-container">
       <div class="hypervisor-header">
         <div class="hypervisor-title-block">
-          <h3>Tomb Hypervisor VM Manager</h3>
-          <p>Xen hypervisor sandboxing controls. Manage security zones, view VM telemetry, and enforce Dom0 isolation policies.</p>
+          <h3>TombCell PQC Quantum Micro-Hypervisor</h3>
+          <p>Next-generation hardware virtualization engine. Zero-Copy IPC channels, real-time Kyber-1024 memory encryption & cell isolation.</p>
         </div>
         <div class="hypervisor-stats">
           <div class="hypervisor-stat-pill">
-            <div class="val">4</div>
-            <div class="lbl">Active VMs</div>
+            <div class="val">64</div>
+            <div class="lbl">Max Cells</div>
           </div>
           <div class="hypervisor-stat-pill">
             <div class="val">3.0 GB</div>
