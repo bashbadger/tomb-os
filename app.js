@@ -524,6 +524,13 @@ function syncComplianceDials() {
 
 // Window Management Configuration
 const windowConfig = {
+  immunesystem: {
+    title: "Autonomous White Blood Cell Immune Defense System",
+    width: 820,
+    height: 560,
+    icon: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#ff3b30"/></svg>`,
+    getContent: () => getImmuneSystemContent()
+  },
   stresstest: {
     title: "Enterprise Stress Test & Load Benchmark Suite",
     width: 800,
@@ -4840,8 +4847,8 @@ const allAppLauncherList = [
   { id: 'threatmap', name: 'Global Threat Radar & Cyber Map', category: 'Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#ff3b30"><circle cx="12" cy="12" r="10" fill="none" stroke="#ff3b30" stroke-width="2"/><path d="M12 2v20M2 12h20" stroke="#ff3b30" stroke-width="1.5"/></svg>`, desc: 'Live global threat radar monitoring rolling IPs & attacks', zone: 'work' },
   { id: 'cipherlab', name: 'Post-Quantum Cipher Laboratory', category: 'Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#00BFFF"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.8L19 8l-7 3.5L5 8l7-3.2z"/></svg>`, desc: 'Kyber-1024 / Dilithium-5 keypair generator & lattice benchmarker', zone: 'secure' },
   { id: 'serviceconnect', name: 'Zero-Trust Service Connect Hub', category: 'Networking & Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#007AFF"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`, desc: 'Connect securely to any external service, DB or API without security compromise', zone: 'secure' },
-  { id: 'sysmon', name: 'System Telemetry Monitor', category: 'System', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#4AF626"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 15.66z"/></svg>`, desc: 'Real-time CPU core activity, RAM usage gauges & telemetry', zone: 'work' },
-  { id: 'stresstest', name: 'Stress Test & Load Benchmarker', category: 'System & Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#ff3b30"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>`, desc: 'Execute synthetic load tests across CPU cores, PQC ciphers & agent task queues', zone: 'work' }
+  { id: 'stresstest', name: 'Stress Test & Load Benchmarker', category: 'System & Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#ff3b30"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>`, desc: 'Execute synthetic load tests across CPU cores, PQC ciphers & agent task queues', zone: 'work' },
+  { id: 'immunesystem', name: 'Autonomous White Blood Cell Immune System', category: 'AI & Security', icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#ff3b30"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`, desc: 'Biological threat hunting agents phagocytizing intrusions like white blood cells', zone: 'secure' }
 ];
 
 function getControlCenterContent() {
@@ -4850,7 +4857,7 @@ function getControlCenterContent() {
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 14px;">
         <div>
           <h2 style="margin: 0; font-size: 20px; color: var(--ubuntu-orange); font-weight: 600;">🎛️ Application Control Center</h2>
-          <div style="font-size: 12px; color: var(--ubuntu-light-grey); margin-top: 2px;">Launch and access all 21 Tomb OS applications from a central hub</div>
+          <div style="font-size: 12px; color: var(--ubuntu-light-grey); margin-top: 2px;">Launch and access all 22 Tomb OS applications from a central hub</div>
         </div>
         <div style="width: 240px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 18px; padding: 6px 12px; display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 12px; color: #888;">🔍</span>
@@ -6953,3 +6960,48 @@ function scrubSensitiveBuffers() {
 setTimeout(() => {
   verifySystemIntegrity();
 }, 2000);
+
+// ============================================================================
+// 9. AUTONOMOUS WHITE BLOOD CELL IMMUNE DEFENSE ENGINE (PHAGOCYTOSIS)
+// ============================================================================
+function getImmuneSystemContent() {
+  return `
+    <div class="app-immunesystem-container" style="display: flex; flex-direction: column; height: 100%; color: #fff; font-family: var(--font-mono); background: #0b0204; padding: 18px; overflow-y: auto;">
+      <div style="border-bottom: 1px solid rgba(255,59,48,0.4); padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2 style="margin: 0; font-size: 18px; color: #ff3b30;">🦠 Autonomous White Blood Cell Immune System</h2>
+          <div style="font-size: 11px; color: #aaa; margin-top: 2px;">Biological threat hunting agents phagocytizing intrusions like white blood cells targeting sickness.</div>
+        </div>
+        <button onclick="runImmunePhagocytosisCycle()" style="background: #ff3b30; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 700; font-size: 11.5px; cursor: pointer;">Deploy Phagocytes & Neutralize Intrusions 🩸</button>
+      </div>
+
+      <div style="background: #000; border: 1px solid rgba(255,59,48,0.2); border-radius: 6px; padding: 14px; flex: 1; min-height: 240px; font-size: 11px; line-height: 1.6; color: #ccc; overflow-y: auto;" id="immune-system-console">
+        <div style="color: #888;">Immune surveillance active. Click 'Deploy Phagocytes & Neutralize Intrusions' to trigger automated biological pathogen destruction cycle across processes and memory cells.</div>
+      </div>
+    </div>
+  `;
+}
+
+function runImmunePhagocytosisCycle() {
+  const log = document.getElementById('immune-system-console');
+  if (!log) return;
+  log.innerHTML = `<div style="color: #ff3b30; font-weight: 700;">[IMMUNE RESPONSE INITIATED] Releasing autonomous phagocyte agents into system memory space...</div>`;
+  log.scrollTop = log.scrollHeight;
+
+  setTimeout(() => {
+    log.innerHTML += `<div style="color: #FFCC00;">▶ [PATHOGEN DETECTED] Identified unauthorized memory probe anomaly [PID: 4092] in Cell sector 0x7F...</div>`;
+    log.scrollTop = log.scrollHeight;
+  }, 600);
+
+  setTimeout(() => {
+    log.innerHTML += `<div style="color: #00BFFF;">▶ [ENGAGING PHAGOCYTOSIS] Enveloping intruder process PID 4092 with isolated VM capability locks...</div>`;
+    log.scrollTop = log.scrollHeight;
+  }, 1200);
+
+  setTimeout(() => {
+    log.innerHTML += `<div style="color: #4AF626; font-weight: 700; margin-top: 8px;">🩸 <strong>INTRUSION NEUTRALIZED: Phagocyte agents successfully destroyed malicious PID 4092 and purged RAM sector. Homeostasis restored!</strong></div>`;
+    log.scrollTop = log.scrollHeight;
+    logAudit("Autonomous White Blood Cell immune agents engaged phagocytosis, destroying malicious process PID 4092 and restoring system homeostasis.");
+  }, 1800);
+}
+
