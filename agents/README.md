@@ -628,6 +628,19 @@ Recommended for raw code auto-generation, system patching, and microkernel scrip
    LLM_PROVIDER="openai" OPENAI_API_KEY="sk-proj-..." OPENAI_MODEL="gpt-4o" npm start
    ```
 
+---
+
+## 🛡️ 11. Autonomous Skill Acquisition via Permission Tracking
+
+Tomb OS agents dynamically expand their capabilities by analyzing user approval patterns. When commands or modifications require manual administrator approval, the `LearningAgent` registers the transaction logs:
+
+### ⚙️ How It Works
+1. **Approval Count Monitoring**: Every time a user grants permission for a specific prefix group (e.g. `run_command:git`), the agent increments the approval count.
+2. **Threshold Checks**: Once the approved count exceeds the learning threshold, the agent flags the prefix group as trusted.
+3. **Autonomous Skill Promotion**: The agent mesh automatically packages the pre-approved pattern and inserts it into the `MemoryStore` as a permanent skill (`MemoryType.SKILL`).
+4. **Pre-Authorized Shortcuts**: For future queries matching this pattern, the orchestrator retrieves the pre-approved skill to execute without manual prompts, creating a self-improving automation loop.
+
+
 
 
 

@@ -1,4 +1,5 @@
-import { BaseAgent, AgentMessage } from './BaseAgent';
+import { BaseAgent } from './BaseAgent';
+import { AgentMessage, AgentRole } from '../types';
 
 export interface PathogenThreat {
   id: string;
@@ -20,14 +21,24 @@ export class ImmuneSystemAgent extends BaseAgent {
   private learnedAntibodies: HardeningAntibody[] = [];
 
   constructor(id: string = 'immune-cell-01') {
-    super(id, 'ImmuneSystemAgent');
+    super(AgentRole.SECURITY, id);
   }
 
-  public async receive(message: AgentMessage): Promise<void> {
-    if (message.type === 'SCAN_PATHOGENS') {
+  public async initialize(): Promise<void> {
+    console.log(`[${this.id}] Initializing Immune System Agent...`);
+  }
+
+  public async shutdown(): Promise<void> {
+    console.log(`[${this.id}] Shutting down Immune System Agent...`);
+  }
+
+  public async receive(message: AgentMessage): Promise<any> {
+    const typeStr = message.type as string;
+    if (typeStr === 'SCAN_PATHOGENS') {
       await this.scanSystemForPathogens();
-    } else if (message.type === 'PHAGOCYTIZE') {
-      await this.phagocytizeIntrusion(message.payload?.threatId);
+    } else if (typeStr === 'PHAGOCYTIZE') {
+      const payload = message.payload as any;
+      await this.phagocytizeAndAdapt(payload?.threatId);
     }
   }
 

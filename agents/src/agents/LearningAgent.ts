@@ -16,11 +16,13 @@ import {
   AdaptationRule,
   UserInteraction,
   AgentMessage,
+  Memory,
 } from '../types';
 
 export class LearningAgent extends BaseAgent {
   private store: MemoryStore;
   private learningThreshold: number;
+  private permissionHistory: Map<string, number> = new Map();
 
   constructor(store: MemoryStore, learningThreshold = 3) {
     super(AgentRole.LEARNING);
@@ -30,6 +32,43 @@ export class LearningAgent extends BaseAgent {
   }
 
   private registerHandlers(): void {
+    this.on(MessageType.EVENT, async (msg: AgentMessage) => {
+      const payload = msg.payload as any;
+      if (payload?.type === 'PERMISSION_GRANTED') {
+        const { actionPrefix } = payload;
+        const count = (this.permissionHistory.get(actionPrefix) ?? 0) + 1;
+        this.permissionHistory.set(actionPrefix, count);
+        console.log(`[LEARNING] Permission approved for "${actionPrefix}". Count: ${count}/${this.learningThreshold}`);
+
+        if (count >= this.learningThreshold) {
+          const existingSkills = this.store.queryMemories({ type: MemoryType.SKILL });
+          const alreadyLearned = existingSkills.some(s => s.metadata?.actionPrefix === actionPrefix);
+          if (!alreadyLearned) {
+            const newSkill: Memory = {
+              id: uuidv4(),
+              type: MemoryType.SKILL,
+              category: 'auto_permission_grant',
+              content: `Auto-approve permission-tracked executor for: ${actionPrefix}`,
+              metadata: { actionPrefix, autoApproved: true, confidence: 1.0 },
+              weight: 0.9,
+              accessCount: 0,
+              createdAt: Date.now(),
+              lastAccessedAt: Date.now(),
+              decayRate: 0,
+              tags: ['permission_learned_skill', actionPrefix]
+            };
+            this.store.addMemory(newSkill);
+            console.log(`[LEARNING] Dynamic Skill Acquired! Permission group [${actionPrefix}] is now auto-approved.`);
+            return this.createMessage(msg.from, MessageType.RESPONSE, {
+              status: 'skill_acquired',
+              skill: newSkill
+            }, msg.id);
+          }
+        }
+      }
+      return this.createMessage(msg.from, MessageType.RESPONSE, { status: 'event_tracked' }, msg.id);
+    });
+
     this.on(MessageType.LEARN, async (msg: AgentMessage) => {
       const { interaction } = msg.payload as { interaction: UserInteraction };
       const insights = this.analyzeInteraction(interaction);

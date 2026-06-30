@@ -4712,6 +4712,7 @@ let userChatCredits = 50; // Chat agent session credits
 let activeWorkspaceTab = 'messages'; // Active tab in single-window mode
 let workspaceLayoutMode = 'split'; // 'split' or 'tabbed'
 let isVMPatchCodeSafe = false; // Code sandbox safety status
+let awaitingAgentKnowledge = null; // Key currently queried from user
 
 function getUnifiedWorkspaceContent() {
   setTimeout(() => {
@@ -5169,7 +5170,30 @@ function sendChatMessage() {
     replyEl.style.cssText = 'align-self: flex-start; background: #202c33; padding: 10px 14px; border-radius: 8px; max-width: 75%; font-size: 11.5px; line-height: 1.45; font-family: var(--font-mono); animation: fadeIn 0.2s ease;';
     
     let content = '';
-    if (currentChatContact === 'sec-admin') {
+    
+    if (awaitingAgentKnowledge) {
+      content = `
+        <div style="border-left: 3px solid #4AF626; padding-left: 10px;">
+          <strong style="color: #4AF626;">[SECURITY WALL AGENT MESH LEARN]</strong><br/>
+          Knowledge vector successfully learned and synchronized:<br/>
+          * Key: <code>${awaitingAgentKnowledge}</code><br/>
+          * Learned Value: <code>${text}</code><br/>
+          This data has been committed to the post-quantum encrypted MemoryStore.
+        </div>
+      `;
+      logAudit(`Security Wall: Learned dynamic parameter "${awaitingAgentKnowledge}" -> "${text}"`);
+      awaitingAgentKnowledge = null;
+    } else if (text.toLowerCase().includes('port') || text.toLowerCase().includes('credentials') || text.toLowerCase().includes('key')) {
+      content = `
+        <div style="border-left: 3px solid #ff9f0a; padding-left: 10px;">
+          <strong style="color: #ff9f0a;">[SECURITY WALL AGENT MESH QUERY]</strong><br/>
+          Requested vector <code>"${text}"</code> is missing from local memory banks.<br/>
+          <br/>
+          <span style="color: #ffe87c;">Please reply with the correct value for this parameter so the mesh can learn it.</span>
+        </div>
+      `;
+      awaitingAgentKnowledge = text;
+    } else if (currentChatContact === 'sec-admin') {
       content = `
         <div style="border-left: 3px solid #4AF626; padding-left: 10px;">
           <strong style="color: #4AF626;">[SECURITY WALL AGENT MESH STATUS]</strong><br/>
