@@ -5644,13 +5644,6 @@ function getThemeContent() {
       <div class="theme-sec-title"> Dock Sizing & Placement</div>
 
       <div class="theme-row">
-        <div class="theme-label">Dock Position:</div>
-        <div class="theme-buttons">
-          ${dockPosHtml}
-        </div>
-      </div>
-
-      <div class="theme-row">
         <div class="theme-label">Dock Icon Size:</div>
         <div class="theme-buttons">
           ${dockSizeHtml}
@@ -5818,16 +5811,17 @@ function applyUIOpacity(val) {
 }
 
 function applyUIDockPosition(pos) {
-  systemState.theme.dockPosition = pos;
+  const forcedPos = 'bottom';
+  systemState.theme.dockPosition = forcedPos;
   const dock = document.getElementById('dock');
   const wrapper = document.getElementById('desktop-wrapper');
   if (dock) {
     dock.classList.remove('pos-left', 'pos-right', 'pos-bottom');
-    dock.classList.add(`pos-${pos}`);
+    dock.classList.add(`pos-${forcedPos}`);
   }
   if (wrapper) {
     wrapper.classList.remove('dock-left', 'dock-right', 'dock-bottom');
-    wrapper.classList.add(`dock-${pos}`);
+    wrapper.classList.add(`dock-${forcedPos}`);
   }
   refreshThemeWindow();
 }
