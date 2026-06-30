@@ -85,10 +85,24 @@ async function runSetup() {
   const envPath = path.join(process.cwd(), '.env');
   fs.writeFileSync(envPath, envContent, 'utf8');
 
+  const { exec } = require('child_process');
   console.log("\n==================================================");
   console.log(`Setup complete! Configuration saved to: ${envPath}`);
-  console.log("Run 'npm start' to boot up the agent mesh.");
+  console.log("Opening Tomb OS Desktop page automatically...");
   console.log("==================================================");
+
+  const desktopPath = path.resolve(process.cwd(), '../index.html');
+  const platform = process.platform;
+  let openCmd = '';
+  if (platform === 'darwin') openCmd = `open "${desktopPath}"`;
+  else if (platform === 'win32') openCmd = `start "" "${desktopPath}"`;
+  else openCmd = `xdg-open "${desktopPath}"`;
+
+  exec(openCmd, (err) => {
+    if (err) {
+      console.warn("Could not open desktop page automatically:", err.message);
+    }
+  });
 
   rl.close();
 }
