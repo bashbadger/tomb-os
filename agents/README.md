@@ -640,6 +640,26 @@ Tomb OS agents dynamically expand their capabilities by analyzing user approval 
 3. **Autonomous Skill Promotion**: The agent mesh automatically packages the pre-approved pattern and inserts it into the `MemoryStore` as a permanent skill (`MemoryType.SKILL`).
 4. **Pre-Authorized Shortcuts**: For future queries matching this pattern, the orchestrator retrieves the pre-approved skill to execute without manual prompts, creating a self-improving automation loop.
 
+---
+
+## 🛠️ 12. Interactive Setup Configuration Command
+
+Instead of manually setting environment variables, run the interactive setup wizard inside your terminal prompt. This wizard walks you through every configuration choice and saves the variables to a local persistent `.env` file.
+
+### 🚀 Running the Wizard
+Initiate the setup prompt by running:
+```bash
+npm run setup
+```
+
+### 📋 Questions Covered
+* **LLM Provider selection**: Choose between Gemini, Claude, OpenAI, or local Offline fallback.
+* **Credentials mapping**: Inputs appropriate API keys and targets specific model names.
+* **Relay options**: Toggles cross-platform relays and sets source/destination endpoints.
+* **Cellular settings**: Configures Twilio phone number, SID, and recipient details.
+* **Storage configurations**: Points memory state directories to target volumes.
+
+
 
 
 
