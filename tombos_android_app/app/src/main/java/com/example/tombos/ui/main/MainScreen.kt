@@ -132,6 +132,23 @@ fun MainScreen(
           }
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+          Column {
+            Text("Microkernel", fontSize = 10.sp, color = Color.Gray)
+            Text("seL4 Verified", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.Green)
+          }
+          Column {
+            Text("Threat Filter", fontSize = 10.sp, color = Color.Gray)
+            Text("AppArmor active", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.Green)
+          }
+          Column {
+            Text("Compliance", fontSize = 10.sp, color = Color.Gray)
+            Text("SOC 2 Audited", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+          }
+        }
+
         Spacer(modifier = Modifier.height(12.dp))
         
         Text("CPU Auditing Load: 18%", fontSize = 10.sp, color = Color.Gray)
