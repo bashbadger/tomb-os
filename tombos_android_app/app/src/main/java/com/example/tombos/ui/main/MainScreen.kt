@@ -46,7 +46,29 @@ fun MainScreen(
   var isBiometricAuthenticated by remember { mutableStateOf(false) }
   var isPinAuthenticated by remember { mutableStateOf(false) }
   var pinInput by remember { mutableStateOf("") }
+  var activeThemeName by remember { mutableStateOf("graphene_os") }
   
+  val activePrimary = when (activeThemeName) {
+    "graphene_os" -> Color(0xFF81C784)
+    "turtle_green" -> Color(0xFF00E676)
+    "tomb_dark" -> Color(0xFFE95420)
+    else -> Color(0xFF81C784)
+  }
+  
+  val activeBackground = when (activeThemeName) {
+    "graphene_os" -> Color(0xFF000000)
+    "turtle_green" -> Color(0xFF0B2512)
+    "tomb_dark" -> Color(0xFF2C001E)
+    else -> Color(0xFF000000)
+  }
+  
+  val activeSurface = when (activeThemeName) {
+    "graphene_os" -> Color(0xFF161618)
+    "turtle_green" -> Color(0xFF1B5E20)
+    "tomb_dark" -> Color(0xFF5E2750)
+    else -> Color(0xFF161618)
+  }
+
   // Terminal states
   var commandInput by remember { mutableStateOf("") }
   var outputLogs by remember { mutableStateOf(listOf<String>()) }
@@ -66,16 +88,20 @@ fun MainScreen(
   Column(
     modifier = modifier
       .fillMaxSize()
-      .background(MaterialTheme.colorScheme.background)
+      .background(activeBackground)
       .padding(16.dp)
       .verticalScroll(rememberScrollState()),
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
     Text(
-      text = "🛡️ GrapheneOS Secure Enclave",
+      text = when (activeThemeName) {
+        "graphene_os" -> "🛡️ GrapheneOS Secure Enclave"
+        "turtle_green" -> "🐢 Turtle OS Mobile Enclave"
+        else -> "☠️ Tomb OS Mobile Enclave"
+      },
       fontSize = 20.sp,
       fontWeight = FontWeight.Bold,
-      color = MaterialTheme.colorScheme.primary,
+      color = activePrimary,
       modifier = Modifier.padding(bottom = 12.dp)
     )
 
@@ -84,7 +110,7 @@ fun MainScreen(
         modifier = Modifier
           .fillMaxWidth()
           .padding(top = 24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = activeSurface)
       ) {
         Column(
           modifier = Modifier.padding(24.dp),
@@ -94,7 +120,7 @@ fun MainScreen(
             text = "🔒 Biometric Scan Required",
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.primary
+            color = activePrimary
           )
           Spacer(modifier = Modifier.height(12.dp))
           Text(
@@ -105,9 +131,10 @@ fun MainScreen(
           Spacer(modifier = Modifier.height(24.dp))
           Button(
             onClick = { isBiometricAuthenticated = true },
+            colors = ButtonDefaults.buttonColors(containerColor = activePrimary),
             modifier = Modifier.fillMaxWidth()
           ) {
-            Text("Simulate Biometric Verification")
+            Text("Simulate Biometric Verification", color = Color.Black)
           }
         }
       }
@@ -116,7 +143,7 @@ fun MainScreen(
         modifier = Modifier
           .fillMaxWidth()
           .padding(top = 24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = activeSurface)
       ) {
         Column(
           modifier = Modifier.padding(24.dp),
@@ -126,7 +153,7 @@ fun MainScreen(
             text = "🔓 Enter Secure PIN",
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.primary
+            color = activePrimary
           )
           Spacer(modifier = Modifier.height(12.dp))
           Text(
@@ -149,9 +176,10 @@ fun MainScreen(
                 isPinAuthenticated = true
               }
             },
+            colors = ButtonDefaults.buttonColors(containerColor = activePrimary),
             modifier = Modifier.fillMaxWidth()
           ) {
-            Text("Verify PIN")
+            Text("Verify PIN", color = Color.Black)
           }
         }
       }
@@ -161,7 +189,7 @@ fun MainScreen(
         modifier = Modifier
           .fillMaxWidth()
           .padding(bottom = 12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = activeSurface)
       ) {
         Column(modifier = Modifier.padding(12.dp)) {
           Row(
@@ -173,7 +201,7 @@ fun MainScreen(
               text = "Mobile Pairing Status",
               fontWeight = FontWeight.SemiBold,
               fontSize = 12.sp,
-              color = MaterialTheme.colorScheme.primary
+              color = activePrimary
             )
             Text(
               text = if (isLinked) "ACTIVE" else "DISCONNECTED",
@@ -208,9 +236,10 @@ fun MainScreen(
                   outputLogs = outputLogs + "Link successful to: $apiEndpoint"
                 }
               },
+              colors = ButtonDefaults.buttonColors(containerColor = activePrimary),
               modifier = Modifier.fillMaxWidth()
             ) {
-              Text("Link to Host OS")
+              Text("Link to Host OS", color = Color.Black)
             }
           } else {
             Spacer(modifier = Modifier.height(6.dp))
@@ -262,16 +291,16 @@ fun MainScreen(
           "analytics" -> {
             Card(
               modifier = Modifier.fillMaxWidth(),
-              colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+              colors = CardDefaults.cardColors(containerColor = activeSurface)
             ) {
               Column(modifier = Modifier.padding(16.dp)) {
-                Text("📊 Host Analytics Dashboard", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                Text("📊 Host Analytics Dashboard", fontWeight = FontWeight.Bold, color = activePrimary)
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                   Column {
                     Text("Security Score", fontSize = 10.sp, color = Color.Gray)
-                    Text("94% (STRICT)", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                    Text("94% (STRICT)", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = activePrimary)
                   }
                   Column {
                     Text("Kyber Shield", fontSize = 10.sp, color = Color.Gray)
@@ -279,7 +308,7 @@ fun MainScreen(
                   }
                   Column {
                     Text("Egress Tunnel", fontSize = 10.sp, color = Color.Gray)
-                    Text("Active VPN", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                    Text("Active VPN", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = activePrimary)
                   }
                 }
 
@@ -296,17 +325,17 @@ fun MainScreen(
                   }
                   Column {
                     Text("Compliance", fontSize = 10.sp, color = Color.Gray)
-                    Text("SOC 2 Audited", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                    Text("SOC 2 Audited", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = activePrimary)
                   }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
                 Text("CPU Load: 18%", fontSize = 10.sp, color = Color.Gray)
-                LinearProgressIndicator(progress = { 0.18f }, modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
+                LinearProgressIndicator(progress = { 0.18f }, color = activePrimary, modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
 
                 Spacer(modifier = Modifier.height(8.dp))
                 Text("Memory Pages: 42%", fontSize = 10.sp, color = Color.Gray)
-                LinearProgressIndicator(progress = { 0.42f }, modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
+                LinearProgressIndicator(progress = { 0.42f }, color = activePrimary, modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
 
                 Spacer(modifier = Modifier.height(12.dp))
                 HorizontalDivider(color = Color.DarkGray)
@@ -315,11 +344,11 @@ fun MainScreen(
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                   Column {
                     Text("MTTD (Incident Detection)", fontSize = 9.sp, color = Color.Gray)
-                    Text("42 sec", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                    Text("42 sec", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = activePrimary)
                   }
                   Column {
                     Text("MTTR (Incident Isolation)", fontSize = 9.sp, color = Color.Gray)
-                    Text("18 sec", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                    Text("18 sec", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = activePrimary)
                   }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -330,7 +359,7 @@ fun MainScreen(
                   }
                   Column {
                     Text("Threats Blocked", fontSize = 9.sp, color = Color.Gray)
-                    Text("284 incidents", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                    Text("284 incidents", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = activePrimary)
                   }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -342,12 +371,48 @@ fun MainScreen(
                 }
               }
             }
+
+            // Mobile Theme Customizer Card
+            Card(
+              modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+              colors = CardDefaults.cardColors(containerColor = activeSurface)
+            ) {
+              Column(modifier = Modifier.padding(16.dp)) {
+                Text("🎨 Mobile Theme Customizer", fontWeight = FontWeight.Bold, color = activePrimary)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Select active styling enclaves for this device interface:", fontSize = 11.sp, color = Color.Gray)
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                  Button(
+                    onClick = { activeThemeName = "graphene_os" },
+                    colors = ButtonDefaults.buttonColors(containerColor = if (activeThemeName == "graphene_os") activePrimary else Color.DarkGray),
+                    modifier = Modifier.weight(1f)
+                  ) {
+                    Text("GrapheneOS", fontSize = 10.sp, color = if (activeThemeName == "graphene_os") Color.Black else Color.White)
+                  }
+                  Button(
+                    onClick = { activeThemeName = "turtle_green" },
+                    colors = ButtonDefaults.buttonColors(containerColor = if (activeThemeName == "turtle_green") activePrimary else Color.DarkGray),
+                    modifier = Modifier.weight(1f)
+                  ) {
+                    Text("Turtle OS", fontSize = 10.sp, color = if (activeThemeName == "turtle_green") Color.Black else Color.White)
+                  }
+                  Button(
+                    onClick = { activeThemeName = "tomb_dark" },
+                    colors = ButtonDefaults.buttonColors(containerColor = if (activeThemeName == "tomb_dark") activePrimary else Color.DarkGray),
+                    modifier = Modifier.weight(1f)
+                  ) {
+                    Text("Tomb OS", fontSize = 10.sp, color = if (activeThemeName == "tomb_dark") Color.Black else Color.White)
+                  }
+                }
+              }
+            }
           }
 
           "messenger" -> {
             Card(
               modifier = Modifier.fillMaxWidth(),
-              colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+              colors = CardDefaults.cardColors(containerColor = activeSurface)
             ) {
               Column(modifier = Modifier.padding(16.dp)) {
                 Row(
@@ -355,8 +420,8 @@ fun MainScreen(
                   horizontalArrangement = Arrangement.SpaceBetween,
                   verticalAlignment = Alignment.CenterVertically
                 ) {
-                  Text("💬 Messenger Enclave", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                  Text("Credits: $chatCredits", fontSize = 11.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                  Text("💬 Messenger Enclave", fontWeight = FontWeight.Bold, color = activePrimary)
+                  Text("Credits: $chatCredits", fontSize = 11.sp, color = activePrimary, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -397,9 +462,10 @@ fun MainScreen(
                       }
                     }
                   },
+                  colors = ButtonDefaults.buttonColors(containerColor = activePrimary),
                   modifier = Modifier.fillMaxWidth()
                 ) {
-                  Text("Send E2EE Message")
+                  Text("Send E2EE Message", color = Color.Black)
                 }
               }
             }
@@ -408,10 +474,10 @@ fun MainScreen(
           "openclaw" -> {
             Card(
               modifier = Modifier.fillMaxWidth(),
-              colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+              colors = CardDefaults.cardColors(containerColor = activeSurface)
             ) {
               Column(modifier = Modifier.padding(16.dp)) {
-                Text("🎮 OpenClaw & Developer Sandbox", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                Text("🎮 OpenClaw & Developer Sandbox", fontWeight = FontWeight.Bold, color = activePrimary)
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -429,7 +495,7 @@ fun MainScreen(
                 )
                 
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(vmStatus, fontSize = 10.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                Text(vmStatus, fontSize = 10.sp, color = activePrimary, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -444,9 +510,10 @@ fun MainScreen(
                         isVMPatchSafe = true
                       }
                     },
+                    colors = ButtonDefaults.buttonColors(containerColor = activePrimary),
                     modifier = Modifier.weight(1f)
                   ) {
-                    Text("Test Patch")
+                    Text("Test Patch", color = Color.Black)
                   }
                   Button(
                     onClick = {
@@ -456,9 +523,10 @@ fun MainScreen(
                       }
                     },
                     enabled = isVMPatchSafe,
+                    colors = ButtonDefaults.buttonColors(containerColor = activePrimary),
                     modifier = Modifier.weight(1f)
                   ) {
-                    Text("Deploy Patch")
+                    Text("Deploy Patch", color = Color.Black)
                   }
                 }
               }
@@ -468,10 +536,10 @@ fun MainScreen(
           "terminal" -> {
             Card(
               modifier = Modifier.fillMaxWidth(),
-              colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+              colors = CardDefaults.cardColors(containerColor = activeSurface)
             ) {
               Column(modifier = Modifier.padding(16.dp)) {
-                Text("🖥️ Remote Command Console", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                Text("🖥️ Remote Command Console", fontWeight = FontWeight.Bold, color = activePrimary)
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedTextField(
@@ -488,9 +556,10 @@ fun MainScreen(
                       commandInput = ""
                     }
                   },
+                  colors = ButtonDefaults.buttonColors(containerColor = activePrimary),
                   modifier = Modifier.fillMaxWidth()
                 ) {
-                  Text("Send Command to Desktop")
+                  Text("Send Command to Desktop", color = Color.Black)
                 }
                 
                 Spacer(modifier = Modifier.height(12.dp))
