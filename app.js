@@ -4849,6 +4849,12 @@ function verifyStackSecurity() {
             <div style="display: flex; justify-content: space-between;"><span>CPU Load:</span><strong id="hub-telemetry-cpu" style="color: #4AF626;">18%</strong></div>
             <div style="display: flex; justify-content: space-between;"><span>Egress Tunnel IP:</span><strong id="hub-telemetry-ip" style="color: #ff9f0a;">198.51.100.82</strong></div>
             <div style="display: flex; justify-content: space-between;"><span>Threat Filter:</span><strong style="color: #4AF626;">AppArmor active</strong></div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.08); margin: 4px 0;"></div>
+            <div style="display: flex; justify-content: space-between;"><span>Mean Time to Detect (MTTD):</span><strong style="color: #00e5ff;">42 sec</strong></div>
+            <div style="display: flex; justify-content: space-between;"><span>Mean Time to Respond (MTTR):</span><strong style="color: #00e5ff;">18 sec</strong></div>
+            <div style="display: flex; justify-content: space-between;"><span>False Positive Rate (FPR):</span><strong style="color: #4AF626;">0.12%</strong></div>
+            <div style="display: flex; justify-content: space-between;"><span>Threats Blocked:</span><strong style="color: #00e5ff;">284 incidents</strong></div>
+            <div style="display: flex; justify-content: space-between;"><span>Egress Latency:</span><strong style="color: #4AF626;">24 ms</strong></div>
           </div>
           <div style="flex: 1; background: #070a10; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
             <div style="font-size: 10px; color: #00e5ff; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 4px;">Defensive Stream</div>

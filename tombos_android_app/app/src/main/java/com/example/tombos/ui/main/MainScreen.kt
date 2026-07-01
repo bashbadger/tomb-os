@@ -307,6 +307,39 @@ fun MainScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 Text("Memory Pages: 42%", fontSize = 10.sp, color = Color.Gray)
                 LinearProgressIndicator(progress = { 0.42f }, modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
+
+                Spacer(modifier = Modifier.height(12.dp))
+                HorizontalDivider(color = Color.DarkGray)
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                  Column {
+                    Text("MTTD (Incident Detection)", fontSize = 9.sp, color = Color.Gray)
+                    Text("42 sec", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                  }
+                  Column {
+                    Text("MTTR (Incident Isolation)", fontSize = 9.sp, color = Color.Gray)
+                    Text("18 sec", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                  }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                  Column {
+                    Text("False Positive Rate (FPR)", fontSize = 9.sp, color = Color.Gray)
+                    Text("0.12%", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Green)
+                  }
+                  Column {
+                    Text("Threats Blocked", fontSize = 9.sp, color = Color.Gray)
+                    Text("284 incidents", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                  }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                  Column {
+                    Text("Egress Tunnel Latency", fontSize = 9.sp, color = Color.Gray)
+                    Text("24 ms", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Green)
+                  }
+                }
               }
             }
           }
