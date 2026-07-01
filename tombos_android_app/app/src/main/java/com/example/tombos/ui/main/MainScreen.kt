@@ -43,6 +43,9 @@ fun MainScreen(
   var apiKey by remember { mutableStateOf("") }
   var isLinked by remember { mutableStateOf(false) }
   var selectedTab by remember { mutableStateOf("analytics") }
+  var isBiometricAuthenticated by remember { mutableStateOf(false) }
+  var isPinAuthenticated by remember { mutableStateOf(false) }
+  var pinInput by remember { mutableStateOf("") }
   
   // Terminal states
   var commandInput by remember { mutableStateOf("") }
@@ -76,325 +79,401 @@ fun MainScreen(
       modifier = Modifier.padding(bottom = 12.dp)
     )
 
-    // Device Link / Pairing Card (Always shown at top)
-    Card(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(bottom = 12.dp),
-      colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
-      Column(modifier = Modifier.padding(12.dp)) {
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically
+    if (!isBiometricAuthenticated) {
+      Card(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(top = 24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+      ) {
+        Column(
+          modifier = Modifier.padding(24.dp),
+          horizontalAlignment = Alignment.CenterHorizontally
         ) {
           Text(
-            text = "Mobile Pairing Status",
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 12.sp,
+            text = "🔒 Biometric Scan Required",
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
             color = MaterialTheme.colorScheme.primary
           )
+          Spacer(modifier = Modifier.height(12.dp))
           Text(
-            text = if (isLinked) "ACTIVE" else "DISCONNECTED",
-            fontSize = 11.sp,
-            color = if (isLinked) Color.Green else Color.Red,
-            fontWeight = FontWeight.Bold
+            text = "Use your phone's fingerprint scanner or Face ID credentials to unlock.",
+            fontSize = 12.sp,
+            color = Color.Gray
           )
+          Spacer(modifier = Modifier.height(24.dp))
+          Button(
+            onClick = { isBiometricAuthenticated = true },
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Text("Simulate Biometric Verification")
+          }
         }
-
-        if (!isLinked) {
-          Spacer(modifier = Modifier.height(8.dp))
+      }
+    } else if (!isPinAuthenticated) {
+      Card(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(top = 24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+      ) {
+        Column(
+          modifier = Modifier.padding(24.dp),
+          horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+          Text(
+            text = "🔓 Enter Secure PIN",
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.primary
+          )
+          Spacer(modifier = Modifier.height(12.dp))
+          Text(
+            text = "Type your individualized 4-digit security PIN to proceed.",
+            fontSize = 12.sp,
+            color = Color.Gray
+          )
+          Spacer(modifier = Modifier.height(16.dp))
           OutlinedTextField(
-            value = apiEndpoint,
-            onValueChange = { apiEndpoint = it },
-            label = { Text("API Connection URL") },
+            value = pinInput,
+            onValueChange = { pinInput = it },
+            label = { Text("Individualized PIN (try 1337)") },
             modifier = Modifier.fillMaxWidth(),
             maxLines = 1
           )
-          Spacer(modifier = Modifier.height(8.dp))
-          OutlinedTextField(
-            value = apiKey,
-            onValueChange = { apiKey = it },
-            label = { Text("API Access Key (TURTLE-789-SEC)") },
-            modifier = Modifier.fillMaxWidth(),
-            maxLines = 1
-          )
-          Spacer(modifier = Modifier.height(8.dp))
+          Spacer(modifier = Modifier.height(16.dp))
           Button(
             onClick = {
-              if (apiEndpoint.isNotBlank() && apiKey.trim() == "TURTLE-789-SEC") {
-                isLinked = true
-                outputLogs = outputLogs + "Link successful to: $apiEndpoint"
+              if (pinInput.trim() == "1337") {
+                isPinAuthenticated = true
               }
             },
             modifier = Modifier.fillMaxWidth()
           ) {
-            Text("Link to Host OS")
-          }
-        } else {
-          Spacer(modifier = Modifier.height(6.dp))
-          Button(
-            onClick = {
-              isLinked = false
-              apiKey = ""
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-            modifier = Modifier.fillMaxWidth()
-          ) {
-            Text("Disconnect Mobile Link", color = Color.White)
+            Text("Verify PIN")
           }
         }
       }
-    }
-
-    if (isLinked) {
-      // One App, All Service access navigation
-      ScrollableTabRow(
-        selectedTabIndex = when (selectedTab) {
-          "analytics" -> 0
-          "messenger" -> 1
-          "openclaw" -> 2
-          "terminal" -> 3
-          else -> 0
-        },
+    } else {
+      // Device Link / Pairing Card (Always shown at top)
+      Card(
         modifier = Modifier
           .fillMaxWidth()
           .padding(bottom = 12.dp),
-        edgePadding = 0.dp
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
       ) {
-        Tab(selected = selectedTab == "analytics", onClick = { selectedTab = "analytics" }) {
-          Text("Dashboard", modifier = Modifier.padding(10.dp), fontSize = 11.sp)
-        }
-        Tab(selected = selectedTab == "messenger", onClick = { selectedTab = "messenger" }) {
-          Text("Messenger", modifier = Modifier.padding(10.dp), fontSize = 11.sp)
-        }
-        Tab(selected = selectedTab == "openclaw", onClick = { selectedTab = "openclaw" }) {
-          Text("OpenClaw", modifier = Modifier.padding(10.dp), fontSize = 11.sp)
-        }
-        Tab(selected = selectedTab == "terminal", onClick = { selectedTab = "terminal" }) {
-          Text("Terminal", modifier = Modifier.padding(10.dp), fontSize = 11.sp)
+        Column(modifier = Modifier.padding(12.dp)) {
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Text(
+              text = "Mobile Pairing Status",
+              fontWeight = FontWeight.SemiBold,
+              fontSize = 12.sp,
+              color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+              text = if (isLinked) "ACTIVE" else "DISCONNECTED",
+              fontSize = 11.sp,
+              color = if (isLinked) Color.Green else Color.Red,
+              fontWeight = FontWeight.Bold
+            )
+          }
+
+          if (!isLinked) {
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+              value = apiEndpoint,
+              onValueChange = { apiEndpoint = it },
+              label = { Text("API Connection URL") },
+              modifier = Modifier.fillMaxWidth(),
+              maxLines = 1
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+              value = apiKey,
+              onValueChange = { apiKey = it },
+              label = { Text("API Access Key (TURTLE-789-SEC)") },
+              modifier = Modifier.fillMaxWidth(),
+              maxLines = 1
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+              onClick = {
+                if (apiEndpoint.isNotBlank() && apiKey.trim() == "TURTLE-789-SEC") {
+                  isLinked = true
+                  outputLogs = outputLogs + "Link successful to: $apiEndpoint"
+                }
+              },
+              modifier = Modifier.fillMaxWidth()
+            ) {
+              Text("Link to Host OS")
+            }
+          } else {
+            Spacer(modifier = Modifier.height(6.dp))
+            Button(
+              onClick = {
+                isLinked = false
+                apiKey = ""
+              },
+              colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+              modifier = Modifier.fillMaxWidth()
+            ) {
+              Text("Disconnect Mobile Link", color = Color.White)
+            }
+          }
         }
       }
 
-      // Switch View Content
-      when (selectedTab) {
-        "analytics" -> {
-          Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-          ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-              Text("📊 Host Analytics Dashboard", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-              Spacer(modifier = Modifier.height(12.dp))
-
-              Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Column {
-                  Text("Security Score", fontSize = 10.sp, color = Color.Gray)
-                  Text("94% (STRICT)", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                }
-                Column {
-                  Text("Kyber Shield", fontSize = 10.sp, color = Color.Gray)
-                  Text("99.8% Stable", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.Green)
-                }
-                Column {
-                  Text("Egress Tunnel", fontSize = 10.sp, color = Color.Gray)
-                  Text("Active VPN", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                }
-              }
-
-              Spacer(modifier = Modifier.height(12.dp))
-
-              Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Column {
-                  Text("Microkernel", fontSize = 10.sp, color = Color.Gray)
-                  Text("seL4 Verified", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.Green)
-                }
-                Column {
-                  Text("Threat Filter", fontSize = 10.sp, color = Color.Gray)
-                  Text("AppArmor active", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.Green)
-                }
-                Column {
-                  Text("Compliance", fontSize = 10.sp, color = Color.Gray)
-                  Text("SOC 2 Audited", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                }
-              }
-
-              Spacer(modifier = Modifier.height(16.dp))
-              Text("CPU Load: 18%", fontSize = 10.sp, color = Color.Gray)
-              LinearProgressIndicator(progress = { 0.18f }, modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
-
-              Spacer(modifier = Modifier.height(8.dp))
-              Text("Memory Pages: 42%", fontSize = 10.sp, color = Color.Gray)
-              LinearProgressIndicator(progress = { 0.42f }, modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
-            }
+      if (isLinked) {
+        // One App, All Service access navigation
+        ScrollableTabRow(
+          selectedTabIndex = when (selectedTab) {
+            "analytics" -> 0
+            "messenger" -> 1
+            "openclaw" -> 2
+            "terminal" -> 3
+            else -> 0
+          },
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp),
+          edgePadding = 0.dp
+        ) {
+          Tab(selected = selectedTab == "analytics", onClick = { selectedTab = "analytics" }) {
+            Text("Dashboard", modifier = Modifier.padding(10.dp), fontSize = 11.sp)
+          }
+          Tab(selected = selectedTab == "messenger", onClick = { selectedTab = "messenger" }) {
+            Text("Messenger", modifier = Modifier.padding(10.dp), fontSize = 11.sp)
+          }
+          Tab(selected = selectedTab == "openclaw", onClick = { selectedTab = "openclaw" }) {
+            Text("OpenClaw", modifier = Modifier.padding(10.dp), fontSize = 11.sp)
+          }
+          Tab(selected = selectedTab == "terminal", onClick = { selectedTab = "terminal" }) {
+            Text("Terminal", modifier = Modifier.padding(10.dp), fontSize = 11.sp)
           }
         }
 
-        "messenger" -> {
-          Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-          ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-              Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-              ) {
-                Text("💬 Messenger Enclave", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                Text("Credits: $chatCredits", fontSize = 11.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-              }
-              Spacer(modifier = Modifier.height(12.dp))
+        // Switch View Content
+        when (selectedTab) {
+          "analytics" -> {
+            Card(
+              modifier = Modifier.fillMaxWidth(),
+              colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+              Column(modifier = Modifier.padding(16.dp)) {
+                Text("📊 Host Analytics Dashboard", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                Spacer(modifier = Modifier.height(12.dp))
 
-              Column(
-                modifier = Modifier
-                  .fillMaxWidth()
-                  .height(180.dp)
-                  .background(Color.Black)
-                  .padding(8.dp)
-                  .verticalScroll(rememberScrollState())
-              ) {
-                chatMessages.forEach { msg ->
-                  Text(msg, color = Color.White, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
-                  Spacer(modifier = Modifier.height(4.dp))
-                }
-              }
-
-              Spacer(modifier = Modifier.height(8.dp))
-              OutlinedTextField(
-                value = chatInput,
-                onValueChange = { chatInput = it },
-                label = { Text("Type message...") },
-                modifier = Modifier.fillMaxWidth()
-              )
-              Spacer(modifier = Modifier.height(8.dp))
-              Button(
-                onClick = {
-                  if (chatInput.isNotBlank() && chatCredits >= 10) {
-                    chatMessages = chatMessages + "User: $chatInput"
-                    chatCredits -= 10
-                    
-                    // Simulate automatic response based on query keywords
-                    val query = chatInput.toLowerCase()
-                    chatInput = ""
-                    if (query.contains("status")) {
-                      chatMessages = chatMessages + "Sec-Admin: Mesh status active. Firewall running."
-                    } else {
-                      chatMessages = chatMessages + "Sec-Admin: Message parsed securely under E2EE PQC."
-                    }
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                  Column {
+                    Text("Security Score", fontSize = 10.sp, color = Color.Gray)
+                    Text("94% (STRICT)", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                   }
-                },
-                modifier = Modifier.fillMaxWidth()
-              ) {
-                Text("Send E2EE Message")
+                  Column {
+                    Text("Kyber Shield", fontSize = 10.sp, color = Color.Gray)
+                    Text("99.8% Stable", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.Green)
+                  }
+                  Column {
+                    Text("Egress Tunnel", fontSize = 10.sp, color = Color.Gray)
+                    Text("Active VPN", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                  }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                  Column {
+                    Text("Microkernel", fontSize = 10.sp, color = Color.Gray)
+                    Text("seL4 Verified", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.Green)
+                  }
+                  Column {
+                    Text("Threat Filter", fontSize = 10.sp, color = Color.Gray)
+                    Text("AppArmor active", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.Green)
+                  }
+                  Column {
+                    Text("Compliance", fontSize = 10.sp, color = Color.Gray)
+                    Text("SOC 2 Audited", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                  }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("CPU Load: 18%", fontSize = 10.sp, color = Color.Gray)
+                LinearProgressIndicator(progress = { 0.18f }, modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Memory Pages: 42%", fontSize = 10.sp, color = Color.Gray)
+                LinearProgressIndicator(progress = { 0.42f }, modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
               }
             }
           }
-        }
 
-        "openclaw" -> {
-          Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-          ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-              Text("🎮 OpenClaw & Developer Sandbox", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-              Spacer(modifier = Modifier.height(8.dp))
+          "messenger" -> {
+            Card(
+              modifier = Modifier.fillMaxWidth(),
+              colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+              Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                  modifier = Modifier.fillMaxWidth(),
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Text("💬 Messenger Enclave", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                  Text("Credits: $chatCredits", fontSize = 11.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                }
+                Spacer(modifier = Modifier.height(12.dp))
 
-              Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("Hunger: $catHunger%", fontSize = 11.sp, color = Color.Gray)
-                Text("Lives: $catLives", fontSize = 11.sp, color = Color.Gray)
-              }
-              Spacer(modifier = Modifier.height(12.dp))
+                Column(
+                  modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .background(Color.Black)
+                    .padding(8.dp)
+                    .verticalScroll(rememberScrollState())
+                ) {
+                  chatMessages.forEach { msg ->
+                    Text(msg, color = Color.White, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                    Spacer(modifier = Modifier.height(4.dp))
+                  }
+                }
 
-              // VM Sandbox Text Area
-              Text("Developer Sandbox Editor", fontSize = 10.sp, color = Color.Gray)
-              OutlinedTextField(
-                value = vmCode,
-                onValueChange = { vmCode = it },
-                modifier = Modifier.fillMaxWidth().height(100.dp),
-                textStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace)
-              )
-              
-              Spacer(modifier = Modifier.height(8.dp))
-              Text(vmStatus, fontSize = 10.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-              Spacer(modifier = Modifier.height(8.dp))
-
-              Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                  value = chatInput,
+                  onValueChange = { chatInput = it },
+                  label = { Text("Type message...") },
+                  modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
                 Button(
                   onClick = {
-                    vmStatus = "Verifying stack checks in VM..."
-                    if (vmCode.contains("unsafe") || vmCode.contains("eval")) {
-                      vmStatus = "VERIFICATION FAILED: Unsafe code."
-                      isVMPatchSafe = false
-                    } else {
-                      vmStatus = "VERIFICATION PASSED: Code is safe."
-                      isVMPatchSafe = true
+                    if (chatInput.isNotBlank() && chatCredits >= 10) {
+                      chatMessages = chatMessages + "User: $chatInput"
+                      chatCredits -= 10
+                      
+                      val query = chatInput.toLowerCase()
+                      chatInput = ""
+                      if (query.contains("status")) {
+                        chatMessages = chatMessages + "Sec-Admin: Mesh status active. Firewall running."
+                      } else {
+                        chatMessages = chatMessages + "Sec-Admin: Message parsed securely under E2EE PQC."
+                      }
                     }
                   },
-                  modifier = Modifier.weight(1f)
+                  modifier = Modifier.fillMaxWidth()
                 ) {
-                  Text("Test Patch")
-                }
-                Button(
-                  onClick = {
-                    if (isVMPatchSafe) {
-                      vmStatus = "Patch successfully deployed to Core."
-                      isVMPatchSafe = false
-                    }
-                  },
-                  enabled = isVMPatchSafe,
-                  modifier = Modifier.weight(1f)
-                ) {
-                  Text("Deploy Patch")
+                  Text("Send E2EE Message")
                 }
               }
             }
           }
-        }
 
-        "terminal" -> {
-          Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-          ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-              Text("🖥️ Remote Command Console", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-              Spacer(modifier = Modifier.height(8.dp))
+          "openclaw" -> {
+            Card(
+              modifier = Modifier.fillMaxWidth(),
+              colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+              Column(modifier = Modifier.padding(16.dp)) {
+                Text("🎮 OpenClaw & Developer Sandbox", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                Spacer(modifier = Modifier.height(8.dp))
 
-              OutlinedTextField(
-                value = commandInput,
-                onValueChange = { commandInput = it },
-                label = { Text("Command (e.g. system status)") },
-                modifier = Modifier.fillMaxWidth()
-              )
-              Spacer(modifier = Modifier.height(8.dp))
-              Button(
-                onClick = {
-                  if (commandInput.isNotBlank()) {
-                    outputLogs = outputLogs + "📱 Sent from phone: \"$commandInput\""
-                    commandInput = ""
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                  Text("Hunger: $catHunger%", fontSize = 11.sp, color = Color.Gray)
+                  Text("Lives: $catLives", fontSize = 11.sp, color = Color.Gray)
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text("Developer Sandbox Editor", fontSize = 10.sp, color = Color.Gray)
+                OutlinedTextField(
+                  value = vmCode,
+                  onValueChange = { vmCode = it },
+                  modifier = Modifier.fillMaxWidth().height(100.dp),
+                  textStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace)
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(vmStatus, fontSize = 10.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                  Button(
+                    onClick = {
+                      vmStatus = "Verifying stack checks in VM..."
+                      if (vmCode.contains("unsafe") || vmCode.contains("eval")) {
+                        vmStatus = "VERIFICATION FAILED: Unsafe code."
+                        isVMPatchSafe = false
+                      } else {
+                        vmStatus = "VERIFICATION PASSED: Code is safe."
+                        isVMPatchSafe = true
+                      }
+                    },
+                    modifier = Modifier.weight(1f)
+                  ) {
+                    Text("Test Patch")
                   }
-                },
-                modifier = Modifier.fillMaxWidth()
-              ) {
-                Text("Send Command to Desktop")
+                  Button(
+                    onClick = {
+                      if (isVMPatchSafe) {
+                        vmStatus = "Patch successfully deployed to Core."
+                        isVMPatchSafe = false
+                      }
+                    },
+                    enabled = isVMPatchSafe,
+                    modifier = Modifier.weight(1f)
+                  ) {
+                    Text("Deploy Patch")
+                  }
+                }
               }
-              
-              Spacer(modifier = Modifier.height(12.dp))
-              Text("Egress stream output", fontSize = 10.sp, color = Color.Gray)
-              Column(
-                modifier = Modifier
-                  .fillMaxWidth()
-                  .background(Color.Black)
-                  .padding(8.dp)
-              ) {
-                if (outputLogs.isEmpty()) {
-                  Text("No logs yet.", color = Color.LightGray, fontFamily = FontFamily.Monospace, fontSize = 10.sp)
-                } else {
-                  outputLogs.forEach { log ->
-                    Text(log, color = Color.Green, fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            }
+          }
+
+          "terminal" -> {
+            Card(
+              modifier = Modifier.fillMaxWidth(),
+              colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+              Column(modifier = Modifier.padding(16.dp)) {
+                Text("🖥️ Remote Command Console", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                  value = commandInput,
+                  onValueChange = { commandInput = it },
+                  label = { Text("Command (e.g. system status)") },
+                  modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                  onClick = {
+                    if (commandInput.isNotBlank()) {
+                      outputLogs = outputLogs + "📱 Sent from phone: \"$commandInput\""
+                      commandInput = ""
+                    }
+                  },
+                  modifier = Modifier.fillMaxWidth()
+                ) {
+                  Text("Send Command to Desktop")
+                }
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                Text("Egress stream output", fontSize = 10.sp, color = Color.Gray)
+                Column(
+                  modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Black)
+                    .padding(8.dp)
+                ) {
+                  if (outputLogs.isEmpty()) {
+                    Text("No logs yet.", color = Color.LightGray, fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                  } else {
+                    outputLogs.forEach { log ->
+                      Text(log, color = Color.Green, fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                    }
                   }
                 }
               }
