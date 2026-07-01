@@ -4713,6 +4713,7 @@ let activeWorkspaceTab = 'messages'; // Active tab in single-window mode
 let workspaceLayoutMode = 'split'; // 'split' or 'tabbed'
 let isVMPatchCodeSafe = false; // Code sandbox safety status
 let awaitingAgentKnowledge = null; // Key currently queried from user
+let isMobileLinked = false; // Mobile phone linkage status
 
 function getUnifiedWorkspaceContent() {
   setTimeout(() => {
@@ -4852,6 +4853,25 @@ function verifyStackSecurity() {
               <div>[16:51] Kyber-1024 audit loop started</div>
               <div>[16:52] VPN Egress IP rotated</div>
               <div>[16:53] Shield integrity 99.8% stable</div>
+            </div>
+          </div>
+
+          <!-- Mobile Device Pairing & Egress Control -->
+          <div style="border-top: 1px solid rgba(0,229,255,0.15); padding-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #00e5ff; font-weight: 700;">Mobile Remote Access</span>
+              <span id="mobile-link-status" style="font-size: 9px; color: #ff3b30; font-weight: 700;">LINK: DISCONNECTED</span>
+            </div>
+            
+            <div id="mobile-link-setup" style="display: flex; gap: 6px; align-items: center;">
+              <span style="font-size: 10px; color: #aaa; flex: 1;">Pair Code: <code>TURTLE-789-SEC</code></span>
+              <button onclick="toggleMobilePairing()" id="mobile-pair-btn" style="background: #1B5E20; border: 1px solid #00E676; color: #00E676; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; cursor: pointer;">Pair Phone</button>
+            </div>
+
+            <!-- Simulated Mobile Command Panel -->
+            <div id="mobile-commands-panel" style="display: none; flex-direction: column; gap: 6px;">
+              <input type="text" id="mobile-cmd-input" onkeydown="if(event.key==='Enter')sendSimulatedMobileCommand()" placeholder="Enter command as sent from paired phone..." style="width: 100%; padding: 6px; font-size: 9.5px; border-radius: 4px; border: none; background: #05080e; color: #4AF626; outline: none; box-sizing: border-box;" />
+              <button onclick="sendSimulatedMobileCommand()" style="background: #00E676; border: none; color: #000; padding: 4px; border-radius: 4px; font-size: 9.5px; font-weight: 700; cursor: pointer;">📱 Send Command from Phone</button>
             </div>
           </div>
         </div>
@@ -5052,6 +5072,58 @@ function submitOpenClawCheat() {
   } else {
     alert(`Unknown cheat code: "${cheat}"`);
   }
+}
+
+function toggleMobilePairing() {
+  const statusEl = document.getElementById('mobile-link-status');
+  const btn = document.getElementById('mobile-pair-btn');
+  const panel = document.getElementById('mobile-commands-panel');
+  if (!statusEl || !btn || !panel) return;
+
+  if (!isMobileLinked) {
+    isMobileLinked = true;
+    statusEl.textContent = "LINK: ACTIVE (IPHONE)";
+    statusEl.style.color = "#00E676";
+    btn.textContent = "Unpair";
+    btn.style.background = "#3c0000";
+    btn.style.borderColor = "#ff3b30";
+    btn.style.color = "#ff3b30";
+    panel.style.display = "flex";
+    logAudit("Mobile Access Link: Paired phone device successfully using credentials TURTLE-789-SEC.");
+    alert("Phone Device Paired! You can now send remote commands from your phone.");
+  } else {
+    isMobileLinked = false;
+    statusEl.textContent = "LINK: DISCONNECTED";
+    statusEl.style.color = "#ff3b30";
+    btn.textContent = "Pair Phone";
+    btn.style.background = "#1B5E20";
+    btn.style.borderColor = "#00E676";
+    btn.style.color = "#00E676";
+    panel.style.display = "none";
+    logAudit("Mobile Access Link: Unpaired phone device.");
+  }
+}
+
+function sendSimulatedMobileCommand() {
+  const input = document.getElementById('mobile-cmd-input');
+  if (!input) return;
+  const cmd = input.value.trim();
+  if (!cmd) return;
+  input.value = '';
+
+  // Execute in telemetry panel log stream!
+  const telemStream = document.querySelector('#hub-panel-telemetry div:last-child div');
+  if (telemStream) {
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+    const logItem = document.createElement('div');
+    logItem.style.color = "#00e5ff";
+    logItem.innerHTML = `[${timeStr}] [MOBILE EGRESS] Paired phone executed command: "${cmd}"`;
+    telemStream.appendChild(logItem);
+    telemStream.scrollTop = telemStream.scrollHeight;
+  }
+
+  logAudit(`Mobile Remote Access: Phone executed command payload "${cmd}"`);
+  alert(`Command Received from Phone: "${cmd}"\nProcessing...`);
 }
 
 function getChatContent() {
