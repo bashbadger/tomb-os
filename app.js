@@ -194,7 +194,11 @@ const idsEventTemplates = [
   { tag: "warn", msg: "Port scan detected on ports: 21, 22, 23, 80", src: "45.143.203.14", type: "Reconnaissance" },
   { tag: "alert", msg: "Brute-force SSH attack: 5 failed logins in 10s", src: "91.240.118.66", type: "Authentication" },
   { tag: "info", msg: "AppArmor blocked unauthorized read on /etc/shadow by chromium-browser", src: "localhost", type: "MAC Policy" },
-  { tag: "warn", msg: "ICMP flood packet volume exceeded threshold", src: "192.168.1.102", type: "DoS Attempt" }
+  { tag: "warn", msg: "ICMP flood packet volume exceeded threshold", src: "192.168.1.102", type: "DoS Attempt" },
+  { tag: "info", msg: "TLS 1.3 Handshake completed: TLS_AES_256_GCM_SHA384 cipher with SNI: keybroker.tomb-os.sec", src: "192.168.1.15", type: "TLS Telemetry" },
+  { tag: "warn", msg: "Outdated TLS 1.0 handshake request rejected from client.", src: "82.41.9.22", type: "TLS Telemetry" },
+  { tag: "info", msg: "Network fingerprinting JA3: 771,4865-4866-4867,0-23-65281 - Fingerprint maps to Chrome 120 / macOS", src: "198.51.100.82", type: "Fingerprint" },
+  { tag: "alert", msg: "Anomalous JA4 fingerprint JA4=t13d1516h2_8a2d1e22_a3f9 detected - Client profiling flags Go-http-client (Script Bot)", src: "185.220.101.5", type: "Fingerprint" }
 ];
 
 let idsActiveLogs = [];
